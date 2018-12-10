@@ -4,13 +4,13 @@ DOMnode = xmlread(filename);
 RailRoadSections = DOMnode.getElementsByTagName('ksj:RailroadSection');
 
 parsed_railroadSections = struct( ...
-             'railRoadSectionID',           [],...
+             'railRoadSectionID',   [],...
              'locationID',          [],...
              'railwayType',         [],...
              'serviceProviderType', [],...
              'railwayLineName',     [],...
              'operationCompany',    [],...
-             'stationID',         []);
+             'stationID',           []);
 
 for n = 0:RailRoadSections.getLength-1
     RailRoadSection = RailRoadSections.item(n);
@@ -23,15 +23,15 @@ for n = 0:RailRoadSections.getLength-1
     operationCompany = RailRoadSection.getElementsByTagName('ksj:operationCompany').item(0).getFirstChild.getData;
     if RailRoadSection.getElementsByTagName('ksj:station').getLength == 1
         stationID = RailRoadSection.getElementsByTagName('ksj:station').item(0).getFirstChild.getData;    
-        parsed_railroadSections(n+1).stationID = strrep(string(stationID),'#','');
+        parsed_railroadSections(n+1).stationID = strrep(char(stationID),'#','');
     end
     
-    parsed_railroadSections(n+1).railRoadSectionID = strrep(string(railRoadSectionID),'#','');
-    parsed_railroadSections(n+1).locationID = string(locationID);
+    parsed_railroadSections(n+1).railRoadSectionID = strrep(char(railRoadSectionID),'#','');
+    parsed_railroadSections(n+1).locationID = char(locationID);
     parsed_railroadSections(n+1).railwayType = int32(str2double(railwayType));
     parsed_railroadSections(n+1).serviceProviderType = int32(str2double(serviceProviderType));
-    parsed_railroadSections(n+1).railwayLineName = string(railwayLineName);
-    parsed_railroadSections(n+1).operationCompany = string(operationCompany);
+    parsed_railroadSections(n+1).railwayLineName = char(railwayLineName);
+    parsed_railroadSections(n+1).operationCompany = char(operationCompany);
 end
 
 end

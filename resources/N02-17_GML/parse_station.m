@@ -13,8 +13,8 @@ parsedStations = struct( ...
              'operationCompany',    [],...
              'stationName',         [],...
              'railroadSectionID',   [],...
-             'weightPoint',         [],...
-             'curve',               []);
+             'weightPos',           [],...
+             'posList',             []);
 
 for n = 0:Stations.getLength-1
     Station = Stations.item(n);
@@ -28,16 +28,16 @@ for n = 0:Stations.getLength-1
     stationName = Station.getElementsByTagName('ksj:stationName').item(0).getFirstChild.getData;
     if Station.getElementsByTagName('ksj:railroadSection').getLength == 1
         railroadSection = Station.getElementsByTagName('ksj:railroadSection').item(0).getFirstChild.getData;
-        parsedStations(n+1).railroadSectionID = strrep(string(railroadSection),'#','');
+        parsedStations(n+1).railroadSectionID = strrep(char(railroadSection),'#','');
     end
     
-    parsedStations(n+1).stationID = string(stationID);
-    parsedStations(n+1).locationID = strrep(string(location),'#','');
+    parsedStations(n+1).stationID = char(stationID);
+    parsedStations(n+1).locationID = strrep(char(location),'#','');
     parsedStations(n+1).railwayType = int32(str2double(railwayType));
     parsedStations(n+1).serviceProviderType = int32(str2double(serviceProviderType));
-    parsedStations(n+1).railwayLineName = string(railwayLineName);
-    parsedStations(n+1).operationCompany = string(operationCompany);
-    parsedStations(n+1).stationName = string(stationName);
+    parsedStations(n+1).railwayLineName = char(railwayLineName);
+    parsedStations(n+1).operationCompany = char(operationCompany);
+    parsedStations(n+1).stationName = char(stationName);
 end
 
 end
