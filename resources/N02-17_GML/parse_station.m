@@ -1,42 +1,43 @@
-clear;
-close all;
+function parsedStations = parse_station(filename)
 
-DOMnode = xmlread('Station_transformed.xml');
+DOMnode = xmlread(filename);
 
 Stations = DOMnode.getElementsByTagName('ksj:Station');
 
-newStations = struct( ...
-             'locationID',            [],...
+parsedStations = struct( ...
+             'stationID',           [],...
+             'locationID',          [],...
              'railwayType',         [],...
              'serviceProviderType', [],...
              'railwayLineName',     [],...
              'operationCompany',    [],...
              'stationName',         [],...
-             'railroadSection',     []);
+             'railroadSectionID',   [],...
+             'weightPoint',         [],...
+             'curve',               []);
 
 for n = 0:Stations.getLength-1
     Station = Stations.item(n);
     
+    stationID =  Station.getElementsByTagName('gml:id').item(0).getFirstChild.getData;
     location = Station.getElementsByTagName('ksj:location').item(0).getFirstChild.getData;
-    railwayType = Station.getElementsByTagName('ksj:stationName').item(0).getFirstChild.getData;
+    railwayType = Station.getElementsByTagName('ksj:railwayType').item(0).getFirstChild.getData;
     serviceProviderType = Station.getElementsByTagName('ksj:serviceProviderType').item(0).getFirstChild.getData;
     railwayLineName = Station.getElementsByTagName('ksj:railwayLineName').item(0).getFirstChild.getData;
     operationCompany = Station.getElementsByTagName('ksj:operationCompany').item(0).getFirstChild.getData;
     stationName = Station.getElementsByTagName('ksj:stationName').item(0).getFirstChild.getData;
     if Station.getElementsByTagName('ksj:railroadSection').getLength == 1
         railroadSection = Station.getElementsByTagName('ksj:railroadSection').item(0).getFirstChild.getData;
-        newStations(n+1).railroadSection = railroadSection;
+        parsedStations(n+1).railroadSectionID = strrep(string(railroadSection),'#','');
     end
-    newStations(n+1).locationID = location;
-    newStations(n+1).railwayType = railwayType;
-    newStations(n+1).serviceProviderType = serviceProviderType;
-    newStations(n+1).railwayLineName = railwayLineName;
-    newStations(n+1).operationCompany = operationCompany;
-    newStations(n+1).stationName = stationName;
     
-    
-%     thisList = thisListItem.getElementsByTagName('ksj:stationName');
-%     thisElement = thisList.item(0);
-%     thisElement
+    parsedStations(n+1).stationID = string(stationID);
+    parsedStations(n+1).locationID = strrep(string(location),'#','');
+    parsedStations(n+1).railwayType = int32(str2double(railwayType));
+    parsedStations(n+1).serviceProviderType = int32(str2double(serviceProviderType));
+    parsedStations(n+1).railwayLineName = string(railwayLineName);
+    parsedStations(n+1).operationCompany = string(operationCompany);
+    parsedStations(n+1).stationName = string(stationName);
 end
 
+end

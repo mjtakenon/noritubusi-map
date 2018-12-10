@@ -1,0 +1,16 @@
+% clear;
+% close all;
+% 
+% curves = parse_curve('Curve_transformed.xml');
+% 
+% stations = parse_station('Station_transformed.xml');
+% sections = parse_railroadSection('RailroadSection_transformed.xml');
+
+for n=1:numel(stations)
+    for nn=1:numel(curves)
+        if stations(n).locationID == curves(nn).curveID
+            break;
+        end
+    end
+    curves(nn)
+end
