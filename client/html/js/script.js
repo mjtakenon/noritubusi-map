@@ -30,7 +30,7 @@ var map = L.map('map', {
     center: [35.7,137.0],
     zoom: 7,
     zoomControl: true,
-    layers: [o_std]
+    layers: [o_std,o_rail]
 });
 
 var Map_BaseLayer = {
