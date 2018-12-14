@@ -39,33 +39,36 @@ var Map_BaseLayer = {
     "地理院地図 淡色": t_pale,
     "地理院地図 オルソ": t_ort,
     "OpenStreetMap 標準": o_std,
-    "OpenRailwayMap": o_rail
 };
+
+var Map_AddLayer = {
+    "OpenRailwayMap": o_rail
+}
 
 function addStationCircles()
 {
     var csv = $.csv.toArrays(data)
 }
 
-function readCsv(data) {
-    var target = '#csv-body';
-    var csv = $.csv.toArrays(data);
-    var insert = '';
-    $(csv).each(function() {
-        if (this.length > 0) {
-            insert += '<tr>';
-            $(this).each(function() {
-                insert += '<td>' + this + '</td>';
-            });
-            insert += '</tr>';
-        }
-    });
-    $(target).append(insert);
-}
-var csvfile = 'res/stations.csv';
-$(function(){
-    $.get(csvfile, readCsv, 'text');
-});
+// function readCsv(data) {
+//     var target = '#csv-body';
+//     var csv = $.csv.toArrays(data);
+//     var insert = '';
+//     $(csv).each(function() {
+//         if (this.length > 0) {
+//             insert += '<tr>';
+//             $(this).each(function() {
+//                 insert += '<td>' + this + '</td>';
+//             });
+//             insert += '</tr>';
+//         }
+//     });
+//     $(target).append(insert);
+// }
+// var csvfile = 'res/stations.csv';
+// $(function(){
+//     $.get(csvfile, readCsv, 'text');
+// });
 
 // example
 L.circle([35.66413037753069,139.75278854370114], {radius: 100}).addTo(map);
@@ -75,6 +78,10 @@ L.control.scale({
     maxWidth: 300
 }).addTo(map);
 
-L.control.layers(Map_BaseLayer, null, {
-    collapsed: true
-}).addTo(map)
+L.control.layers(
+    Map_BaseLayer,
+    Map_AddLayer, 
+    {
+        collapsed: false
+    }
+).addTo(map)
