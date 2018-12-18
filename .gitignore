@@ -1,6 +1,10 @@
 # Created by https://www.gitignore.io/api/vue,vim,node,ruby,macos,linux,rails,vuejs,emacs,python,windows,sublimetext,visualstudiocode
 # Edit at https://www.gitignore.io/?templates=vue,vim,node,ruby,macos,linux,rails,vuejs,emacs,python,windows,sublimetext,visualstudiocode
 
+
+### Custom Preset ###
+test.json
+
 ### Emacs ###
 # -*- mode: gitignore; -*-
 *~
