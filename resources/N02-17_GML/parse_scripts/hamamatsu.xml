@@ -1,0 +1,488 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ksj:Dataset gml:id="N02Dataset"
+ xmlns:ksj="http://nlftp.mlit.go.jp/ksj/schemas/ksj-app"
+ xmlns:gml="http://www.opengis.net/gml/3.2"
+ xmlns:xlink="http://www.w3.org/1999/xlink"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://nlftp.mlit.go.jp/ksj/schemas/ksj-app KsjAppSchema-N02-v2_3.xsd">
+
+<ksj:Station>
+	<gml:id>eb03_429</gml:id>
+  <ksj:location>#cv_stn429</ksj:location>
+  <ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+  <ksj:stationName>遠州小松</ksj:stationName>
+  <ksj:railroadSection> #eb02_810 </ksj:railroadSection>
+</ksj:Station>
+<ksj:Station>
+	<gml:id>eb03_430</gml:id>
+  <ksj:location>#cv_stn430</ksj:location>
+  <ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+  <ksj:stationName>上島</ksj:stationName>
+  <ksj:railroadSection> #eb02_808 </ksj:railroadSection>
+</ksj:Station>
+<ksj:Station>
+	<gml:id>eb03_431</gml:id>
+  <ksj:location>#cv_stn431</ksj:location>
+  <ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+  <ksj:stationName>浜北</ksj:stationName>
+  <ksj:railroadSection> #eb02_805 </ksj:railroadSection>
+</ksj:Station>
+<ksj:Station>
+	<gml:id>eb03_432</gml:id>
+  <ksj:location>#cv_stn432</ksj:location>
+  <ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+  <ksj:stationName>遠州芝本</ksj:stationName>
+  <ksj:railroadSection> #eb02_803 </ksj:railroadSection>
+</ksj:Station>
+<ksj:Station>
+	<gml:id>eb03_433</gml:id>
+  <ksj:location>#cv_stn433</ksj:location>
+  <ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+  <ksj:stationName>自動車学校前</ksj:stationName>
+  <ksj:railroadSection> #eb02_802 </ksj:railroadSection>
+</ksj:Station>
+<ksj:Station>
+	<gml:id>eb03_434</gml:id>
+  <ksj:location>#cv_stn434</ksj:location>
+  <ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+  <ksj:stationName>八幡</ksj:stationName>
+  <ksj:railroadSection> #eb02_796 </ksj:railroadSection>
+</ksj:Station>
+<ksj:Station>
+	<gml:id>eb03_435</gml:id>
+  <ksj:location>#cv_stn435</ksj:location>
+  <ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+  <ksj:stationName>遠州病院</ksj:stationName>
+  <ksj:railroadSection> #eb02_795 </ksj:railroadSection>
+</ksj:Station>
+<ksj:Station>
+	<gml:id>eb03_436</gml:id>
+  <ksj:location>#cv_stn436</ksj:location>
+  <ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+  <ksj:stationName>遠州岩水寺</ksj:stationName>
+  <ksj:railroadSection> #eb02_794 </ksj:railroadSection>
+</ksj:Station>
+<ksj:Station>
+	<gml:id>eb03_437</gml:id>
+  <ksj:location>#cv_stn437</ksj:location>
+  <ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+  <ksj:stationName>新浜松</ksj:stationName>
+  <ksj:railroadSection> #eb02_793 </ksj:railroadSection>
+</ksj:Station>
+<ksj:Station>
+	<gml:id>eb03_438</gml:id>
+  <ksj:location>#cv_stn438</ksj:location>
+  <ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+  <ksj:stationName>さぎの宮</ksj:stationName>
+  <ksj:railroadSection> #eb02_790 </ksj:railroadSection>
+</ksj:Station>
+<ksj:Station>
+	<gml:id>eb03_439</gml:id>
+  <ksj:location>#cv_stn439</ksj:location>
+  <ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+  <ksj:stationName>積志</ksj:stationName>
+  <ksj:railroadSection> #eb02_811 </ksj:railroadSection>
+</ksj:Station>
+<ksj:Station>
+	<gml:id>eb03_440</gml:id>
+  <ksj:location>#cv_stn440</ksj:location>
+  <ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+  <ksj:stationName>美薗中央公園</ksj:stationName>
+  <ksj:railroadSection> #eb02_785 </ksj:railroadSection>
+</ksj:Station>
+<ksj:Station>
+	<gml:id>eb03_441</gml:id>
+  <ksj:location>#cv_stn441</ksj:location>
+  <ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+  <ksj:stationName>遠州西ヶ崎</ksj:stationName>
+  <ksj:railroadSection> #eb02_783 </ksj:railroadSection>
+</ksj:Station>
+<ksj:Station>
+	<gml:id>eb03_442</gml:id>
+  <ksj:location>#cv_stn442</ksj:location>
+  <ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+  <ksj:stationName>遠州小林</ksj:stationName>
+  <ksj:railroadSection> #eb02_782 </ksj:railroadSection>
+</ksj:Station>
+<ksj:Station>
+	<gml:id>eb03_443</gml:id>
+  <ksj:location>#cv_stn443</ksj:location>
+  <ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+  <ksj:stationName>助信</ksj:stationName>
+  <ksj:railroadSection> #eb02_781 </ksj:railroadSection>
+</ksj:Station>
+<ksj:Station>
+	<gml:id>eb03_444</gml:id>
+  <ksj:location>#cv_stn444</ksj:location>
+  <ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+  <ksj:stationName>曳馬</ksj:stationName>
+  <ksj:railroadSection> #eb02_780 </ksj:railroadSection>
+</ksj:Station>
+<ksj:Station>
+	<gml:id>eb03_445</gml:id>
+  <ksj:location>#cv_stn445</ksj:location>
+  <ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+  <ksj:stationName>第一通り</ksj:stationName>
+  <ksj:railroadSection> #eb02_788 </ksj:railroadSection>
+</ksj:Station>
+<ksj:Station>
+	<gml:id>eb03_446</gml:id>
+  <ksj:location>#cv_stn446</ksj:location>
+  <ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+  <ksj:stationName>西鹿島</ksj:stationName>
+  <ksj:railroadSection> #eb02_814 </ksj:railroadSection>
+</ksj:Station>
+
+
+<ksj:RailroadSection>
+	<ksj:RailroadSectionID>eb02_780</ksj:RailroadSectionID>
+  <ksj:location>#cv_rss780</ksj:location>
+	<ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+  <ksj:station>#eb03_444</ksj:station>
+</ksj:RailroadSection>
+<ksj:RailroadSection>
+	<ksj:RailroadSectionID>eb02_781</ksj:RailroadSectionID>
+  <ksj:location>#cv_rss781</ksj:location>
+	<ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+  <ksj:station>#eb03_443</ksj:station>
+</ksj:RailroadSection>
+<ksj:RailroadSection>
+	<ksj:RailroadSectionID>eb02_782</ksj:RailroadSectionID>
+  <ksj:location>#cv_rss782</ksj:location>
+	<ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+  <ksj:station>#eb03_442</ksj:station>
+</ksj:RailroadSection>
+<ksj:RailroadSection>
+	<ksj:RailroadSectionID>eb02_783</ksj:RailroadSectionID>
+  <ksj:location>#cv_rss783</ksj:location>
+	<ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+  <ksj:station>#eb03_441</ksj:station>
+</ksj:RailroadSection>
+<ksj:RailroadSection>
+	<ksj:RailroadSectionID>eb02_784</ksj:RailroadSectionID>
+  <ksj:location>#cv_rss784</ksj:location>
+	<ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+</ksj:RailroadSection>
+<ksj:RailroadSection>
+	<ksj:RailroadSectionID>eb02_785</ksj:RailroadSectionID>
+  <ksj:location>#cv_rss785</ksj:location>
+	<ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+  <ksj:station>#eb03_440</ksj:station>
+</ksj:RailroadSection>
+<ksj:RailroadSection>
+	<ksj:RailroadSectionID>eb02_786</ksj:RailroadSectionID>
+  <ksj:location>#cv_rss786</ksj:location>
+	<ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+</ksj:RailroadSection>
+<ksj:RailroadSection>
+	<ksj:RailroadSectionID>eb02_787</ksj:RailroadSectionID>
+  <ksj:location>#cv_rss787</ksj:location>
+	<ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+</ksj:RailroadSection>
+<ksj:RailroadSection>
+	<ksj:RailroadSectionID>eb02_788</ksj:RailroadSectionID>
+  <ksj:location>#cv_rss788</ksj:location>
+	<ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+  <ksj:station>#eb03_445</ksj:station>
+</ksj:RailroadSection>
+<ksj:RailroadSection>
+	<ksj:RailroadSectionID>eb02_789</ksj:RailroadSectionID>
+  <ksj:location>#cv_rss789</ksj:location>
+	<ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+</ksj:RailroadSection>
+<ksj:RailroadSection>
+	<ksj:RailroadSectionID>eb02_790</ksj:RailroadSectionID>
+  <ksj:location>#cv_rss790</ksj:location>
+	<ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+  <ksj:station>#eb03_438</ksj:station>
+</ksj:RailroadSection>
+<ksj:RailroadSection>
+	<ksj:RailroadSectionID>eb02_791</ksj:RailroadSectionID>
+  <ksj:location>#cv_rss791</ksj:location>
+	<ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+</ksj:RailroadSection>
+<ksj:RailroadSection>
+	<ksj:RailroadSectionID>eb02_792</ksj:RailroadSectionID>
+  <ksj:location>#cv_rss792</ksj:location>
+	<ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+</ksj:RailroadSection>
+<ksj:RailroadSection>
+	<ksj:RailroadSectionID>eb02_793</ksj:RailroadSectionID>
+  <ksj:location>#cv_rss793</ksj:location>
+	<ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+  <ksj:station>#eb03_437</ksj:station>
+</ksj:RailroadSection>
+<ksj:RailroadSection>
+	<ksj:RailroadSectionID>eb02_794</ksj:RailroadSectionID>
+  <ksj:location>#cv_rss794</ksj:location>
+	<ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+  <ksj:station>#eb03_436</ksj:station>
+</ksj:RailroadSection>
+<ksj:RailroadSection>
+	<ksj:RailroadSectionID>eb02_795</ksj:RailroadSectionID>
+  <ksj:location>#cv_rss795</ksj:location>
+	<ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+  <ksj:station>#eb03_435</ksj:station>
+</ksj:RailroadSection>
+<ksj:RailroadSection>
+	<ksj:RailroadSectionID>eb02_796</ksj:RailroadSectionID>
+  <ksj:location>#cv_rss796</ksj:location>
+	<ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+  <ksj:station>#eb03_434</ksj:station>
+</ksj:RailroadSection>
+<ksj:RailroadSection>
+	<ksj:RailroadSectionID>eb02_797</ksj:RailroadSectionID>
+  <ksj:location>#cv_rss797</ksj:location>
+	<ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+</ksj:RailroadSection>
+<ksj:RailroadSection>
+	<ksj:RailroadSectionID>eb02_798</ksj:RailroadSectionID>
+  <ksj:location>#cv_rss798</ksj:location>
+	<ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+</ksj:RailroadSection>
+<ksj:RailroadSection>
+	<ksj:RailroadSectionID>eb02_799</ksj:RailroadSectionID>
+  <ksj:location>#cv_rss799</ksj:location>
+	<ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+</ksj:RailroadSection>
+<ksj:RailroadSection>
+	<ksj:RailroadSectionID>eb02_800</ksj:RailroadSectionID>
+  <ksj:location>#cv_rss800</ksj:location>
+	<ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+</ksj:RailroadSection>
+<ksj:RailroadSection>
+	<ksj:RailroadSectionID>eb02_801</ksj:RailroadSectionID>
+  <ksj:location>#cv_rss801</ksj:location>
+	<ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+</ksj:RailroadSection>
+<ksj:RailroadSection>
+	<ksj:RailroadSectionID>eb02_802</ksj:RailroadSectionID>
+  <ksj:location>#cv_rss802</ksj:location>
+	<ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+  <ksj:station>#eb03_433</ksj:station>
+</ksj:RailroadSection>
+<ksj:RailroadSection>
+	<ksj:RailroadSectionID>eb02_803</ksj:RailroadSectionID>
+  <ksj:location>#cv_rss803</ksj:location>
+	<ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+  <ksj:station>#eb03_432</ksj:station>
+</ksj:RailroadSection>
+<ksj:RailroadSection>
+	<ksj:RailroadSectionID>eb02_804</ksj:RailroadSectionID>
+  <ksj:location>#cv_rss804</ksj:location>
+	<ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+</ksj:RailroadSection>
+<ksj:RailroadSection>
+	<ksj:RailroadSectionID>eb02_805</ksj:RailroadSectionID>
+  <ksj:location>#cv_rss805</ksj:location>
+	<ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+  <ksj:station>#eb03_431</ksj:station>
+</ksj:RailroadSection>
+<ksj:RailroadSection>
+	<ksj:RailroadSectionID>eb02_806</ksj:RailroadSectionID>
+  <ksj:location>#cv_rss806</ksj:location>
+	<ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+</ksj:RailroadSection>
+<ksj:RailroadSection>
+	<ksj:RailroadSectionID>eb02_807</ksj:RailroadSectionID>
+  <ksj:location>#cv_rss807</ksj:location>
+	<ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+</ksj:RailroadSection>
+<ksj:RailroadSection>
+	<ksj:RailroadSectionID>eb02_808</ksj:RailroadSectionID>
+  <ksj:location>#cv_rss808</ksj:location>
+	<ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+  <ksj:station>#eb03_430</ksj:station>
+</ksj:RailroadSection>
+<ksj:RailroadSection>
+	<ksj:RailroadSectionID>eb02_809</ksj:RailroadSectionID>
+  <ksj:location>#cv_rss809</ksj:location>
+	<ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+</ksj:RailroadSection>
+<ksj:RailroadSection>
+	<ksj:RailroadSectionID>eb02_810</ksj:RailroadSectionID>
+  <ksj:location>#cv_rss810</ksj:location>
+	<ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+  <ksj:station>#eb03_429</ksj:station>
+</ksj:RailroadSection>
+<ksj:RailroadSection>
+	<ksj:RailroadSectionID>eb02_811</ksj:RailroadSectionID>
+  <ksj:location>#cv_rss811</ksj:location>
+	<ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+  <ksj:station>#eb03_439</ksj:station>
+</ksj:RailroadSection>
+<ksj:RailroadSection>
+	<ksj:RailroadSectionID>eb02_812</ksj:RailroadSectionID>
+  <ksj:location>#cv_rss812</ksj:location>
+	<ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+</ksj:RailroadSection>
+<ksj:RailroadSection>
+	<ksj:RailroadSectionID>eb02_813</ksj:RailroadSectionID>
+  <ksj:location>#cv_rss813</ksj:location>
+	<ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+</ksj:RailroadSection>
+<ksj:RailroadSection>
+	<ksj:RailroadSectionID>eb02_814</ksj:RailroadSectionID>
+  <ksj:location>#cv_rss814</ksj:location>
+	<ksj:railwayType>12</ksj:railwayType>
+  <ksj:serviceProviderType>4</ksj:serviceProviderType>
+  <ksj:railwayLineName>鉄道線</ksj:railwayLineName>
+  <ksj:operationCompany>遠州鉄道</ksj:operationCompany>
+  <ksj:station>#eb03_446</ksj:station>
+</ksj:RailroadSection>
