@@ -1,0 +1,33 @@
+# REF: https://qiita.com/gldn/items/2a8486c4d7a42d7a0f1f
+
+version: '2'
+
+# networks:
+#   bridge:
+#     driver: bridge
+
+services:
+  app:
+    image: python:3.6.7-alpine3.8
+    container_name: app
+    volumes:
+      - './app:/app'
+      - './config:/config'
+    command: sh /config/server/setup.sh
+    ports:
+      - '5050:5050'
+    # tty: true
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    environment: 
+      - 'MONGODB_USER=user'
+      - 'MONGODB_PASS=pAssWord'
+    volumes:
+      - 'mongodb-data:/data/db'
+    ports:
+      - '27017:27017'
+    command: mongod --smallfiles
+
+volumes:
+  mongodb-data: {}
