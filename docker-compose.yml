@@ -7,6 +7,16 @@ version: '2'
 #     driver: bridge
 
 services:
+  app:
+    image: python:3.6.7-alpine3.8
+    container_name: app
+    volumes:
+      - './app:/app'
+      - './config:/config'
+    command: sh /config/server/setup.sh
+    ports:
+      - '5050:5050'
+    # tty: true
   mongodb:
     image: mongo:latest
     container_name: mongodb
