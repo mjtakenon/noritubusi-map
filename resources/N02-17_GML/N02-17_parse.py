@@ -1,6 +1,8 @@
-import xml.etree.ElementTree as ET
-import sys, re
+#!/usr/bin/env python3
 
+import xml.etree.ElementTree as ET
+import os, sys, re, json
+import numpy as np
 
 def get_id(xml_elem):
   ret_val = elem.get(f"{{{ns['gml']}}}id")
@@ -79,11 +81,22 @@ if __name__ == '__main__':
           key = re.sub(f"{{{ns['ksj']}}}", "", child.tag)
           val = child.text
           st.update({key: val})
-      st['location'] = get_link(elem, 'location')
+      st['location'] = get_link(elem, 'ksj:location')
       st['railroadSection'] = get_link(elem, 'ksj:railroadSection')
 
       stations.update(
         { attr_id: st }
       )
 
-    
+    # Merge Datasets
+    for station in stations.values():
+      if station['location'] != "null":
+        station.update({'location': curves[station['location']]})
+      # 重心計算
+      arr = np.array(station['location']['posList'], dtype=np.float64)
+      station['location']['center'] = [ f"{p:.8f}" for p in arr.mean(axis=0) ]
+
+    # Print as JSON
+    with open((os.path.splitext(argv[1])[0] + ".json"), "wt") as fp:
+      json.dump(stations, fp, ensure_ascii=False, indent=2, sort_keys=True, separators=(',', ': '))
+

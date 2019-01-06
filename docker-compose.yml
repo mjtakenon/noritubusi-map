@@ -1,4 +1,6 @@
 # REF: https://qiita.com/gldn/items/2a8486c4d7a42d7a0f1f
+# REF: https://qiita.com/juhn/items/274e44ee80354a39d872
+# REF: https://qiita.com/Manatee/items/58d0f98a15656ed65136
 
 version: '2'
 
@@ -16,18 +18,36 @@ services:
     command: sh /config/server/setup.sh
     ports:
       - '5050:5050'
-    # tty: true
-  mongodb:
-    image: mongo:latest
-    container_name: mongodb
-    environment: 
-      - 'MONGODB_USER=user'
-      - 'MONGODB_PASS=pAssWord'
-    volumes:
-      - 'mongodb-data:/data/db'
+    tty: true
+  # mongodb:
+  #   image: mongo:latest
+  #   container_name: mongodb
+  #   environment: 
+  #     - MONGODB_USER: user
+  #     - MONGODB_PASS: pAssWord
+  #   volumes:
+  #     - 'mongodb-data:/data/db'
+  #   ports:
+  #     - '27017:27017'
+  #   command: mongod --smallfiles
+  mysql:
+    build: ./config/mysql
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: noritubusi_map
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: rootpassword
     ports:
-      - '27017:27017'
-    command: mongod --smallfiles
+      - "3314:3306"
+    volumes:
+      - ./config/mysql/initdb.d:/docker-entrypoint-initdb.d
+      - ./config/mysql/conf.d:/etc/mysql/conf.d
+      - ./log/mysql:/var/log/mysql
+      - mysql-data:/var/lib/mysql
+
 
 volumes:
   mongodb-data: {}
+  mysql-data: {}
