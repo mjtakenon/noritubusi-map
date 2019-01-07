@@ -15,6 +15,11 @@ def get_link(xml_elem, str_selector):
       return elem.get(f"{{{ns['xlink']}}}href").lstrip('#')
   return "null"
 
+def SQL_INSERT_INTO(TBL_NAME, KEYS, VALUES, IDX_NOT_QUOTED=[]):
+  str_keys   = ', '.join([ f"`{x}`" for x in KEYS])
+  str_values = ', '.join([ f"'{x}'" if i not in IDX_NOT_QUOTED else x for (i, x) in enumerate(VALUES) ])
+  
+  return f"INSERT INTO `{TBL_NAME}` ({str_keys}) VALUES ({str_values});\n"
 
 if __name__ == '__main__':
   argc, argv = len(sys.argv), sys.argv
@@ -88,6 +93,7 @@ if __name__ == '__main__':
         { attr_id: st }
       )
 
+
     # Merge Datasets
     for station in stations.values():
       if station['location'] != "null":
@@ -97,6 +103,30 @@ if __name__ == '__main__':
       station['location']['center'] = [ f"{p:.8f}" for p in arr.mean(axis=0) ]
 
     # Print as JSON
-    with open((os.path.splitext(argv[1])[0] + ".json"), "wt") as fp:
-      json.dump(stations, fp, ensure_ascii=False, indent=2, sort_keys=True, separators=(',', ': '))
+    # sys.stderr.write("Print as JSON ... \n")
+    # with open((os.path.splitext(argv[1])[0] + ".json"), "wt") as fp:
+    #   json.dump(stations, fp, ensure_ascii=False, indent=2, sort_keys=True, separators=(',', ': '))
+
+
+    # Generate SQL Seeds
+    sys.stderr.write("Print as SQL ... \n")
+    
+    # Print as SQL
+    with open((os.path.splitext(argv[1])[0] + "_seeds.sql"), "wt") as fp:
+      # 1. companies
+      for s in stations.values():
+        kv = {
+          'station_name': s['stationName'], 
+          'center_latlong': f"GeomFromText('POINT({' '.join(s['location']['center'])})')", 
+          'operation_company': s['operationCompany'], 
+          'service_provider_type': s['serviceProviderType'], 
+          'railway_line_name': s['railwayLineName'], 
+          'railway_type': s['railwayType']
+        }
+
+        fp.write(
+          SQL_INSERT_INTO('stations', kv.keys(), kv.values(), IDX_NOT_QUOTED=[1, 3, 5])
+        )
+
+
 
