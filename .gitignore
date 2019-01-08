@@ -4,7 +4,6 @@
 
 ### Custom Preset ###
 test.json
-config/mysql/initdb.d/2_seeds.sql
 
 ### Emacs ###
 # -*- mode: gitignore; -*-
