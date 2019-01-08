@@ -1,4 +1,3 @@
-
 CREATE TABLE IF NOT EXISTS `stations` (
   `id`                     INT NOT NULL AUTO_INCREMENT,
   `station_name`           VARCHAR(128) NOT NULL,
