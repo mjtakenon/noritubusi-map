@@ -15,21 +15,13 @@ services:
     volumes:
       - './app:/app'
       - './config:/config'
+    environment:
+      PY_REQUIREMENTS_PATH: "/config/server/requirements.txt"
+      PY_FLASK_APP_PATH: "/app/app.py"
     command: sh /config/server/setup.sh
     ports:
       - '5050:5050'
     tty: true
-  # mongodb:
-  #   image: mongo:latest
-  #   container_name: mongodb
-  #   environment: 
-  #     - MONGODB_USER: user
-  #     - MONGODB_PASS: pAssWord
-  #   volumes:
-  #     - 'mongodb-data:/data/db'
-  #   ports:
-  #     - '27017:27017'
-  #   command: mongod --smallfiles
   mysql:
     build: ./config/mysql
     image: mysql:5.7
@@ -47,8 +39,19 @@ services:
       - ./config/mysql/conf.d:/etc/mysql/conf.d
       - mysql-data:/var/lib/mysql
       # - ./log/mysql:/var/log/mysql
+  # mongodb:
+  #   image: mongo:latest
+  #   container_name: mongodb
+  #   environment: 
+  #     - MONGODB_USER: user
+  #     - MONGODB_PASS: pAssWord
+  #   volumes:
+  #     - 'mongodb-data:/data/db'
+  #   ports:
+  #     - '27017:27017'
+  #   command: mongod --smallfiles
 
 
 volumes:
-  mongodb-data: {}
+  # mongodb-data: {}
   mysql-data: {}

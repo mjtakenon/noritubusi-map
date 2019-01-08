@@ -1,7 +1,5 @@
 #!/bin/sh
 
-source /config/ENV.sh
-
 # pip3: Install from requirements.txt
 pip3 install -r $PY_REQUIREMENTS_PATH
 
