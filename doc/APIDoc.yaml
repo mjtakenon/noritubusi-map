@@ -341,22 +341,30 @@ definitions:
       id:
         description: 駅ID
         type: integer
+        example: 5871
       name:
         description: 駅名
         type: string
+        example: 浜松
       latitude:
         description: 緯度
         type: number
+        example: 34.70406000
       longitude:
         description: 経度
         type: number
+        example: 137.73511750
       company:
         description: 運営会社
         type: string
+        example: 東海旅客鉄道
       serviceProviderType:
         type: integer
+        example: 2
       railwayName:
         description: 路線名
         type: string
+        example: 東海道線
       railwayType:
         type: integer
+        example: 11
