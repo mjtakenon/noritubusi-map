@@ -18,7 +18,31 @@ tags:
 schemes:
   - http
 paths:
-  /railways:
+  /railways/:
+      get:
+        tags: 
+          - railway
+        summary: 路線一覧取得
+        description: ""
+        responses:
+          200:
+            description: OK
+            schema:
+              title: arrayOfRailways
+              type: array
+              items:
+                title: railway
+                description: "路線情報"
+                type: object
+                properties:
+                  name:
+                    description: 路線名
+                    type: string
+                  number:
+                    description: 駅数
+                    type: integer
+
+  /railways/{railName}:
     get:
       tags:
         - railway
@@ -29,9 +53,29 @@ paths:
         - application/json
       produces:
         - application/json
+      parameters: 
+        - name: railName
+          in : path
+          description: 路線名、もしくは路線ID
+          required: true
+          type: string
       responses:
         '200':
           description: 路線情報取得が成功
+          schema:
+            title: arrayOfStations
+            type: array
+            items:
+              title: station
+              description: 駅情報
+              type: object
+              properties:
+                id:
+                  description: 駅ID
+                  type: integer
+                name:
+                  description: 駅名
+                  type: string
         '400':
           description: 不正なパラメータ
   /stations:
@@ -43,12 +87,55 @@ paths:
       operationId: getStationsInfo
       produces:
         - application/json
-      parameters: []
+      parameters: 
+        - name: begin_latitude
+          in: query
+          description: Latitude at the upper left of the screen 
+          required: true
+          type: number
+        - name: begin_longitude
+          in: query
+          description: Longitude at the upper left of the screen
+          required: true
+          type: number
+        - name: end_latitude
+          in: query
+          description: Latitude at the lower right of the screen 
+          required: true
+          type: number
+        - name: end_longitude
+          in: query
+          description: Longitude at the lower right of the screen
+          required: true
+          type: number
       responses:
         '200':
           description: 駅情報取得が成功
+          schema:
+            title: arrayOfStations
+            type: array
+            items:
+              $ref: '#/definitions/stationInfomation'
+                
         '400':
           description: 不正なパラメータ
+  /stations/{stationName}:
+    get:
+      tags:
+        - station
+      summary: "駅情報取得"
+      description: ""
+      parameters: 
+        - name: stationName
+          required: true
+          in: path
+          type: string
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/stationInfomation'
+    
   '/users/{userid}':
     get:
       tags:
@@ -99,6 +186,67 @@ paths:
       responses:
         '200':
           description: OK
+  '/users/{userid}/record':
+    get:
+      tags:
+        - user
+      summary: 乗り潰し駅情報取得
+      description: ''
+      operationId: recordUserInfo
+      produces:
+        - application/json
+      parameters:
+        - name: userid
+          in: path
+          description: Created user object
+          required: true
+          type: string
+        - name: latitude
+          in: query
+          description: A latitude that searching for record
+          required: true
+          type: number
+        - name: longitude
+          in: query
+          description: A longitude that searching for record
+          required: true
+          type: number
+      responses:
+        '200':
+          description: 乗り潰し駅情報の取得が成功
+        '404':
+          description: 乗り潰し駅情報が見つからなかった
+    post:
+      tags: 
+        - user
+      summary: 乗り潰し駅情報追加
+      description: 'ユーザID，駅ID，登録日時の組を乗り潰しテーブルに追加'
+      parameters:
+        - name: userid
+          in: path
+          description: Created user object
+          required: true
+          type: string
+        - name: begin_station_id
+          in: query
+          description: A station ID that get on train
+          required: true
+          type: integer
+        - name: end_station_id
+          in: query
+          description: A station ID that get out train
+          required: true
+          type: integer
+        - name: railway_id
+          in: query
+          description: A railway ID
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: 情報追加が失敗
   /signin:
     get:
       tags:
@@ -186,4 +334,29 @@ securityDefinitions:
     type: apiKey
     name: api_key
     in: header
-    
+definitions:
+  stationInfomation:
+    type: object
+    properties:
+      id:
+        description: 駅ID
+        type: integer
+      name:
+        description: 駅名
+        type: string
+      latitude:
+        description: 緯度
+        type: number
+      longitude:
+        description: 経度
+        type: number
+      company:
+        description: 運営会社
+        type: string
+      serviceProviderType:
+        type: integer
+      railwayName:
+        description: 路線名
+        type: string
+      railwayType:
+        type: integer
