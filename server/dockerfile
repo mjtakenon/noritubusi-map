@@ -1,0 +1,11 @@
+FROM golang:1.12.0 AS builder
+WORKDIR /go/src/noritubushi
+COPY . .
+
+RUN go get -u github.com/golang/dep/cmd/dep
+RUN dep ensure
+RUN CGO_ENABLED=0 GOOS=linux go build -o server
+
+FROM alpine:latest
+COPY --from=builder /go/src/noritubushi/server /
+CMD ["/server"]

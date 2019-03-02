@@ -2,7 +2,7 @@
 # REF: https://qiita.com/juhn/items/274e44ee80354a39d872
 # REF: https://qiita.com/Manatee/items/58d0f98a15656ed65136
 
-version: '2'
+version: "2"
 
 # networks:
 #   bridge:
@@ -10,26 +10,12 @@ version: '2'
 
 services:
   app:
-    image: python:3.6.7-alpine3.8
-    container_name: app
-    volumes:
-      - './app:/app'
-      - './config:/config'
-    command: sh /config/server/setup.sh
+    build: ./server/
     ports:
-      - '5050:5050'
-    tty: true
-  # mongodb:
-  #   image: mongo:latest
-  #   container_name: mongodb
-  #   environment: 
-  #     - MONGODB_USER: user
-  #     - MONGODB_PASS: pAssWord
-  #   volumes:
-  #     - 'mongodb-data:/data/db'
-  #   ports:
-  #     - '27017:27017'
-  #   command: mongod --smallfiles
+      - "8080:1323"
+    links:
+      - mysql
+
   mysql:
     build: ./config/mysql
     image: mysql:5.7
@@ -47,7 +33,6 @@ services:
       - ./config/mysql/conf.d:/etc/mysql/conf.d
       - mysql-data:/var/lib/mysql
       # - ./log/mysql:/var/log/mysql
-
 
 volumes:
   mongodb-data: {}
