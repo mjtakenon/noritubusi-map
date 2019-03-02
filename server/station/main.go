@@ -9,14 +9,14 @@ import (
 )
 
 type stationInfo struct {
-	Id                  int64  `db:"id"`
-	Name                string `db:"station_name"`
-	Latitude            string `db:"lat"`
-	Longitude           string `db:"long"`
-	Company             string `db:"operation_company"`
-	ServiceProviderType int64  `db:"service_provider_type"`
-	RailwayName         string `db:"railway_line_name"`
-	RailwayType         int64  `db:"railway_type"`
+	Id                  int64  `db:"id" json:"id"`
+	Name                string `db:"station_name" json:"name"`
+	Latitude            string `db:"lat" json:"latitude"`
+	Longitude           string `db:"long" json:"longitude"`
+	Company             string `db:"operation_company" json:"company"`
+	ServiceProviderType int64  `db:"service_provider_type" json:"serviceProviderType"`
+	RailwayName         string `db:"railway_line_name" json:"railwayName"`
+	RailwayType         int64  `db:"railway_type" json:"railwayType"`
 }
 
 func (s stationInfo) String() string {
@@ -40,7 +40,7 @@ func (s *StationDB) New(userName, password, address, dbName string) error {
 	return nil
 }
 
-func (s *StationDB) getStationInfoInRange(beginLat, beginLong, endLat, endLong string) ([]stationInfo, error) {
+func (s *StationDB) GetStationInfoInRange(beginLat, beginLong, endLat, endLong string) ([]stationInfo, error) {
 	query := `select id,station_name,X(center_latlong) AS 'lat',Y(center_latlong) AS 'long',operation_company,service_provider_type,railway_line_name,railway_type from stations where MBRContains(GeomFromText(CONCAT("LINESTRING(",?," ",?,",",?," ", ?,")")),center_latlong)`
 
 	infos := []stationInfo{}

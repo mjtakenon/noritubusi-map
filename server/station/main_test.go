@@ -60,7 +60,7 @@ func TestStationData_New(t *testing.T) {
 	}
 }
 
-func TestStationDB_getStationInfoInRange(t *testing.T) {
+func TestStationDB_GetStationInfoInRange(t *testing.T) {
 	type fields struct {
 		DB *sqlx.DB
 	}
@@ -138,7 +138,7 @@ func TestStationDB_getStationInfoInRange(t *testing.T) {
 			s := &StationDB{
 				DB: tt.fields.DB,
 			}
-			got, err := s.getStationInfoInRange(tt.args.beginLat, tt.args.beginLong, tt.args.endLat, tt.args.endLong)
+			got, err := s.GetStationInfoInRange(tt.args.beginLat, tt.args.beginLong, tt.args.endLat, tt.args.endLong)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("StationDB.getStationInfoInRange() error = %v, wantErr %v", err, tt.wantErr)
 				return
