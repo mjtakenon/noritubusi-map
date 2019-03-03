@@ -25,7 +25,7 @@
 
 ## 環境構築
 
-- バックエンド   → [doc/環境構築.md](doc/環境構築.md)
+- バックエンド   → [doc/BE環境構築.md](doc/BE環境構築.md)
 - フロントエンド → [doc/FE環境構築.md](doc/FE環境構築.md)
 
 - ~~`create-dev-environment` ブランチにて展開中 ...~~
