@@ -1,6 +1,6 @@
 ### Custom Preset ###
 test.json
-backend/config/mysql/initdb.d/2_seeds.sql
+# backend/config/mysql/initdb.d/2_seeds.sql
 /dist/
 npm-debug.log*
 yarn-debug.log*
