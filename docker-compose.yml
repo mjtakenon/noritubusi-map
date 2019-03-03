@@ -10,31 +10,24 @@ version: "2"
 
 services:
   app:
+    env_file: .env
     build: ./config/server
-    command: ./start
+    command: ./delayed_start
     volumes:
       - ./server:/go/src/noritubusi-map/server
     ports:
       - "1323:1323"
     links:
       - mysql:stationdb
-    environment:
-      STATION_DB_ADDRESS: stationdb
-      SERVER_APP_DIR: /go/src/noritubusi-map/server
     depends_on:
       - mysql
     tty: true
 
   mysql:
+    env_file: .env
     build: ./config/mysql
     image: mysql:5.7
     restart: always
-    environment:
-      MYSQL_DATABASE: noritubusi_map
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
-      MYSQL_ROOT_PASSWORD: rootpassword
-      TZ: "Asia/Tokyo"
     ports:
       - "3314:3306"
     volumes:
