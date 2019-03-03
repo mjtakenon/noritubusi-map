@@ -19,7 +19,9 @@ import './stylesheet/main.css'
 
 /* eslint-disable no-new */
 Vue.use( Vuetify, {
-  iconfont: 'fa4'
+  theme: {
+    primary: "#378640"
+  }
 } )
 new Vue( {
   el: '#app',

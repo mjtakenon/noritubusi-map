@@ -13,14 +13,12 @@
       <l-tile-layer :url="url"></l-tile-layer>
     </l-map>
     <v-toolbar class="float-toolbar" dense floating>
-      <v-text-field hide-details prepend-icon="search" single-line></v-text-field>
-
+      <v-btn icon>
+        <v-icon>search</v-icon>
+      </v-btn>
+      <v-text-field clearable label="駅名を入力" single-line></v-text-field>
       <v-btn icon>
         <v-icon>my_location</v-icon>
-      </v-btn>
-
-      <v-btn icon>
-        <v-icon>more_vert</v-icon>
       </v-btn>
     </v-toolbar>
   </div>
