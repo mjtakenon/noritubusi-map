@@ -1,0 +1,2 @@
+backend/resources/N02-17_GML/N02-17.xml filter=lfs diff=lfs merge=lfs -text
+backend/config/mysql/initdb.d/2_seeds.sql filter=lfs diff=lfs merge=lfs -text
