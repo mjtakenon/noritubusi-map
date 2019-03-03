@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
-	"noritubusi-map/server/station"
+	"noritubusi-map/app/station"
 	"os"
 	"time"
 

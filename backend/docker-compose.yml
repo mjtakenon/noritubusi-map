@@ -10,11 +10,12 @@ version: "2"
 
 services:
   app:
+    container_name: go_server
     env_file: .env
-    build: ./config/server
+    build: ./config/app
     command: ./delayed_start
     volumes:
-      - ./server:/go/src/noritubusi-map/server
+      - ./app:/go/src/noritubusi-map/app
     ports:
       - "1323:1323"
     links:
@@ -22,7 +23,9 @@ services:
     depends_on:
       - mysql
     tty: true
+  
   mysql:
+    container_name: db
     env_file: .env
     build: ./config/mysql
     image: mysql:5.7
@@ -34,17 +37,6 @@ services:
       - ./config/mysql/conf.d:/etc/mysql/conf.d
       - mysql-data:/var/lib/mysql
       # - ./log/mysql:/var/log/mysql
-  # mongodb:
-  #   image: mongo:latest
-  #   container_name: mongodb
-  #   environment: 
-  #     - MONGODB_USER: user
-  #     - MONGODB_PASS: pAssWord
-  #   volumes:
-  #     - 'mongodb-data:/data/db'
-  #   ports:
-  #     - '27017:27017'
-  #   command: mongod --smallfiles
 
 volumes:
   mysql-data: {}

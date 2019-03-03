@@ -29,6 +29,8 @@ if __name__ == '__main__':
     sys.exit(-1)
   else:
 
+    sys.stderr.write("Pre-processing ... \n")
+
     # Get Namespace Map
     ns = dict()
     with open(argv[1]) as f:

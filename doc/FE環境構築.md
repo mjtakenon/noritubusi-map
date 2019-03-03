@@ -1,5 +1,10 @@
 # 環境構築 (フロントエンド)
 
+```sh
+$ cd frontend
+```
+
+
 - `vue-cli` で雛形作成
   - `vuejs-templates/webpack` テンプレートをベースに作成
   - REF: [Vue-cli(webpack)解剖 ーディレクトリ構成ー - Qiita](https://qiita.com/h_plum/items/86b8a6a86ac0fea8a4d1)

@@ -1,15 +1,14 @@
-# Created by https://www.gitignore.io/api/vue,vim,node,ruby,macos,linux,rails,vuejs,emacs,python,windows,sublimetext,visualstudiocode
-# Edit at https://www.gitignore.io/?templates=vue,vim,node,ruby,macos,linux,rails,vuejs,emacs,python,windows,sublimetext,visualstudiocode
-
-
 ### Custom Preset ###
 test.json
-config/mysql/initdb.d/2_seeds.sql
+backend/config/mysql/initdb.d/2_seeds.sql
 /dist/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+
+# Created by https://www.gitignore.io/api/go,vue,vim,node,ruby,rails,macos,linux,emacs,vuejs,python,windows,sublimetext,visualstudiocode
+# Edit at https://www.gitignore.io/?templates=go,vue,vim,node,ruby,rails,macos,linux,emacs,vuejs,python,windows,sublimetext,visualstudiocode
 
 ### Emacs ###
 # -*- mode: gitignore; -*-
@@ -49,6 +48,9 @@ dist/
 # Flycheck
 flycheck_*.el
 
+# server auth directory
+/server/
+
 # projectiles files
 .projectile
 
@@ -58,6 +60,24 @@ flycheck_*.el
 # network security
 /network-security.data
 
+
+### Go ###
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+### Go Patch ###
+vendor
+Godeps
 
 ### Linux ###
 
@@ -159,7 +179,8 @@ typings/
 .yarn-integrity
 
 # dotenv environment variables file
-# .env
+.env
+.env.test
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
@@ -179,7 +200,7 @@ typings/
 # FuseBox cache
 .fusebox/
 
-#DynamoDB Local files
+# DynamoDB Local files
 .dynamodb/
 
 ### Python ###
@@ -189,7 +210,6 @@ __pycache__/
 *$py.class
 
 # C extensions
-*.so
 
 # Distribution / packaging
 .Python
@@ -204,6 +224,7 @@ parts/
 sdist/
 var/
 wheels/
+pip-wheel-metadata/
 share/python-wheels/
 *.egg-info/
 .installed.cfg
@@ -372,6 +393,8 @@ bower.json
 # Used by dotenv library to load environment variables.
 # .env
 
+# Ignore Byebug command history file.
+
 ## Specific to RubyMotion:
 .dat*
 .repl_history
@@ -384,16 +407,14 @@ build-iPhoneSimulator/
 # We recommend against adding the Pods directory to your .gitignore. However
 # you should judge for yourself, the pros and cons are mentioned at:
 # https://guides.cocoapods.org/using/using-cocoapods.html#should-i-check-the-pods-directory-into-source-control
-#
 # vendor/Pods/
 
 ## Documentation cache and generated files:
 /.yardoc/
 /_yardoc/
-# /doc/
+/doc/
 /rdoc/
 
-## Environment normalization:
 /.bundle/
 /lib/bundler/man/
 
@@ -468,7 +489,6 @@ tags
 
 ### Vue ###
 # gitignore template for Vue.js projects
-#
 # Recommended template: Node.gitignore
 
 # TODO: where does this rule come from?
@@ -505,27 +525,4 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-# End of https://www.gitignore.io/api/vue,vim,node,ruby,macos,linux,rails,vuejs,emacs,python,windows,sublimetext,visualstudiocode
-
-# Created by https://www.gitignore.io/api/go
-# Edit at https://www.gitignore.io/?templates=go
-
-### Go ###
-# Binaries for programs and plugins
-*.exe
-*.exe~
-*.dll
-*.so
-*.dylib
-
-# Test binary, built with `go test -c`
-*.test
-
-# Output of the go coverage tool, specifically when used with LiteIDE
-*.out
-
-### Go Patch ###
-/vendor/
-/Godeps/
-
-# End of https://www.gitignore.io/api/go
+# End of https://www.gitignore.io/api/go,vue,vim,node,ruby,rails,macos,linux,emacs,vuejs,python,windows,sublimetext,visualstudiocode
