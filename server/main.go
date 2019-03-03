@@ -57,7 +57,7 @@ func main() {
 	e.Use(middleware.Recover())
 
 	// stationInfo DB connect
-	time.Sleep(20)
+	time.Sleep(40)
 	err := stationInfoDB.New(stationInfoDBUserName, stationInfoDBPassword, stationInfoDBAddress, stationInfoDBName)
 	if err != nil {
 		e.Logger.Fatal("station DB Connection Error:", err)
