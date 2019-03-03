@@ -2,7 +2,7 @@
 # REF: https://qiita.com/juhn/items/274e44ee80354a39d872
 # REF: https://qiita.com/Manatee/items/58d0f98a15656ed65136
 
-version: '2'
+version: "2"
 
 # networks:
 #   bridge:
@@ -10,28 +10,23 @@ version: '2'
 
 services:
   app:
-    image: python:3.6.7-alpine3.8
-    container_name: app
+    env_file: .env
+    build: ./config/server
+    command: ./delayed_start
     volumes:
-      - './app:/app'
-      - './config:/config'
-    environment:
-      PY_REQUIREMENTS_PATH: "/config/server/requirements.txt"
-      PY_FLASK_APP_PATH: "/app/app.py"
-    command: sh /config/server/setup.sh
+      - ./server:/go/src/noritubusi-map/server
     ports:
-      - '5050:5050'
+      - "1323:1323"
+    links:
+      - mysql:stationdb
+    depends_on:
+      - mysql
     tty: true
   mysql:
+    env_file: .env
     build: ./config/mysql
     image: mysql:5.7
     restart: always
-    environment:
-      MYSQL_DATABASE: noritubusi_map
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
-      MYSQL_ROOT_PASSWORD: rootpassword
-      TZ: "Asia/Tokyo"
     ports:
       - "3314:3306"
     volumes:
@@ -51,7 +46,5 @@ services:
   #     - '27017:27017'
   #   command: mongod --smallfiles
 
-
 volumes:
-  # mongodb-data: {}
   mysql-data: {}

@@ -49,9 +49,6 @@ dist/
 # Flycheck
 flycheck_*.el
 
-# server auth directory
-/server/
-
 # projectiles files
 .projectile
 
@@ -162,7 +159,7 @@ typings/
 .yarn-integrity
 
 # dotenv environment variables file
-.env
+# .env
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
@@ -509,3 +506,26 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.gitignore.io/api/vue,vim,node,ruby,macos,linux,rails,vuejs,emacs,python,windows,sublimetext,visualstudiocode
+
+# Created by https://www.gitignore.io/api/go
+# Edit at https://www.gitignore.io/?templates=go
+
+### Go ###
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+### Go Patch ###
+/vendor/
+/Godeps/
+
+# End of https://www.gitignore.io/api/go
