@@ -25,7 +25,8 @@
 
 ## 環境構築
 
-[doc/環境構築.md](doc/環境構築.md)
+- バックエンド   → [doc/環境構築.md](doc/環境構築.md)
+- フロントエンド → [doc/FE環境構築.md](doc/FE環境構築.md)
 
 - ~~`create-dev-environment` ブランチにて展開中 ...~~
   + `create-db-datasets` にて作業中 ... (2019/01/07 15:14)
