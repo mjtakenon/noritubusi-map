@@ -10,15 +10,20 @@ version: "2"
 
 services:
   app:
-    build: ./server/
+    build: ./config/server
+    command: ./start
+    volumes:
+      - ./server:/go/src/noritubusi-map/server
     ports:
-      - "8080:1323"
+      - "1323:1323"
     links:
       - mysql:stationdb
     environment:
       STATION_DB_ADDRESS: stationdb
+      SERVER_APP_DIR: /go/src/noritubusi-map/server
     depends_on:
       - mysql
+    tty: true
 
   mysql:
     build: ./config/mysql
@@ -39,5 +44,4 @@ services:
       # - ./log/mysql:/var/log/mysql
 
 volumes:
-  mongodb-data: {}
   mysql-data: {}
