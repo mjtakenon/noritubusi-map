@@ -5,6 +5,11 @@
 ### Custom Preset ###
 test.json
 config/mysql/initdb.d/2_seeds.sql
+/dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
 
 ### Emacs ###
 # -*- mode: gitignore; -*-
