@@ -15,7 +15,7 @@ services:
     build: ./config/app
     command: ./delayed_start
     volumes:
-      - ./app:/go/src/noritubusi-map/app
+      - ./app:/go/src/noritubusi-map/backend/app
     ports:
       - "1323:1323"
     links:
@@ -23,7 +23,7 @@ services:
     depends_on:
       - mysql
     tty: true
-  
+
   mysql:
     container_name: db
     env_file: .env

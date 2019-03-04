@@ -3,9 +3,9 @@ package main
 import (
 	"log"
 	"net/http"
-	"noritubusi-map/app/station"
+	"noritubusi-map/backend/app/station"
+
 	"os"
-	"time"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
@@ -57,7 +57,6 @@ func main() {
 	e.Use(middleware.Recover())
 
 	// stationInfo DB connect
-	time.Sleep(40)
 	err := stationInfoDB.New(stationInfoDBUserName, stationInfoDBPassword, stationInfoDBAddress, stationInfoDBName)
 	if err != nil {
 		e.Logger.Fatal("station DB Connection Error:", err)
