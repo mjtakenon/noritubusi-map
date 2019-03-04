@@ -20,7 +20,7 @@ schemes:
 paths:
   /railways/:
       get:
-        tags: 
+        tags:
           - railway
         summary: 路線一覧取得
         description: ""
@@ -53,7 +53,7 @@ paths:
         - application/json
       produces:
         - application/json
-      parameters: 
+      parameters:
         - name: railName
           in : path
           description: 路線名、もしくは路線ID
@@ -87,10 +87,10 @@ paths:
       operationId: getStationsInfo
       produces:
         - application/json
-      parameters: 
+      parameters:
         - name: begin_latitude
           in: query
-          description: Latitude at the upper left of the screen 
+          description: Latitude at the upper left of the screen
           required: true
           type: number
         - name: begin_longitude
@@ -100,7 +100,7 @@ paths:
           type: number
         - name: end_latitude
           in: query
-          description: Latitude at the lower right of the screen 
+          description: Latitude at the lower right of the screen
           required: true
           type: number
         - name: end_longitude
@@ -116,7 +116,7 @@ paths:
             type: array
             items:
               $ref: '#/definitions/stationInfomation'
-                
+
         '400':
           description: 不正なパラメータ
   /stations/{stationName}:
@@ -125,7 +125,7 @@ paths:
         - station
       summary: "駅情報取得"
       description: ""
-      parameters: 
+      parameters:
         - name: stationName
           required: true
           in: path
@@ -135,7 +135,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/stationInfomation'
-    
+
   '/users/{userid}':
     get:
       tags:
@@ -157,7 +157,7 @@ paths:
         '404':
           description: ユーザが見つからなかった
     put:
-      tags: 
+      tags:
         - user
       summary: ユーザ情報の変更
       description: ''
@@ -173,7 +173,7 @@ paths:
         '400':
           description: 情報変更が失敗
     delete:
-      tags: 
+      tags:
         - user
       summary: ユーザの削除
       description: ''
@@ -201,14 +201,24 @@ paths:
           description: Created user object
           required: true
           type: string
-        - name: latitude
+        - name: begin_latitude
           in: query
-          description: A latitude that searching for record
+          description: An upper left latitude that searching for record
           required: true
           type: number
-        - name: longitude
+        - name: begin_longitude
           in: query
-          description: A longitude that searching for record
+          description: An upper left longitude that searching for record
+          required: true
+          type: number
+        - name: end_latitude
+          in: query
+          description: A lower right latitude that searching for record
+          required: true
+          type: number
+        - name: end_longitude
+          in: query
+          description: A lower right longitude that searching for record
           required: true
           type: number
       responses:
@@ -217,7 +227,7 @@ paths:
         '404':
           description: 乗り潰し駅情報が見つからなかった
     post:
-      tags: 
+      tags:
         - user
       summary: 乗り潰し駅情報追加
       description: 'ユーザID，駅ID，登録日時の組を乗り潰しテーブルに追加'
@@ -285,7 +295,7 @@ paths:
         '400':
           description: Invalid username/password supplied
     post:
-      tags: 
+      tags:
         - user
       summary: ログイン情報受け取り
       description: ''
@@ -307,7 +317,7 @@ paths:
           description: successful operation
   /signup:
     get:
-      tags: 
+      tags:
         - user
       summary: ユーザ登録ページ取得
       description: ''
@@ -315,7 +325,7 @@ paths:
         '200':
           description: OK
     post:
-      tags: 
+      tags:
         - user
       summary: 入力されたユーザ情報受取
       description: ''
