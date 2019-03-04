@@ -1,0 +1,5 @@
+#!/bin/bash
+
+cd ${SERVER_APP_DIR}
+dep ensure
+go run main.go
