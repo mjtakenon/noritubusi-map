@@ -155,7 +155,7 @@ func TestStationDB_GetStationInfoByID(t *testing.T) {
 		DB *sqlx.DB
 	}
 	type args struct {
-		id int32
+		id int
 	}
 	//DBセットアップ
 	userName := "user"

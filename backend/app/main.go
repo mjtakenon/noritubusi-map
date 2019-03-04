@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"noritubusi-map/backend/app/station"
+	"strconv"
 
 	"os"
 
@@ -32,6 +33,18 @@ func getStationInfomationInRange(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, "server error")
 	}
 
+	return c.JSON(http.StatusOK, stationInfo)
+}
+
+func getStationInfoByID(c echo.Context) error {
+	stationID, err := strconv.Atoi(c.Param("stationid"))
+	if err != nil {
+		return c.String(http.StatusBadRequest, "invalid parameter")
+	}
+	stationInfo, err := stationInfoDB.GetStationInfoByID(stationID)
+	if err != nil {
+		return c.String(http.StatusNotFound, "not found")
+	}
 	return c.JSON(http.StatusOK, stationInfo)
 }
 
@@ -65,6 +78,7 @@ func main() {
 	// Routes
 	e.GET("/", hello)
 	e.GET("/stations", getStationInfomationInRange)
+	e.GET("/stations/:stationid", getStationInfoByID)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":1323"))

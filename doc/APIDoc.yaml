@@ -1,9 +1,9 @@
-swagger: '2.0'
+swagger: "2.0"
 info:
   description: 乗りつぶしMAPのAPIです
   version: 0.0.1
   title: Swagger Petstore
-  termsOfService: 'http://swagger.io/terms/'
+  termsOfService: "http://swagger.io/terms/"
   contact:
     email: mjtakenon@mjtakenon
 host: localhost
@@ -19,35 +19,35 @@ schemes:
   - http
 paths:
   /railways/:
-      get:
-        tags:
-          - railway
-        summary: 路線一覧取得
-        description: ""
-        responses:
-          200:
-            description: OK
-            schema:
-              title: arrayOfRailways
-              type: array
-              items:
-                title: railway
-                description: "路線情報"
-                type: object
-                properties:
-                  name:
-                    description: 路線名
-                    type: string
-                  number:
-                    description: 駅数
-                    type: integer
+    get:
+      tags:
+        - railway
+      summary: 路線一覧取得
+      description: ""
+      responses:
+        200:
+          description: OK
+          schema:
+            title: arrayOfRailways
+            type: array
+            items:
+              title: railway
+              description: "路線情報"
+              type: object
+              properties:
+                name:
+                  description: 路線名
+                  type: string
+                number:
+                  description: 駅数
+                  type: integer
 
   /railways/{railName}:
     get:
       tags:
         - railway
       summary: 路線情報取得
-      description: ''
+      description: ""
       operationId: getRailwaysInfo
       consumes:
         - application/json
@@ -55,12 +55,12 @@ paths:
         - application/json
       parameters:
         - name: railName
-          in : path
+          in: path
           description: 路線名、もしくは路線ID
           required: true
           type: string
       responses:
-        '200':
+        "200":
           description: 路線情報取得が成功
           schema:
             title: arrayOfStations
@@ -76,14 +76,14 @@ paths:
                 name:
                   description: 駅名
                   type: string
-        '400':
+        "400":
           description: 不正なパラメータ
   /stations:
     get:
       tags:
         - station
       summary: 駅情報取得
-      description: ''
+      description: ""
       operationId: getStationsInfo
       produces:
         - application/json
@@ -109,15 +109,15 @@ paths:
           required: true
           type: number
       responses:
-        '200':
+        "200":
           description: 駅情報取得が成功
           schema:
             title: arrayOfStations
             type: array
             items:
-              $ref: '#/definitions/stationInfomation'
+              $ref: "#/definitions/stationInfomation"
 
-        '400':
+        "400":
           description: 不正なパラメータ
   /stations/{stationName}:
     get:
@@ -127,21 +127,48 @@ paths:
       description: ""
       parameters:
         - name: stationName
+          description: "station ID"
           required: true
           in: path
+          type: number
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/stationInfomation"
+        400:
+          description: 不正なパラメータ
+        404:
+          description: Not Found
+  /stations/suggest:
+    get:
+      tags:
+        - station
+      summary: "指定された文字列を持つ駅名検索"
+      description: ""
+      parameters:
+        - name: keyword
+          description: "検索する文字列"
+          required: true
+          in: query
           type: string
       responses:
         200:
           description: OK
           schema:
-            $ref: '#/definitions/stationInfomation'
+            title: arrayOfStations
+            type: array
+            items:
+              $ref: "#/definitions/stationInfomation"
+        400:
+          description: パラメータ不足
 
-  '/users/{userid}':
+  "/users/{userid}":
     get:
       tags:
         - user
       summary: ユーザ情報取得
-      description: ''
+      description: ""
       operationId: getUserInfo
       produces:
         - application/json
@@ -152,15 +179,15 @@ paths:
           required: true
           type: string
       responses:
-        '200':
+        "200":
           description: ユーザ情報の取得が成功
-        '404':
+        "404":
           description: ユーザが見つからなかった
     put:
       tags:
         - user
       summary: ユーザ情報の変更
-      description: ''
+      description: ""
       parameters:
         - name: userid
           in: path
@@ -168,15 +195,15 @@ paths:
           required: true
           type: string
       responses:
-        '200':
+        "200":
           description: OK
-        '400':
+        "400":
           description: 情報変更が失敗
     delete:
       tags:
         - user
       summary: ユーザの削除
-      description: ''
+      description: ""
       parameters:
         - name: userid
           in: path
@@ -184,14 +211,14 @@ paths:
           required: true
           type: string
       responses:
-        '200':
+        "200":
           description: OK
-  '/users/{userid}/record':
+  "/users/{userid}/record":
     get:
       tags:
         - user
       summary: 乗り潰し駅情報取得
-      description: ''
+      description: ""
       operationId: recordUserInfo
       produces:
         - application/json
@@ -222,15 +249,15 @@ paths:
           required: true
           type: number
       responses:
-        '200':
+        "200":
           description: 乗り潰し駅情報の取得が成功
-        '404':
+        "404":
           description: 乗り潰し駅情報が見つからなかった
     post:
       tags:
         - user
       summary: 乗り潰し駅情報追加
-      description: 'ユーザID，駅ID，登録日時の組を乗り潰しテーブルに追加'
+      description: "ユーザID，駅ID，登録日時の組を乗り潰しテーブルに追加"
       parameters:
         - name: userid
           in: path
@@ -253,16 +280,16 @@ paths:
           required: true
           type: integer
       responses:
-        '200':
+        "200":
           description: OK
-        '400':
+        "400":
           description: 情報追加が失敗
   /signin:
     get:
       tags:
         - user
       summary: Logs user into the system
-      description: ''
+      description: ""
       operationId: loginUser
       produces:
         - application/xml
@@ -279,7 +306,7 @@ paths:
           required: true
           type: string
       responses:
-        '200':
+        "200":
           description: successful operation
           schema:
             type: string
@@ -292,21 +319,21 @@ paths:
               type: string
               format: date-time
               description: date in UTC when token expires
-        '400':
+        "400":
           description: Invalid username/password supplied
     post:
       tags:
         - user
       summary: ログイン情報受け取り
-      description: ''
+      description: ""
       responses:
-        '200':
+        "200":
           description: OK
     delete:
       tags:
         - user
       summary: ログアウト
-      description: ''
+      description: ""
       operationId: logoutUser
       produces:
         - application/xml
@@ -320,26 +347,26 @@ paths:
       tags:
         - user
       summary: ユーザ登録ページ取得
-      description: ''
+      description: ""
       responses:
-        '200':
+        "200":
           description: OK
     post:
       tags:
         - user
       summary: 入力されたユーザ情報受取
-      description: ''
+      description: ""
       responses:
-        '200':
+        "200":
           description: OK
 securityDefinitions:
   petstore_auth:
     type: oauth2
-    authorizationUrl: 'http://petstore.swagger.io/oauth/dialog'
+    authorizationUrl: "http://petstore.swagger.io/oauth/dialog"
     flow: implicit
     scopes:
-      'write:pets': modify pets in your account
-      'read:pets': read your pets
+      "write:pets": modify pets in your account
+      "read:pets": read your pets
   api_key:
     type: apiKey
     name: api_key
