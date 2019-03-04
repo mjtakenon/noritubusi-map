@@ -1,0 +1,42 @@
+# REF: https://qiita.com/gldn/items/2a8486c4d7a42d7a0f1f
+# REF: https://qiita.com/juhn/items/274e44ee80354a39d872
+# REF: https://qiita.com/Manatee/items/58d0f98a15656ed65136
+
+version: "2"
+
+# networks:
+#   bridge:
+#     driver: bridge
+
+services:
+  app:
+    container_name: go_server
+    env_file: .env
+    build: ./config/app
+    command: ./delayed_start
+    volumes:
+      - ./app:/go/src/noritubusi-map/app
+    ports:
+      - "1323:1323"
+    links:
+      - mysql:stationdb
+    depends_on:
+      - mysql
+    tty: true
+  
+  mysql:
+    container_name: db
+    env_file: .env
+    build: ./config/mysql
+    image: mysql:5.7
+    restart: always
+    ports:
+      - "3314:3306"
+    volumes:
+      - ./config/mysql/initdb.d:/docker-entrypoint-initdb.d
+      - ./config/mysql/conf.d:/etc/mysql/conf.d
+      - mysql-data:/var/lib/mysql
+      # - ./log/mysql:/var/log/mysql
+
+volumes:
+  mysql-data: {}

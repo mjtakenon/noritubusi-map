@@ -1,0 +1,17 @@
+#!/bin/bash
+
+cd ${SERVER_APP_DIR}
+
+echo "Install Go depedencies ... "
+dep ensure
+
+echo "Waiting mysql ..."
+
+while [[ ! $( mysql --user=root \
+  --password=${MYSQL_ROOT_PASSWORD} \
+  --host=${STATION_DB_ADDRESS} \
+  --port=3306 \
+  -e "USE ${STATION_DB_NAME}; SHOW TABLES;") ]]
+do sleep 1; done
+
+go run main.go
