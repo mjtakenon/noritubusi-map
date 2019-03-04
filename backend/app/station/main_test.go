@@ -149,3 +149,69 @@ func TestStationDB_GetStationInfoInRange(t *testing.T) {
 		})
 	}
 }
+
+func TestStationDB_GetStationInfoByID(t *testing.T) {
+	type fields struct {
+		DB *sqlx.DB
+	}
+	type args struct {
+		id int32
+	}
+	//DBセットアップ
+	userName := "user"
+	password := "password"
+	address := "localhost:3314"
+	dbName := "noritubusi_map"
+	db, err := sqlx.Connect("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s", userName, password, address, dbName))
+
+	if err != nil {
+		t.Errorf("DB Connection Error:%v", err)
+		return
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    stationInfo
+		wantErr bool
+	}{
+		{
+			name:   "Shin-Hamamatsu(No.437)",
+			fields: fields{DB: db},
+			args:   args{id: 437},
+			want: stationInfo{
+				Id:                  437,
+				Name:                "新浜松",
+				Latitude:            "34.70341",
+				Longitude:           "137.73246",
+				Company:             "遠州鉄道",
+				ServiceProviderType: 4,
+				RailwayName:         "鉄道線",
+				RailwayType:         12,
+			},
+			wantErr: false,
+		},
+		{
+			name:    "not found id number",
+			fields:  fields{DB: db},
+			args:    args{id: 12345},
+			want:    stationInfo{},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := &StationDB{
+				DB: tt.fields.DB,
+			}
+			got, err := s.GetStationInfoByID(tt.args.id)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("StationDB.GetStationInfoByID() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("StationDB.GetStationInfoByID() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

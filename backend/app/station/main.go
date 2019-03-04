@@ -51,3 +51,13 @@ func (s *StationDB) GetStationInfoInRange(beginLat, beginLong, endLat, endLong s
 
 	return infos, nil
 }
+
+func (s *StationDB) GetStationInfoByID(id int32) (stationInfo, error) {
+	query := `select id,station_name,X(center_latlong) AS 'lat',Y(center_latlong) AS 'long',operation_company,service_provider_type,railway_line_name,railway_type from stations where id = ?`
+
+	var info stationInfo
+	err := s.DB.Get(&info, query, id)
+
+	// Getは何も存在しないとerrorを返すのでerrorチェックの必要がない
+	return info, err
+}
