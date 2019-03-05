@@ -15,7 +15,7 @@ services:
     build: ./config/app
     command: ./delayed_start
     volumes:
-      - ./app:/go/src/noritubusi-map/backend/app
+      - ${PWD}/app:/go/src/noritubusi-map/backend/app
     ports:
       - "1323:1323"
     links:
@@ -33,8 +33,8 @@ services:
     ports:
       - "3314:3306"
     volumes:
-      - ./config/mysql/initdb.d:/docker-entrypoint-initdb.d
-      - ./config/mysql/conf.d:/etc/mysql/conf.d
+      - ${PWD}/config/mysql/initdb.d:/docker-entrypoint-initdb.d
+      - ${PWD}/config/mysql/conf.d:/etc/mysql/conf.d
       - mysql-data:/var/lib/mysql
       # - ./log/mysql:/var/log/mysql
 
