@@ -41,11 +41,27 @@ func getStationInfoByID(c echo.Context) error {
 	if err != nil {
 		return c.String(http.StatusBadRequest, "invalid parameter")
 	}
+
 	stationInfo, err := stationInfoDB.GetStationInfoByID(stationID)
 	if err != nil {
 		return c.String(http.StatusNotFound, "not found")
 	}
+
 	return c.JSON(http.StatusOK, stationInfo)
+}
+
+func getStationNameSuggestion(c echo.Context) error {
+	keyword := c.QueryParam("keyword")
+	if keyword == "" {
+		return c.String(http.StatusBadRequest, "invalid parameter")
+	}
+
+	stationInfos, err := stationInfoDB.GetStationsInfoByKeyword(keyword)
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "server error")
+	}
+
+	return c.JSON(http.StatusOK, stationInfos)
 }
 
 var (
@@ -79,6 +95,7 @@ func main() {
 	e.GET("/", hello)
 	e.GET("/stations", getStationInfomationInRange)
 	e.GET("/stations/:stationid", getStationInfoByID)
+	e.GET("/stations/suggest", getStationNameSuggestion)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":1323"))
