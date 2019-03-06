@@ -12,14 +12,11 @@ $ cd backend
 
 #### 路線データの流し込み ( `N02-17.xml` )
 
-- Requirements: Python 3.x, numpy
+- Requirements: Git LFS
 
 ```bash
-# シード用 SQL ファイルの生成
-$ cd resouces/N02-17_GML
-$ ./N02-17_parse.py N02-17.xml
-# シードファイル を コンテナ立ち上げ時に流し込むため、initdb.d ディレクトリに移動
-$ mv N02-17_seeds.sql ../../config/mysql/initdb.d/2_seeds.sql
+# このリポジトリのルートで実行。GitLFS管理しているN02-17.xmlと2_seed.sqlを取得
+$ git lfs pull
 
 # backend ディレクトリに戻る
 $ cd ../../
@@ -48,21 +45,23 @@ $ docker-compose build
 ## Run
 
 ```sh
-$ docker-compose up -d 
+$ docker-compose up -d
 ```
 
 ## Tips -- Docker
 
 - エイリアスを貼っておくと楽？
+
 ```sh
 $ alias d='docker'
 $ alias dc='docker-compose'
 ```
 
 - docker-compose: 起動と終了
+
 ```sh
 # 標準起動の場合(標準出力がロギングのために奪われる)
-$ docker-compose up 
+$ docker-compose up
 # デーモン起動の場合
 $ docker-compose up -d
 
@@ -71,6 +70,7 @@ $ docker-compose down
 ```
 
 - docker-compose: ログ表示
+
 ```sh
 # 全体ログ表示
 $ docker-compose logs
@@ -82,11 +82,13 @@ $ docker-compse -f app
 
 - docker-compose: 標準入力にアタッチ
   - デバッグ時のインタプリタ入力にアタッチする際に使用するかも
+
 ```sh
 $ docker attach $(docker-compose ps -q )
 ```
 
 - docker イメージの削除
+
 ```
 # ビルド失敗時に生成された一時イメージの削除
 $ docker rmi --force $(docker images -q --filter "dangling=true")
@@ -94,4 +96,3 @@ $ docker rmi --force $(docker images -q --filter "dangling=true")
 # 全イメージの削除
 $ docker-compose down --rmi all --volumes --remove-orphans
 ```
-
