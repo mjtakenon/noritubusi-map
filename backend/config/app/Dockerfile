@@ -1,5 +1,5 @@
 FROM golang:1.12.0 
-WORKDIR $GOPATH/src/noritubusi-map/app
+WORKDIR $GOPATH/src/noritubusi-map/backend/app
 
 COPY . .
 

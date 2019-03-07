@@ -3,9 +3,10 @@ package main
 import (
 	"log"
 	"net/http"
-	"noritubusi-map/app/station"
+	"noritubusi-map/backend/app/station"
+	"strconv"
+
 	"os"
-	"time"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
@@ -35,6 +36,34 @@ func getStationInfomationInRange(c echo.Context) error {
 	return c.JSON(http.StatusOK, stationInfo)
 }
 
+func getStationInfoByID(c echo.Context) error {
+	stationID, err := strconv.Atoi(c.Param("stationid"))
+	if err != nil {
+		return c.String(http.StatusBadRequest, "invalid parameter")
+	}
+
+	stationInfo, err := stationInfoDB.GetStationInfoByID(stationID)
+	if err != nil {
+		return c.String(http.StatusNotFound, "not found")
+	}
+
+	return c.JSON(http.StatusOK, stationInfo)
+}
+
+func getStationNameSuggestion(c echo.Context) error {
+	keyword := c.QueryParam("keyword")
+	if keyword == "" {
+		return c.String(http.StatusBadRequest, "invalid parameter")
+	}
+
+	stationInfos, err := stationInfoDB.GetStationsInfoByKeyword(keyword)
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "server error")
+	}
+
+	return c.JSON(http.StatusOK, stationInfos)
+}
+
 var (
 	stationInfoDB station.StationDB
 )
@@ -57,7 +86,6 @@ func main() {
 	e.Use(middleware.Recover())
 
 	// stationInfo DB connect
-	time.Sleep(40)
 	err := stationInfoDB.New(stationInfoDBUserName, stationInfoDBPassword, stationInfoDBAddress, stationInfoDBName)
 	if err != nil {
 		e.Logger.Fatal("station DB Connection Error:", err)
@@ -66,6 +94,8 @@ func main() {
 	// Routes
 	e.GET("/", hello)
 	e.GET("/stations", getStationInfomationInRange)
+	e.GET("/stations/:stationid", getStationInfoByID)
+	e.GET("/stations/suggest", getStationNameSuggestion)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":1323"))

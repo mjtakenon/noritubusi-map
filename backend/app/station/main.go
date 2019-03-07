@@ -41,7 +41,7 @@ func (s *StationDB) New(userName, password, address, dbName string) error {
 }
 
 func (s *StationDB) GetStationInfoInRange(beginLat, beginLong, endLat, endLong string) ([]stationInfo, error) {
-	query := `select id,station_name,X(center_latlong) AS 'lat',Y(center_latlong) AS 'long',operation_company,service_provider_type,railway_line_name,railway_type from stations where MBRContains(GeomFromText(CONCAT("LINESTRING(",?," ",?,",",?," ", ?,")")),center_latlong)`
+	query := `select id,station_name,ST_X(center_latlong) AS 'lat',ST_Y(center_latlong) AS 'long',operation_company,service_provider_type,railway_line_name,railway_type from stations where MBRContains(GeomFromText(CONCAT("LINESTRING(",?," ",?,",",?," ", ?,")")),center_latlong)`
 
 	infos := []stationInfo{}
 	err := s.DB.Select(&infos, query, beginLat, beginLong, endLat, endLong)
@@ -50,4 +50,25 @@ func (s *StationDB) GetStationInfoInRange(beginLat, beginLong, endLat, endLong s
 	}
 
 	return infos, nil
+}
+
+func (s *StationDB) GetStationInfoByID(id int) (stationInfo, error) {
+	query := `select id,station_name,ST_X(center_latlong) AS 'lat',ST_Y(center_latlong) AS 'long',operation_company,service_provider_type,railway_line_name,railway_type from stations where id = ?`
+
+	var info stationInfo
+	err := s.DB.Get(&info, query, id)
+
+	// Getは何も存在しないとerrorを返すのでerrorチェックの必要がない
+	return info, err
+}
+
+func (s *StationDB) GetStationsInfoByKeyword(keyword string) ([]stationInfo, error) {
+	query := `select id,station_name,ST_X(center_latlong) AS 'lat',ST_Y(center_latlong) AS 'long',operation_company,service_provider_type,railway_line_name,railway_type from stations where station_name like concat("%",?,"%");`
+
+	suggestedStations := []stationInfo{}
+	err := s.DB.Select(&suggestedStations, query, keyword)
+	if err != nil {
+		return nil, err
+	}
+	return suggestedStations, nil
 }
