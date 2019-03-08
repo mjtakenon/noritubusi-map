@@ -16,7 +16,7 @@
 
 ## やること
 
-* -> Go to [Project page](../../projects/1)
+-> Go to [Project page](../../projects/1)
 
 ## Requirements
 
