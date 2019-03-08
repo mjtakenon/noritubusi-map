@@ -32,6 +32,8 @@ import { LMap, LTileLayer } from "vue2-leaflet";
 import TMarker from "./Marker";
 import "leaflet/dist/leaflet.css";
 
+import axios from "axios";
+
 export default {
   components: {
     LMap,
