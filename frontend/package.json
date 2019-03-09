@@ -1,7 +1,23 @@
 {
-  "name": "vue_cli_3",
+  "name": "noritubusi-map",
+  "description": "This is the frontend application of 'noritubusi-map'",
   "version": "0.1.0",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mjtakenon/noritubusi-map"
+  },
+  "author": {
+    "name": "So Takeuchi",
+    "email": "mjtakenon@gmail.com",
+    "url": "https://github.com/mjtakenon"
+  },
+  "contributors": [{
+    "name": "Fumiya Endou",
+    "email": "fantom0779@gmail.com",
+    "url": "https://github.com/popunbom"
+  }],
+  "main": "src/main.js",
   "scripts": {
     "serve": "vue-cli-service serve src/main.js",
     "build": "vue-cli-service build src/main.js",
