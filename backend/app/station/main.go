@@ -41,7 +41,7 @@ func (s *StationDB) New(userName, password, address, dbName string) error {
 }
 
 func (s *StationDB) GetStationInfoInRange(beginLat, beginLong, endLat, endLong string) ([]stationInfo, error) {
-	query := `select id,station_name,ST_X(center_latlong) AS 'lat',ST_Y(center_latlong) AS 'long',operation_company,service_provider_type,railway_line_name,railway_type from stations where MBRContains(GeomFromText(CONCAT("LINESTRING(",?," ",?,",",?," ", ?,")")),center_latlong)`
+	query := `select id,station_name,ST_X(center_latlong) AS 'lat',ST_Y(center_latlong) AS 'long',operation_company,service_provider_type,railway_line_name,railway_type from stations where MBRContains(GeomFromText(CONCAT("LINESTRING(",?," ",?,",",?," ", ?,")")),center_latlong) order by id`
 
 	infos := []stationInfo{}
 	err := s.DB.Select(&infos, query, beginLat, beginLong, endLat, endLong)
@@ -53,7 +53,7 @@ func (s *StationDB) GetStationInfoInRange(beginLat, beginLong, endLat, endLong s
 }
 
 func (s *StationDB) GetStationInfoByID(id int) (stationInfo, error) {
-	query := `select id,station_name,ST_X(center_latlong) AS 'lat',ST_Y(center_latlong) AS 'long',operation_company,service_provider_type,railway_line_name,railway_type from stations where id = ?`
+	query := `select id,station_name,ST_X(center_latlong) AS 'lat',ST_Y(center_latlong) AS 'long',operation_company,service_provider_type,railway_line_name,railway_type from stations where id = ? order by id`
 
 	var info stationInfo
 	err := s.DB.Get(&info, query, id)
@@ -63,7 +63,7 @@ func (s *StationDB) GetStationInfoByID(id int) (stationInfo, error) {
 }
 
 func (s *StationDB) GetStationsInfoByKeyword(keyword string) ([]stationInfo, error) {
-	query := `select id,station_name,ST_X(center_latlong) AS 'lat',ST_Y(center_latlong) AS 'long',operation_company,service_provider_type,railway_line_name,railway_type from stations where station_name like concat("%",?,"%");`
+	query := `select id,station_name,ST_X(center_latlong) AS 'lat',ST_Y(center_latlong) AS 'long',operation_company,service_provider_type,railway_line_name,railway_type from stations where station_name like concat("%",?,"%") order by id;`
 
 	suggestedStations := []stationInfo{}
 	err := s.DB.Select(&suggestedStations, query, keyword)
