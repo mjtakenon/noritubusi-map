@@ -3,7 +3,7 @@
     <l-map
       class="l-map"
       ref="mainMap"
-      :options="{zoomControl: false}"
+      :options="{ zoomControl: false }"
       :zoom="zoom"
       :center="center"
       @update:zoom="zoomUpdated"
@@ -12,7 +12,7 @@
     >
       <l-tile-layer :url="url"></l-tile-layer>
       <!-- <l-marker v-for="(m, i) in markers" :key="i" :lat-lng="m.latlong"></l-marker> -->
-      <TMarker v-for="(m, i) in markers" :key="i" :lat-long="m"/>
+      <TMarker v-for="(m, i) in markers" :key="i" :lat-long="m" />
     </l-map>
     <v-toolbar class="float-toolbar" dense floating>
       <v-btn icon>
@@ -31,6 +31,8 @@
 import { LMap, LTileLayer } from "vue2-leaflet";
 import TMarker from "./Marker";
 import "leaflet/dist/leaflet.css";
+
+import axios from "axios";
 
 export default {
   components: {

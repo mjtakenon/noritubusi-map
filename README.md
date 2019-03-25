@@ -1,12 +1,12 @@
-# 乗り潰しマップ自分用メモ
+# noritubusi-map (乗りつぶしマップ)
 
-* 鉄路乗り潰すオタク用ツール
+* 鉄路乗りつぶすオタク用ツール
 
-## 仕様
+## Features (in the future)
 
-* ブラウザで動く
+* [x] ブラウザで動く
 * これらの情報を表示
-  * 地図
+  * [x] 地図
   * 路線図
     * 乗り潰したところは色を変える
     * JRと私鉄でも変える
@@ -16,25 +16,25 @@
 
 ## やること
 
-* 地図と路線図の表示
-  * 地図はとりあえずgoogle map api
-  * 路線図をDBに格納して動的に読み込みたい
-    * 通信量が ...
+-> Go to [Project page](../../projects/1)
 
-* 詳細は issue を見て
+## Requirements
 
-## 環境構築
+- Docker, docker-compose
+- Node.js ( 10.15.x )
+- Git LFS
+
+## Setup
+
+```sh
+$ git clone https://github.com/mjtakenon/noritubusi-map
+$ cd noritubusi-map
+$ git lfs pull
+```
 
 - バックエンド   → [doc/環境構築_BE.md](doc/環境構築_BE.md)
 - フロントエンド → [doc/環境構築_FE.md](doc/環境構築_FE.md)
 
-- ~~`create-dev-environment` ブランチにて展開中 ...~~
-  + `create-db-datasets` にて作業中 ... (2019/01/07 15:14)
-
-- Git LFSについて
-  + `config/mysql/init.d/2_seeds.sql`をGitLFS管理にしました。
-  + このブランチを取り込む前にGitLFSを導入してください
-    + https://blog.amedama.jp/entry/2017/11/19/091626
 
 ## 参考リンク
 

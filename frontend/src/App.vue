@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <Map/>
+    <Map />
   </v-app>
 </template>
 
