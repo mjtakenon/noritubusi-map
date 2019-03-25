@@ -526,3 +526,10 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.gitignore.io/api/go,vue,vim,node,ruby,rails,macos,linux,emacs,vuejs,python,windows,sublimetext,visualstudiocode
+
+### yarn ###
+
+# package files
+
+package-lock.json
+yarn.lock
