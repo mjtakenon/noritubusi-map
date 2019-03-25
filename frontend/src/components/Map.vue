@@ -96,6 +96,12 @@ export default {
           console.log(`Axios ERROR!: ${err}`);
         });
     }
-  }
+  },
+  mounted: function () {
+  this.$nextTick(function () {
+    // 初期位置・ズームの設定
+    this.bounds = this.$refs.mainMap.mapObject.getBounds();
+  })
+}
 };
 </script>
