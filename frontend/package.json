@@ -12,11 +12,13 @@
     "email": "mjtakenon@gmail.com",
     "url": "https://github.com/mjtakenon"
   },
-  "contributors": [{
-    "name": "Fumiya Endou",
-    "email": "fantom0779@gmail.com",
-    "url": "https://github.com/popunbom"
-  }],
+  "contributors": [
+    {
+      "name": "Fumiya Endou",
+      "email": "fantom0779@gmail.com",
+      "url": "https://github.com/popunbom"
+    }
+  ],
   "main": "src/main.js",
   "scripts": {
     "serve": "vue-cli-service serve src/main.js",
@@ -28,7 +30,8 @@
     "vue": "^2.6.6",
     "vue-router": "^3.0.1",
     "vue2-leaflet": "^2.0.2",
-    "vuetify": "^1.5.5"
+    "vuetify": "^1.5.5",
+    "yarn": "^1.13.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.4.0",
