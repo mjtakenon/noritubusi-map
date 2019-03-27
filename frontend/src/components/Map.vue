@@ -87,9 +87,11 @@ export default {
           console.log(`response: ${resp}`);
           console.log(`status: ${resp.status}`);
           console.log(resp.data);
+
           this.markers = resp.data.map(elem => ({
             lat: elem.latitude,
-            lng: elem.longitude
+            lng: elem.longitude,
+            popup: L.popup().setContent(elem.name)
           }));
         })
         .catch(err => {

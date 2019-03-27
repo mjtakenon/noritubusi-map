@@ -1,20 +1,16 @@
 <template>
-  <l-marker :lat-lng="latLong" @l-add="$event.target.openPopup()">
-    <l-popup>test</l-popup>
-  </l-marker>
-  
+  <l-popup :lat-lng="latLong"> Hello! </l-popup>
 </template>
 
 <script>
-import { LMarker, LPopup } from "vue2-leaflet";
+import { LPopup } from "vue2-leaflet";
 
 export default {
   components: {
-    LMarker,
     LPopup
   },
   props: {
-    latLong: {
+    latLng: {
       type: Object,
       required: true
     }
