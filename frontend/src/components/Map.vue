@@ -12,7 +12,7 @@
     >
       <l-tile-layer :url="url"></l-tile-layer>
       <!-- <l-marker v-for="(m, i) in markers" :key="i" :lat-lng="m.latlong"></l-marker> -->
-      <TMarker v-for="(m, i) in markers" :key="i" :lat-long="m" />
+      <TMarker v-for="(m, i) in markers" :key="i" :lat-long="m"/>
     </l-map>
     <v-toolbar class="float-toolbar" dense floating>
       <v-btn icon>
@@ -87,11 +87,11 @@ export default {
           console.log(`response: ${resp}`);
           console.log(`status: ${resp.status}`);
           console.log(resp.data);
-
           this.markers = resp.data.map(elem => ({
             lat: elem.latitude,
             lng: elem.longitude,
-            popup: L.popup().setContent(elem.name)
+            name: elem.name,
+            railwayName: elem.railwayName
           }));
         })
         .catch(err => {

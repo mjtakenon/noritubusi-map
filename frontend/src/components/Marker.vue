@@ -1,6 +1,6 @@
 <template>
-  <l-marker :lat-lng="latLong" @l-add="$event.target.openPopup()">
-    <l-popup>test</l-popup>
+  <l-marker :lat-lng="latLong" v-on:click="onClick" @l-add="$event.target.openPopup()">
+    <l-popup> {{ this.latLong.name }} </l-popup>
   </l-marker>
   
 </template>
@@ -21,6 +21,12 @@ export default {
   },
   data() {
     return {};
+  },
+  methods: {
+    onClick : function() {
+      console.log(this)
+    }
   }
 };
+
 </script>
