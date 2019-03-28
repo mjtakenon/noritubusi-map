@@ -12,13 +12,14 @@
     >
       <l-tile-layer :url="url"></l-tile-layer>
       <!-- <l-marker v-for="(m, i) in markers" :key="i" :lat-lng="m.latlong"></l-marker> -->
-      <TMarker v-for="(m) in markers" :key="m.id" :data="m"/>
+      <TMarker v-for="m in markers" :key="m.id" :data="m"/>
     </l-map>
     <v-toolbar class="float-toolbar" dense floating>
       <v-btn icon>
         <v-icon>search</v-icon>
       </v-btn>
-      <v-text-field clearable label="駅名を入力" single-line></v-text-field>
+      <!-- <v-text-field clearable label="駅名を入力" single-line ></v-text-field> -->
+      <v-autocomplete ref="autoComplete" label="駅名を入力" :single-line="true" :items="stationList" append-icon="" clearable :search-input.sync="searchText" no-data-text="検索結果なし"></v-autocomplete>
       <v-btn icon @click="getCurrentRect">
         <v-icon>my_location</v-icon>
       </v-btn>
@@ -59,7 +60,10 @@ export default {
           lng: 139.79489050805572
         }
       },
-      markers: []
+      markers: [],
+      stationList: [],
+      searchText:"",
+      inputedText:""
     };
   },
   methods: {
@@ -105,7 +109,22 @@ export default {
   this.$nextTick(function () {
     // 初期位置・ズームの設定
     this.bounds = this.$refs.mainMap.mapObject.getBounds();
-  })
-}
+  })},
+  watch: {
+    searchText(str) {
+      console.log("searchText : "+isEmpty(str));
+      // console.log(this.$refs.autoComplete.clearableCallback());
+      if(isEmpty(str)) {
+        // this.stationList = [];
+        // this.$refs.autoComplete.isMenuActive = false;
+        this.$refs.autoComplete.lazyValue = "";
+      } else {
+        // TODO ここにサジェストで帰ってきた候補を代入するとサジェストが動く
+        this.stationList = ['東京', '大阪', '茨城', '千葉', '滋賀', '佐賀', '京都', '東根室', '中京競馬場前', '東岡崎' ];
+        // this.$refs.autoComplete.isMenuActive = true;
+      }
+    }
+  }
 };
+function isEmpty(val){return !val?!(val===0||val===false)?true:false:false;}
 </script>
