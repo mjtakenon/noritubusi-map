@@ -7,5 +7,6 @@ CREATE TABLE IF NOT EXISTS `stations` (
   `railway_line_name`      VARCHAR(128) NOT NULL,
   `railway_type`           TINYINT UNSIGNED NOT NULL,
   PRIMARY KEY (`id`),
+  KEY `station_name` (`station_name`),
   SPATIAL INDEX (`center_latlong`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
