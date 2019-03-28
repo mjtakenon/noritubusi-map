@@ -44,7 +44,7 @@
             <v-icon>search</v-icon>
           </v-btn>
           <!-- <v-toolbar-title>Inbox</v-toolbar-title> -->
-          <v-text-field clearable label="駅名を入力" single-line v-model="textField"></v-text-field>
+          <v-text-field clearable label="駅名を入力" single-line v-model="textField" @keyup.enter="searchStation" ></v-text-field>
           <v-btn icon @click="getCurrentRect">
             <v-icon>my_location</v-icon>
           </v-btn>
@@ -167,18 +167,17 @@ export default {
             name: elem.name,
             companyName: elem.company,
             railwayName: elem.railwayName,
-            id: elem.id
-          }));
-          // 駅名が完全一致でなければ表示をしない
-          for(var n=resp.data.length-1; n>=0; n--) {
-            if(this.markers[n].name !== this.textField) {
-              this.markers.splice(n, 1);
-            }
+            id: elem.id }));
+        // 駅名が完全一致でなければ表示をしない
+        for(var n=resp.data.length-1; n>=0; n--) {
+          if(this.markers[n].name !== this.textField) {
+            this.markers.splice(n, 1);
           }
-          // もし完全一致する駅が存在すれば検索結果の1つ目の駅にフォーカス
-          if(this.markers.length >= 1){
-            this.$refs.mainMap.mapObject.panTo([this.markers[0].lat,this.markers[0].lng]);
-          }
+        }
+        // もし完全一致する駅が存在すれば検索結果の1つ目の駅にフォーカス
+        if(this.markers.length >= 1){
+          this.$refs.mainMap.mapObject.panTo([this.markers[0].lat,this.markers[0].lng]);
+        }
       })
     },
     stationListClicked() {
