@@ -12,7 +12,7 @@
     >
       <l-tile-layer :url="url"></l-tile-layer>
       <!-- <l-marker v-for="(m, i) in markers" :key="i" :lat-lng="m.latlong"></l-marker> -->
-      <TMarker v-for="(m, i) in markers" :key="i" :lat-long="m"/>
+      <TMarker v-for="(m) in markers" :key="m.id" :data="m"/>
     </l-map>
     <v-toolbar class="float-toolbar" dense floating>
       <v-btn icon>
@@ -91,7 +91,9 @@ export default {
             lat: elem.latitude,
             lng: elem.longitude,
             name: elem.name,
-            railwayName: elem.railwayName
+            companyName: elem.company,
+            railwayName: elem.railwayName,
+            id: elem.id
           }));
         })
         .catch(err => {
