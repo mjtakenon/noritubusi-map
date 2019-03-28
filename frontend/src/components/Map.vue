@@ -14,16 +14,54 @@
       <!-- <l-marker v-for="(m, i) in markers" :key="i" :lat-lng="m.latlong"></l-marker> -->
       <TMarker v-for="m in markers" :key="m.id" :data="m"/>
     </l-map>
-    <v-toolbar class="float-toolbar" dense floating>
-      <v-btn icon>
+    <!-- <v-toolbar class="float-toolbar" dense floating extended height="200px"> -->
+      <!-- <v-btn icon @click="searchStation">
         <v-icon>search</v-icon>
       </v-btn>
-      <!-- <v-text-field clearable label="駅名を入力" single-line ></v-text-field> -->
-      <v-autocomplete ref="autoComplete" label="駅名を入力" :single-line="true" :items="stationList" append-icon="" clearable :search-input.sync="searchText" no-data-text="検索結果なし"></v-autocomplete>
-      <v-btn icon @click="getCurrentRect">
+      <v-text-field clearable label="駅名を入力" single-line ></v-text-field> -->
+      <!-- <v-autocomplete ref="autoComplete" label="駅名を入力" :single-line="true" :items="stationList" append-icon="" clearable :search-input.sync="searchText" no-data-text="検索結果なし"></v-autocomplete> -->
+      <!-- <v-btn icon @click="getCurrentRect">
         <v-icon>my_location</v-icon>
-      </v-btn>
-    </v-toolbar>
+      </v-btn> -->
+      <!-- <v-list>
+        <v-list-tile
+          v-for="l in stationList"
+          :key="l.id"
+          @click="stationListClicked">
+          <v-list-tile-content>
+            <v-list-tile-title v-text="l.name"></v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+      </v-list>
+    </v-toolbar> -->
+    <v-layout align-start justify-start row/> 
+    <br>
+    <v-flex xs4 offset-xs1 sm3 offset-sm1 md2 offset-md1>
+      <v-card>
+        <v-toolbar>
+          <!-- <v-toolbar-side-icon></v-toolbar-side-icon> -->
+          <v-btn icon @click="searchStation">
+            <v-icon>search</v-icon>
+          </v-btn>
+          <!-- <v-toolbar-title>Inbox</v-toolbar-title> -->
+          <v-text-field clearable label="駅名を入力" single-line v-model="textField"></v-text-field>
+          <v-btn icon @click="getCurrentRect">
+            <v-icon>my_location</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-list v-show="hasResult">
+          <v-list-tile
+            v-for="l in stationList"
+            :key="l.id"
+            @click="stationListClicked">
+            <v-list-tile-content>
+              <v-list-tile-title v-text="l.name"></v-list-tile-title>
+              <v-list-tile-sub-title v-text="l.railwayName"></v-list-tile-sub-title>
+            </v-list-tile-content>
+          </v-list-tile>
+        </v-list>
+      </v-card>
+    </v-flex>
   </div>
 </template>
 
@@ -61,9 +99,13 @@ export default {
         }
       },
       markers: [],
-      stationList: [],
-      searchText:"",
-      inputedText:""
+      stationList: [
+        {name: "東京", railwayName: "東海道本線", id: 1},
+        {name: "大阪", railwayName: "東海道本線", id: 2},
+        {name: "名古屋", railwayName: "東海道本線", id: 3},
+      ],
+      textField: "",
+      hasResult: false
     };
   },
   methods: {
@@ -103,6 +145,44 @@ export default {
         .catch(err => {
           console.log(`Axios ERROR!: ${err}`);
         });
+    },
+    // DBからstrをキーワードに駅検索
+    getStationList(str) {
+      axios.get(`http://${window.location.hostname}:1323/stations/suggest?keyword=` + str)
+        .then(resp => {
+          console.log(resp.data);
+      })
+    },
+    // 駅名で検索・移動
+    // 駅検索
+    searchStation() {
+      console.log("search:" + this.textField);
+      // TODO: 別の関数を呼び出すとReferenceErrorる
+      // getStationList(this.textField);
+      axios.get(`http://${window.location.hostname}:1323/stations/suggest?keyword=` + this.textField)
+        .then(resp => {
+          this.markers = resp.data.map(elem => ({
+            lat: elem.latitude,
+            lng: elem.longitude,
+            name: elem.name,
+            companyName: elem.company,
+            railwayName: elem.railwayName,
+            id: elem.id
+          }));
+          // 駅名が完全一致でなければ表示をしない
+          for(var n=resp.data.length-1; n>=0; n--) {
+            if(this.markers[n].name !== this.textField) {
+              this.markers.splice(n, 1);
+            }
+          }
+          // もし完全一致する駅が存在すれば検索結果の1つ目の駅にフォーカス
+          if(this.markers.length >= 1){
+            this.$refs.mainMap.mapObject.panTo([this.markers[0].lat,this.markers[0].lng]);
+          }
+      })
+    },
+    stationListClicked() {
+      
     }
   },
   mounted: function () {
@@ -111,17 +191,19 @@ export default {
     this.bounds = this.$refs.mainMap.mapObject.getBounds();
   })},
   watch: {
-    searchText(str) {
-      console.log("searchText : "+isEmpty(str));
+    textField(str) {
+      console.log("textField :" + str);
       // console.log(this.$refs.autoComplete.clearableCallback());
       if(isEmpty(str)) {
         // this.stationList = [];
         // this.$refs.autoComplete.isMenuActive = false;
-        this.$refs.autoComplete.lazyValue = "";
+        // this.$refs.autoComplete.lazyValue = "";
+        this.hasResult = false;
       } else {
         // TODO ここにサジェストで帰ってきた候補を代入するとサジェストが動く
-        this.stationList = ['東京', '大阪', '茨城', '千葉', '滋賀', '佐賀', '京都', '東根室', '中京競馬場前', '東岡崎' ];
-        // this.$refs.autoComplete.isMenuActive = true;
+        // this.stationList = ['東京', '大阪', '茨城', '千葉', '滋賀', '佐賀', '京都', '東根室', '中京競馬場前', '東岡崎' ];
+        // this.$refs.autoComplete.lazySearch
+        this.hasResult = true;
       }
     }
   }
