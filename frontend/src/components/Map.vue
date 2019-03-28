@@ -14,6 +14,8 @@
       <!-- <l-marker v-for="(m, i) in markers" :key="i" :lat-lng="m.latlong"></l-marker> -->
       <TMarker v-for="m in markers" :key="m.id" :data="m"/>
     </l-map>
+    <!-- v-autocompleteはバグ(仕様)が多くて使いづらかったため没 -->
+    <!-- v-toolbarのfloatingは表示が崩れて難しい -->
     <!-- <v-toolbar class="float-toolbar" dense floating extended height="200px"> -->
       <!-- <v-btn icon @click="searchStation">
         <v-icon>search</v-icon>
@@ -50,10 +52,11 @@
           </v-btn>
         </v-toolbar>
         <v-list v-show="hasResult">
+          <!-- array.slice はバックエンドでやるべき -->
           <v-list-tile
-            v-for="l in stationList"
+            v-for="l in stationList.slice(0, 5)"
             :key="l.id"
-            @click="stationListClicked">
+            @click="stationListClicked(l.id)">
             <v-list-tile-content>
               <v-list-tile-title v-text="l.name"></v-list-tile-title>
               <v-list-tile-sub-title v-text="l.railwayName"></v-list-tile-sub-title>
@@ -180,8 +183,21 @@ export default {
         }
       })
     },
-    stationListClicked() {
-      
+    stationListClicked(val) {
+      axios.get(`http://${window.location.hostname}:1323/stations/` + val)
+          .then(resp => {
+            // Arrayじゃないとmapができないため配列に
+            resp.data = [resp.data];
+            this.markers = resp.data.map(elem => ({
+              lat: elem.latitude,
+              lng: elem.longitude,
+              name: elem.name,
+              companyName: elem.company,
+              railwayName: elem.railwayName,
+              id: elem.id }));
+            // 駅をフォーカスして表示
+            this.$refs.mainMap.mapObject.panTo([this.markers[0].lat,this.markers[0].lng]);
+          })
     }
   },
   mounted: function () {
@@ -191,18 +207,28 @@ export default {
   })},
   watch: {
     textField(str) {
-      console.log("textField :" + str);
-      // console.log(this.$refs.autoComplete.clearableCallback());
+      // console.log("textField :" + str);
+      // 何も入力されてなければリストは非表示
       if(isEmpty(str)) {
-        // this.stationList = [];
-        // this.$refs.autoComplete.isMenuActive = false;
-        // this.$refs.autoComplete.lazyValue = "";
         this.hasResult = false;
-      } else {
-        // TODO ここにサジェストで帰ってきた候補を代入するとサジェストが動く
-        // this.stationList = ['東京', '大阪', '茨城', '千葉', '滋賀', '佐賀', '京都', '東根室', '中京競馬場前', '東岡崎' ];
-        // this.$refs.autoComplete.lazySearch
-        this.hasResult = true;
+      } 
+      // 入力された文字列が駅名に一致すればリストに表示
+      // 文字列が入力されていて一致がなければ最後のリストを表示し続ける
+      else {
+          axios.get(`http://${window.location.hostname}:1323/stations/suggest?keyword=` + this.textField)
+          .then(resp => {
+            var list = resp.data.map(elem => ({
+            lat: elem.latitude,
+            lng: elem.longitude,
+            name: elem.name,
+            companyName: elem.company,
+            railwayName: elem.railwayName,
+            id: elem.id }));
+            if (list.length >= 1) {
+              this.stationList = list;
+              this.hasResult = true;
+            }
+          })
       }
     }
   }
