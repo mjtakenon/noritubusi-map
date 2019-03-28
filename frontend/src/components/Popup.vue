@@ -1,5 +1,23 @@
 <template>
-  <l-popup :lat-lng="latLong"> Hello! </l-popup>
+  <l-popup> 
+    ID:{{ this.data.id }} <br>
+    <H1>{{ this.data.name }} </H1>
+    <!-- <H2> 🚊  {{ this.data.companyName }} : {{ this.data.railwayName }} </H2>  -->
+    <v-list>
+      <v-list-tile
+        v-for="(c, idx) in this.data.companyName"
+        :key="idx"
+        @click="companyNameClicked(idx)">
+        <v-list-tile-avatar>
+          <H1>{{icon}}</H1> <!-- <v-icon :class="[item.iconClass]">{{ item.icon }}</v-icon> -->
+        </v-list-tile-avatar>
+        <v-list-tile-content>
+          <v-list-tile-title> {{ data.railwayName[idx] }}</v-list-tile-title>
+          <v-list-tile-sub-title> {{ data.companyName[idx] }} </v-list-tile-sub-title>
+        </v-list-tile-content>
+      </v-list-tile>
+    </v-list>
+  </l-popup>
 </template>
 
 <script>
@@ -10,13 +28,30 @@ export default {
     LPopup
   },
   props: {
-    latLng: {
+    data: {
       type: Object,
       required: true
     }
   },
   data() {
-    return {};
-  }
+    return {
+      icon: ""
+    };
+  },
+  methods: {
+      companyNameClicked(val) {
+        console.log(val);
+    }
+  },
+  mounted: function () {
+  this.$nextTick(function () {
+    // アイコンの指定
+    // 新幹線以外
+    if(this.data.railwayName[0].indexOf("新幹線") !== -1) {
+      this.icon="🚆"
+    } else {
+      this.icon="🚊"
+    }
+  })}
 };
 </script>

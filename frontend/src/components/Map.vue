@@ -140,8 +140,8 @@ export default {
             lat: elem.latitude,
             lng: elem.longitude,
             name: elem.name,
-            companyName: elem.company,
-            railwayName: elem.railwayName,
+            companyName: [elem.company], // <- Arrayで帰ってくるのであれば不要
+            railwayName: [elem.railwayName], // <- 同上
             id: elem.id
           }));
         })
@@ -168,8 +168,8 @@ export default {
             lat: elem.latitude,
             lng: elem.longitude,
             name: elem.name,
-            companyName: elem.company,
-            railwayName: elem.railwayName,
+            companyName: [elem.company], // <- Arrayで帰ってくるのであれば不要
+            railwayName: [elem.railwayName], // <- 同上
             id: elem.id }));
         // 駅名が完全一致でなければ表示をしない
         for(var n=resp.data.length-1; n>=0; n--) {
@@ -187,14 +187,16 @@ export default {
       axios.get(`http://${window.location.hostname}:1323/stations/` + val)
           .then(resp => {
             // Arrayじゃないとmapができないため配列に
+            // arrayが帰ってこないのでとりあえずこれで対応
             resp.data = [resp.data];
             this.markers = resp.data.map(elem => ({
               lat: elem.latitude,
               lng: elem.longitude,
               name: elem.name,
-              companyName: elem.company,
-              railwayName: elem.railwayName,
+              companyName: [elem.company], // <- Arrayで帰ってくるのであれば不要
+              railwayName: [elem.railwayName], // <- 同上
               id: elem.id }));
+
             // 駅をフォーカスして表示
             this.$refs.mainMap.mapObject.panTo([this.markers[0].lat,this.markers[0].lng]);
           })
