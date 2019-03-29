@@ -1,4 +1,4 @@
-package station
+package db
 
 import (
 	"fmt"
@@ -23,11 +23,11 @@ func (s StationInfo) String() string {
 	return fmt.Sprintf("[%4d]%s, (%s,%s), %s, %d, %s, %d", s.Id, s.Name, s.Latitude, s.Longitude, s.Company, s.ServiceProviderType, s.RailwayName, s.RailwayType)
 }
 
-type StationDB struct {
+type DB struct {
 	DB *sqlx.DB
 }
 
-func (s *StationDB) New(userName, password, address, dbName string) error {
+func (s *DB) New(userName, password, address, dbName string) error {
 	//userName:password@protocol(adress)/dbName
 	db, err := sqlx.Connect("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s", userName, password, address, dbName))
 
@@ -40,7 +40,7 @@ func (s *StationDB) New(userName, password, address, dbName string) error {
 	return nil
 }
 
-func (s *StationDB) GetStationInfoInRange(beginLat, beginLong, endLat, endLong string) ([]StationInfo, error) {
+func (s *DB) GetStationInfoInRange(beginLat, beginLong, endLat, endLong string) ([]StationInfo, error) {
 	query := `select id,station_name,ST_X(center_latlong) AS 'lat',ST_Y(center_latlong) AS 'long',operation_company,service_provider_type,railway_line_name,railway_type from stations where MBRContains(ST_GeomFromText(CONCAT("LINESTRING(",?," ",?,",",?," ", ?,")")),center_latlong) order by id`
 
 	infos := []StationInfo{}
@@ -52,7 +52,7 @@ func (s *StationDB) GetStationInfoInRange(beginLat, beginLong, endLat, endLong s
 	return infos, nil
 }
 
-func (s *StationDB) GetStationInfoByID(id int) (StationInfo, error) {
+func (s *DB) GetStationInfoByID(id int) (StationInfo, error) {
 	query := `select id,station_name,ST_X(center_latlong) AS 'lat',ST_Y(center_latlong) AS 'long',operation_company,service_provider_type,railway_line_name,railway_type from stations where id = ? order by id`
 
 	var info StationInfo
@@ -62,7 +62,7 @@ func (s *StationDB) GetStationInfoByID(id int) (StationInfo, error) {
 	return info, err
 }
 
-func (s *StationDB) GetStationsInfoByKeyword(keyword string) ([]StationInfo, error) {
+func (s *DB) GetStationsInfoByKeyword(keyword string) ([]StationInfo, error) {
 	query := `select id,station_name,ST_X(center_latlong) AS 'lat',ST_Y(center_latlong) AS 'long',operation_company,service_provider_type,railway_line_name,railway_type from stations where station_name like concat("%",?,"%") order by id;`
 
 	suggestedStations := []StationInfo{}

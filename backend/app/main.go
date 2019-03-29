@@ -3,10 +3,9 @@ package main
 import (
 	"log"
 	"net/http"
-	"noritubusi-map/backend/app/station"
-	"strconv"
-
+	"noritubusi-map/backend/app/db"
 	"os"
+	"strconv"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
@@ -27,7 +26,7 @@ func getStationInfomationInRange(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "invalid paramater")
 	}
 
-	stationInfo, err := stationInfoDB.GetStationInfoInRange(beginLat, beginLong, endLat, endLong)
+	stationInfo, err := infoDB.GetStationInfoInRange(beginLat, beginLong, endLat, endLong)
 	if err != nil {
 		log.Println("/stations get info error:", err)
 		return c.String(http.StatusInternalServerError, "server error")
@@ -42,12 +41,12 @@ func getStationInfoByID(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "invalid parameter")
 	}
 
-	stationInfo, err := stationInfoDB.GetStationInfoByID(stationID)
+	stationInfo, err := infoDB.GetStationInfoByID(stationID)
 	if err != nil {
 		return c.String(http.StatusNotFound, "not found")
 	}
 
-	return c.JSON(http.StatusOK, []station.StationInfo{stationInfo})
+	return c.JSON(http.StatusOK, []db.StationInfo{stationInfo})
 }
 
 func getStationNameSuggestion(c echo.Context) error {
@@ -56,7 +55,7 @@ func getStationNameSuggestion(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "invalid parameter")
 	}
 
-	stationInfos, err := stationInfoDB.GetStationsInfoByKeyword(keyword)
+	stationInfos, err := infoDB.GetStationsInfoByKeyword(keyword)
 	if err != nil {
 		return c.String(http.StatusInternalServerError, "server error")
 	}
@@ -65,7 +64,7 @@ func getStationNameSuggestion(c echo.Context) error {
 }
 
 var (
-	stationInfoDB station.StationDB
+	infoDB db.DB
 )
 
 func main() {
@@ -91,7 +90,7 @@ func main() {
 	}))
 
 	// stationInfo DB connect
-	err := stationInfoDB.New(stationInfoDBUserName, stationInfoDBPassword, stationInfoDBAddress, stationInfoDBName)
+	err := infoDB.New(stationInfoDBUserName, stationInfoDBPassword, stationInfoDBAddress, stationInfoDBName)
 	if err != nil {
 		e.Logger.Fatal("station DB Connection Error:", err)
 	}

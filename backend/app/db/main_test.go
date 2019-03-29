@@ -1,4 +1,4 @@
-package station
+package db
 
 import (
 	"fmt"
@@ -65,7 +65,7 @@ func TestStationData_New(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := StationDB{
+			s := DB{
 				DB: tt.fields.DB,
 			}
 			if err := s.New(tt.args.userName, tt.args.password, tt.args.address, tt.args.dbName); (err != nil) != tt.wantErr {
@@ -138,7 +138,7 @@ func TestStationDB_GetStationInfoInRange(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := &StationDB{
+			s := &DB{
 				DB: tt.fields.DB,
 			}
 			got, err := s.GetStationInfoInRange(tt.args.beginLat, tt.args.beginLong, tt.args.endLat, tt.args.endLong)
@@ -193,7 +193,7 @@ func TestStationDB_GetStationInfoByID(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := &StationDB{
+			s := &DB{
 				DB: tt.fields.DB,
 			}
 			got, err := s.GetStationInfoByID(tt.args.id)
@@ -285,7 +285,7 @@ func TestStationDB_GetStationsInfoByKeyword(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := &StationDB{
+			s := &DB{
 				DB: tt.fields.DB,
 			}
 			got, err := s.GetStationsInfoByKeyword(tt.args.keyword)
