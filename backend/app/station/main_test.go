@@ -9,6 +9,21 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+func SetUpDB(t *testing.T) *sqlx.DB {
+	//DBセットアップ
+	userName := "user"
+	password := "password"
+	address := "localhost:3314"
+	dbName := "noritubusi_map"
+	db, err := sqlx.Connect("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s", userName, password, address, dbName))
+
+	if err != nil {
+		t.Errorf("DB Connection Error:%v", err)
+		return nil
+	}
+	return db
+}
+
 func TestStationData_New(t *testing.T) {
 	type fields struct {
 		DB *sqlx.DB
@@ -64,18 +79,6 @@ func TestStationDB_GetStationInfoInRange(t *testing.T) {
 	type fields struct {
 		DB *sqlx.DB
 	}
-
-	//DBセットアップ
-	userName := "user"
-	password := "password"
-	address := "localhost:3314"
-	dbName := "noritubusi_map"
-	db, err := sqlx.Connect("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s", userName, password, address, dbName))
-
-	if err != nil {
-		t.Errorf("DB Connection Error:%v", err)
-		return
-	}
 	type args struct {
 		beginLat  string
 		beginLong string
@@ -91,7 +94,7 @@ func TestStationDB_GetStationInfoInRange(t *testing.T) {
 	}{
 		{
 			name:   "near Hamamatsu Station",
-			fields: fields{DB: db},
+			fields: fields{DB: SetUpDB(t)},
 			args: args{
 				beginLat:  "34.705549",
 				beginLong: "137.729265",
@@ -157,17 +160,6 @@ func TestStationDB_GetStationInfoByID(t *testing.T) {
 	type args struct {
 		id int
 	}
-	//DBセットアップ
-	userName := "user"
-	password := "password"
-	address := "localhost:3314"
-	dbName := "noritubusi_map"
-	db, err := sqlx.Connect("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s", userName, password, address, dbName))
-
-	if err != nil {
-		t.Errorf("DB Connection Error:%v", err)
-		return
-	}
 	tests := []struct {
 		name    string
 		fields  fields
@@ -177,7 +169,7 @@ func TestStationDB_GetStationInfoByID(t *testing.T) {
 	}{
 		{
 			name:   "Shin-Hamamatsu(No.437)",
-			fields: fields{DB: db},
+			fields: fields{DB: SetUpDB(t)},
 			args:   args{id: 437},
 			want: StationInfo{
 				Id:                  437,
@@ -193,7 +185,7 @@ func TestStationDB_GetStationInfoByID(t *testing.T) {
 		},
 		{
 			name:    "not found id number",
-			fields:  fields{DB: db},
+			fields:  fields{DB: SetUpDB(t)},
 			args:    args{id: 12345},
 			want:    StationInfo{},
 			wantErr: true,
@@ -223,17 +215,6 @@ func TestStationDB_GetStationsInfoByKeyword(t *testing.T) {
 	type args struct {
 		keyword string
 	}
-	//DBセットアップ
-	userName := "user"
-	password := "password"
-	address := "localhost:3314"
-	dbName := "noritubusi_map"
-	db, err := sqlx.Connect("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s", userName, password, address, dbName))
-
-	if err != nil {
-		t.Errorf("DB Connection Error:%v", err)
-		return
-	}
 	tests := []struct {
 		name    string
 		fields  fields
@@ -243,7 +224,7 @@ func TestStationDB_GetStationsInfoByKeyword(t *testing.T) {
 	}{
 		{
 			name:   "%浜松%",
-			fields: fields{DB: db},
+			fields: fields{DB: SetUpDB(t)},
 			args: args{
 				keyword: "浜松",
 			},
