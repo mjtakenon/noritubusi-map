@@ -86,7 +86,7 @@ func TestStationDB_GetStationInfoInRange(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    []stationInfo
+		want    []StationInfo
 		wantErr bool
 	}{
 		{
@@ -98,7 +98,7 @@ func TestStationDB_GetStationInfoInRange(t *testing.T) {
 				endLat:    "34.702267",
 				endLong:   "137.741667",
 			},
-			want: []stationInfo{
+			want: []StationInfo{
 				{
 					Id:                  437,
 					Name:                "新浜松",
@@ -172,14 +172,14 @@ func TestStationDB_GetStationInfoByID(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    stationInfo
+		want    StationInfo
 		wantErr bool
 	}{
 		{
 			name:   "Shin-Hamamatsu(No.437)",
 			fields: fields{DB: db},
 			args:   args{id: 437},
-			want: stationInfo{
+			want: StationInfo{
 				Id:                  437,
 				Name:                "新浜松",
 				Latitude:            "34.70341",
@@ -195,7 +195,7 @@ func TestStationDB_GetStationInfoByID(t *testing.T) {
 			name:    "not found id number",
 			fields:  fields{DB: db},
 			args:    args{id: 12345},
-			want:    stationInfo{},
+			want:    StationInfo{},
 			wantErr: true,
 		},
 	}
@@ -238,7 +238,7 @@ func TestStationDB_GetStationsInfoByKeyword(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    []stationInfo
+		want    []StationInfo
 		wantErr bool
 	}{
 		{
@@ -247,7 +247,7 @@ func TestStationDB_GetStationsInfoByKeyword(t *testing.T) {
 			args: args{
 				keyword: "浜松",
 			},
-			want: []stationInfo{
+			want: []StationInfo{
 				{
 					Id:                  437,
 					Name:                "新浜松",

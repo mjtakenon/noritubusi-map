@@ -8,7 +8,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type stationInfo struct {
+type StationInfo struct {
 	Id                  int64  `db:"id" json:"id"`
 	Name                string `db:"station_name" json:"name"`
 	Latitude            string `db:"lat" json:"latitude"`
@@ -19,7 +19,7 @@ type stationInfo struct {
 	RailwayType         int64  `db:"railway_type" json:"railwayType"`
 }
 
-func (s stationInfo) String() string {
+func (s StationInfo) String() string {
 	return fmt.Sprintf("[%4d]%s, (%s,%s), %s, %d, %s, %d", s.Id, s.Name, s.Latitude, s.Longitude, s.Company, s.ServiceProviderType, s.RailwayName, s.RailwayType)
 }
 
@@ -40,10 +40,10 @@ func (s *StationDB) New(userName, password, address, dbName string) error {
 	return nil
 }
 
-func (s *StationDB) GetStationInfoInRange(beginLat, beginLong, endLat, endLong string) ([]stationInfo, error) {
+func (s *StationDB) GetStationInfoInRange(beginLat, beginLong, endLat, endLong string) ([]StationInfo, error) {
 	query := `select id,station_name,ST_X(center_latlong) AS 'lat',ST_Y(center_latlong) AS 'long',operation_company,service_provider_type,railway_line_name,railway_type from stations where MBRContains(ST_GeomFromText(CONCAT("LINESTRING(",?," ",?,",",?," ", ?,")")),center_latlong) order by id`
 
-	infos := []stationInfo{}
+	infos := []StationInfo{}
 	err := s.DB.Select(&infos, query, beginLat, beginLong, endLat, endLong)
 	if err != nil {
 		return nil, err
@@ -52,20 +52,20 @@ func (s *StationDB) GetStationInfoInRange(beginLat, beginLong, endLat, endLong s
 	return infos, nil
 }
 
-func (s *StationDB) GetStationInfoByID(id int) (stationInfo, error) {
+func (s *StationDB) GetStationInfoByID(id int) (StationInfo, error) {
 	query := `select id,station_name,ST_X(center_latlong) AS 'lat',ST_Y(center_latlong) AS 'long',operation_company,service_provider_type,railway_line_name,railway_type from stations where id = ? order by id`
 
-	var info stationInfo
+	var info StationInfo
 	err := s.DB.Get(&info, query, id)
 
 	// Getは何も存在しないとerrorを返すのでerrorチェックの必要がない
 	return info, err
 }
 
-func (s *StationDB) GetStationsInfoByKeyword(keyword string) ([]stationInfo, error) {
+func (s *StationDB) GetStationsInfoByKeyword(keyword string) ([]StationInfo, error) {
 	query := `select id,station_name,ST_X(center_latlong) AS 'lat',ST_Y(center_latlong) AS 'long',operation_company,service_provider_type,railway_line_name,railway_type from stations where station_name like concat("%",?,"%") order by id;`
 
-	suggestedStations := []stationInfo{}
+	suggestedStations := []StationInfo{}
 	err := s.DB.Select(&suggestedStations, query, keyword)
 	if err != nil {
 		return nil, err
