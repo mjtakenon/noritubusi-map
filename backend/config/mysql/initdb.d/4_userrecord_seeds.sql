@@ -1,0 +1,12 @@
+INSERT INTO `user_records` (`user_id`,`station_id`) VALUES ('mjtakenon',2115);
+INSERT INTO `user_records` (`user_id`,`station_id`) VALUES ('mjtakenon',2116);
+INSERT INTO `user_records` (`user_id`,`station_id`) VALUES ('mjtakenon',2117);
+INSERT INTO `user_records` (`user_id`,`station_id`) VALUES ('mjtakenon',2118);
+INSERT INTO `user_records` (`user_id`,`station_id`) VALUES ('mjtakenon',2119);
+INSERT INTO `user_records` (`user_id`,`station_id`) VALUES ('mjtakenon',2120);
+INSERT INTO `user_records` (`user_id`,`station_id`) VALUES ('mjtakenon',2121);
+INSERT INTO `user_records` (`user_id`,`station_id`) VALUES ('mjtakenon',2122);
+INSERT INTO `user_records` (`user_id`,`station_id`) VALUES ('mjtakenon',2123);
+INSERT INTO `user_records` (`user_id`,`station_id`) VALUES ('mjtakenon',2124);
+INSERT INTO `user_records` (`user_id`,`station_id`) VALUES ('mjtakenon',2125);
+INSERT INTO `user_records` (`user_id`,`station_id`) VALUES ('mjtakenon',2126);
