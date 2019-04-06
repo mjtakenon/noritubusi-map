@@ -26,7 +26,7 @@ func getStationInfomationInRange(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "invalid paramater")
 	}
 
-	stationInfo, err := infoDB.GetStationInfoInRange(beginLat, beginLong, endLat, endLong)
+	stationInfo, err := DB.GetStationInfoInRange(beginLat, beginLong, endLat, endLong)
 	if err != nil {
 		log.Println("/stations get info error:", err)
 		return c.String(http.StatusInternalServerError, "server error")
@@ -41,7 +41,7 @@ func getStationInfoByID(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "invalid parameter")
 	}
 
-	stationInfo, err := infoDB.GetStationInfoByID(stationID)
+	stationInfo, err := DB.GetStationInfoByID(stationID)
 	if err != nil {
 		return c.String(http.StatusNotFound, "not found")
 	}
@@ -55,7 +55,7 @@ func getStationNameSuggestion(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "invalid parameter")
 	}
 
-	stationInfos, err := infoDB.GetStationsInfoByKeyword(keyword)
+	stationInfos, err := DB.GetStationsInfoByKeyword(keyword)
 	if err != nil {
 		return c.String(http.StatusInternalServerError, "server error")
 	}
@@ -64,7 +64,7 @@ func getStationNameSuggestion(c echo.Context) error {
 }
 
 var (
-	infoDB db.DB
+	DB db.DB
 )
 
 func main() {
@@ -90,7 +90,7 @@ func main() {
 	}))
 
 	// stationInfo DB connect
-	err := infoDB.New(stationInfoDBUserName, stationInfoDBPassword, stationInfoDBAddress, stationInfoDBName)
+	err := DB.New(stationInfoDBUserName, stationInfoDBPassword, stationInfoDBAddress, stationInfoDBName)
 	if err != nil {
 		e.Logger.Fatal("station DB Connection Error:", err)
 	}

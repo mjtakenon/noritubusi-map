@@ -27,7 +27,7 @@ type DB struct {
 	DB *sqlx.DB
 }
 
-func (s *DB) New(userName, password, address, dbName string) error {
+func (d *DB) New(userName, password, address, dbName string) error {
 	//userName:password@protocol(adress)/dbName
 	db, err := sqlx.Connect("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s", userName, password, address, dbName))
 
@@ -36,15 +36,15 @@ func (s *DB) New(userName, password, address, dbName string) error {
 		return err
 	}
 
-	s.DB = db
+	d.DB = db
 	return nil
 }
 
-func (s *DB) GetStationInfoInRange(beginLat, beginLong, endLat, endLong string) ([]StationInfo, error) {
+func (d *DB) GetStationInfoInRange(beginLat, beginLong, endLat, endLong string) ([]StationInfo, error) {
 	query := `select id,station_name,ST_X(center_latlong) AS 'lat',ST_Y(center_latlong) AS 'long',operation_company,service_provider_type,railway_line_name,railway_type from stations where MBRContains(ST_GeomFromText(CONCAT("LINESTRING(",?," ",?,",",?," ", ?,")")),center_latlong) order by id`
 
 	infos := []StationInfo{}
-	err := s.DB.Select(&infos, query, beginLat, beginLong, endLat, endLong)
+	err := d.DB.Select(&infos, query, beginLat, beginLong, endLat, endLong)
 	if err != nil {
 		return nil, err
 	}
@@ -52,21 +52,21 @@ func (s *DB) GetStationInfoInRange(beginLat, beginLong, endLat, endLong string) 
 	return infos, nil
 }
 
-func (s *DB) GetStationInfoByID(id int) (StationInfo, error) {
+func (d *DB) GetStationInfoByID(id int) (StationInfo, error) {
 	query := `select id,station_name,ST_X(center_latlong) AS 'lat',ST_Y(center_latlong) AS 'long',operation_company,service_provider_type,railway_line_name,railway_type from stations where id = ? order by id`
 
 	var info StationInfo
-	err := s.DB.Get(&info, query, id)
+	err := d.DB.Get(&info, query, id)
 
 	// Getは何も存在しないとerrorを返すのでerrorチェックの必要がない
 	return info, err
 }
 
-func (s *DB) GetStationsInfoByKeyword(keyword string) ([]StationInfo, error) {
+func (d *DB) GetStationsInfoByKeyword(keyword string) ([]StationInfo, error) {
 	query := `select id,station_name,ST_X(center_latlong) AS 'lat',ST_Y(center_latlong) AS 'long',operation_company,service_provider_type,railway_line_name,railway_type from stations where station_name like concat("%",?,"%") order by id;`
 
 	suggestedStations := []StationInfo{}
-	err := s.DB.Select(&suggestedStations, query, keyword)
+	err := d.DB.Select(&suggestedStations, query, keyword)
 	if err != nil {
 		return nil, err
 	}
