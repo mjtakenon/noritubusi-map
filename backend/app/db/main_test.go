@@ -288,7 +288,7 @@ func TestStationDB_GetStationsInfoByKeyword(t *testing.T) {
 			args: args{
 				keyword: "ああああ",
 			},
-			want:    nil,
+			want:    []StationInfo{},
 			wantErr: false,
 		},
 	}
