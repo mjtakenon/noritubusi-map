@@ -116,19 +116,74 @@ if __name__ == '__main__':
     # Print as SQL
     with open((os.path.splitext(argv[1])[0] + "_seeds.sql"), "wt") as fp:
       # 1. companies
+      railways = list()
+      buildings = list()
       for s in stations.values():
-        kv = {
-          'station_name': s['stationName'], 
-          'center_latlong': f"GeomFromText('POINT({' '.join(s['location']['center'])})')", 
-          'operation_company': s['operationCompany'], 
-          'service_provider_type': s['serviceProviderType'], 
-          'railway_line_name': s['railwayLineName'], 
-          'railway_type': s['railwayType']
-        }
+        railways.append( (s['operationCompany'], s['railwayLineName']) )
+        buildings.append( [s['stationName'], np.array([float(s['location']['center'][0]),float(s['location']['center'][1])])] )
 
+      buildings = np.array(buildings)
+      
+      # 駅: 同名かつユークリッド距離が近い駅(0.5km以内)を統合して出力
+      mergeDistanceThreshold = 0.00545
+
+      # 全ての駅でループ(実装)
+      for b in range(len(buildings)):
+        if b >= len(buildings):
+          break
+        # 駅名で検索、リスト作成
+        station = buildings[buildings[:,0] ==  buildings[b,0],:]
+        # 統合されたら削除
+        isMerged = [False] * len(station)
+        for n in range(len(station)): 
+          for nn in range(len(station)):
+            # もし統合されていたら被統合対象とせずスキップ
+            if isMerged[n] or isMerged[nn] or n == nn:
+              continue
+            # 距離が一定以下だったら位置情報を追加し統合フラグをたてる 統合した駅の座標を見ていない為改善が必要
+            distance = np.linalg.norm(station[n][1][0:1] - station[nn][1][0:1])
+            if distance < mergeDistanceThreshold:
+              station[n][1] = np.append(station[n][1],station[nn][1])
+              isMerged[nn] = True
+        for n in range(len(station)): 
+          if not isMerged[n]: # 被統合
+            # 位置情報の再計算
+            station[n][1] = [sum(station[n][1][0::2]) / len(station[n][1][0::2]), sum(station[n][1][1::2]) / len(station[n][1][1::2])]
+        # 親リストに反映
+        # 位置情報の更新
+        buildings[np.where(buildings[:,0] == buildings[b,0])[0][np.logical_not(isMerged)],:][0][1] = station[np.logical_not(isMerged),1]
+        # 重複駅の削除
+        buildings = np.delete(buildings,np.where(buildings[:,0] == buildings[b,0])[0][isMerged],0)
+
+      buildings = buildings.tolist()
+
+      for b in buildings:
+        # print(SQL_INSERT_INTO('buildings', ['name', 'latlong'] , [b[0], f"GeomFromText('POINT({' '.join(map(str,b[1]))})')"] ))
         fp.write(
-          SQL_INSERT_INTO('stations', kv.keys(), kv.values(), IDX_NOT_QUOTED=[1, 3, 5])
+          SQL_INSERT_INTO('buildings', ['name', 'latlong'] , [b[0], f"GeomFromText('POINT({' '.join(map(str,b[1]))})')"] )
         )
 
+      # 路線名の出力
+      railways = list(set(railways))
+      for r in railways:
+        # print(SQL_INSERT_INTO('railways', ['operation_company', 'railway_line_name'], r))
+        fp.write(
+          SQL_INSERT_INTO('railways', ['operation_company', 'railway_line_name'], r)
+        )
 
+      # TODO: 駅の出力 
 
+      # for s in stations.values():
+      #   kv = {
+      #     'station_name': s['stationName'], 
+      #     'center_latlong': f"GeomFromText('POINT({' '.join(s['location']['center'])})')", 
+      #     'operation_company': s['operationCompany'], 
+      #     'service_provider_type': s['serviceProviderType'], 
+      #     'railway_line_name': s['railwayLineName'], 
+      #     'railway_type': s['railwayType']
+      #   }
+      # # for r in railways.values():
+      # #   print(SQL_INSERT_INTO('railways', r.keys(), r.values()))
+      #   fp.write(
+      #     SQL_INSERT_INTO('stations', kv.keys(), kv.values(), IDX_NOT_QUOTED=[1, 3, 5])
+      #   )
