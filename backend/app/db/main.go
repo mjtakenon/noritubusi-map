@@ -43,13 +43,10 @@ func (d *DB) New(userName, password, address, dbName string) error {
 func (d *DB) GetStationInfoInRange(beginLat, beginLong, endLat, endLong string) ([]StationInfo, error) {
 	query := `select id,station_name,ST_X(center_latlong) AS 'lat',ST_Y(center_latlong) AS 'long',operation_company,service_provider_type,railway_line_name,railway_type from stations where MBRContains(ST_GeomFromText(CONCAT("LINESTRING(",?," ",?,",",?," ", ?,")")),center_latlong) order by id`
 
-	infos := []StationInfo{}
+	var infos []StationInfo
 	err := d.DB.Select(&infos, query, beginLat, beginLong, endLat, endLong)
-	if err != nil {
-		return nil, err
-	}
 
-	return infos, nil
+	return infos, err
 }
 
 func (d *DB) GetStationInfoByID(id int) (StationInfo, error) {
@@ -65,10 +62,8 @@ func (d *DB) GetStationInfoByID(id int) (StationInfo, error) {
 func (d *DB) GetStationsInfoByKeyword(keyword string) ([]StationInfo, error) {
 	query := `select id,station_name,ST_X(center_latlong) AS 'lat',ST_Y(center_latlong) AS 'long',operation_company,service_provider_type,railway_line_name,railway_type from stations where station_name like concat("%",?,"%") order by id;`
 
-	suggestedStations := []StationInfo{}
+	var suggestedStations []StationInfo
 	err := d.DB.Select(&suggestedStations, query, keyword)
-	if err != nil {
-		return nil, err
-	}
-	return suggestedStations, nil
+
+	return suggestedStations, err
 }
