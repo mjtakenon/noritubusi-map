@@ -163,6 +163,8 @@ if __name__ == '__main__':
       # railways = np.array(list(set(railways)))
       railways = np.array(list(dict.fromkeys(railways)))
 
+      # TODO: np.whereでの位置情報の検索が上手くいかなかったためこの形で実装したので後で修正したい
+      # TODO: IDが降順でインクリメントされること前提で組んでいるのでデータの順番が変わるとIDも変わってしまう=セーブデータの互換性が消えてしまう問題
       # 駅: 対応する路線と建物インデックスの計算
       for s in stations.values():
         s['railway_id'] = np.where((railways[:,0] == s['railwayLineName']) & (railways[:,2] == s['operationCompany']))[0][0]
@@ -177,8 +179,6 @@ if __name__ == '__main__':
         # print(s['railway_id'])
         # print(s['building_id'])
         # import pdb; pdb.set_trace()
-        # np.whereでの位置情報の検索が上手くいかなかったためこの形で実装したので後で修正したい
-
 
 
       # 建物の出力
