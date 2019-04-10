@@ -45,11 +45,8 @@ func (d *DB) GetStationInfoInRange(beginLat, beginLong, endLat, endLong string) 
 
 	infos := []StationInfo{}
 	err := d.DB.Select(&infos, query, beginLat, beginLong, endLat, endLong)
-	if err != nil {
-		return nil, err
-	}
 
-	return infos, nil
+	return infos, err
 }
 
 func (d *DB) GetStationInfoByID(id int) (StationInfo, error) {
@@ -67,8 +64,6 @@ func (d *DB) GetStationsInfoByKeyword(keyword string) ([]StationInfo, error) {
 
 	suggestedStations := []StationInfo{}
 	err := d.DB.Select(&suggestedStations, query, keyword)
-	if err != nil {
-		return nil, err
-	}
-	return suggestedStations, nil
+
+	return suggestedStations, err
 }

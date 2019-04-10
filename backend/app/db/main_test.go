@@ -282,6 +282,15 @@ func TestStationDB_GetStationsInfoByKeyword(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name:   "error case",
+			fields: fields{DB: SetUpDB(t)},
+			args: args{
+				keyword: "ああああ",
+			},
+			want:    []StationInfo{},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
