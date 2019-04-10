@@ -131,7 +131,7 @@ if __name__ == '__main__':
       # 駅: 同名かつユークリッド距離が近い駅(0.5km以内)を統合して出力
       mergeDistanceThreshold = 0.00545
 
-      # 全ての駅でループ(実装)
+      # 全ての駅でループ
       for b in range(len(buildings)):
         if b >= len(buildings):
           break
@@ -159,10 +159,11 @@ if __name__ == '__main__':
         # 重複駅の削除
         buildings = np.delete(buildings,np.where(buildings[:,0] == buildings[b,0])[0][isMerged],0)
       
-      # 重複路線の削除
+      # 路線: 重複を削除
       # railways = np.array(list(set(railways)))
       railways = np.array(list(dict.fromkeys(railways)))
-      # 駅に対応する路線と建物インデックスの計算
+
+      # 駅: 対応する路線と建物インデックスの計算
       for s in stations.values():
         s['railway_id'] = np.where((railways[:,0] == s['railwayLineName']) & (railways[:,2] == s['operationCompany']))[0][0]
         # 駅名が完全一致している緯度経度リストを取得
@@ -173,34 +174,53 @@ if __name__ == '__main__':
         # print(nearestBuildingIdx)
         # そのインデックスに対応する建物IDを取得
         s['building_id'] = np.where(buildings[:,0] == s['stationName'])[0][nearestBuildingIdx]
+        # print(s['railway_id'])
+        # print(s['building_id'])
+        # import pdb; pdb.set_trace()
         # np.whereでの位置情報の検索が上手くいかなかったためこの形で実装したので後で修正したい
+
+
 
       # 建物の出力
       buildings = buildings.tolist()
-      for b in buildings:
+      for n, b in enumerate(buildings):
         # print(SQL_INSERT_INTO('buildings', ['name', 'latlong'] , [b[0], f"GeomFromText('POINT({' '.join(map(str,b[1]))})')"] ))
+        kv = {
+          'id': str(n),
+          'name': b[0],
+          'latlong': f"GeomFromText('POINT({' '.join(map(str,b[1]))})')"
+        }
         fp.write(
-          SQL_INSERT_INTO('buildings', ['name', 'latlong'] , [b[0], f"GeomFromText('POINT({' '.join(map(str,b[1]))})')"],IDX_NOT_QUOTED=[1])
+          SQL_INSERT_INTO('buildings', ['id', 'name', 'latlong'] , [str(n), b[0], f"GeomFromText('POINT({' '.join(map(str,b[1]))})')"],IDX_NOT_QUOTED=[0, 2])
+          # SQL_INSERT_INTO('buildings', kv.keys(), kv.values(), IDX_NOT_QUOTED=[0, 2])
         )
 
       # 路線名の出力
       railways = list(railways)
-      for r in railways:
-        # print(SQL_INSERT_INTO('railways', ['operation_company', 'railway_line_name'], r))
+      for n, r in enumerate(railways):
+        # kv = {
+        #   'id': n,
+        #   'name': r[0],
+        #   'type': r[1],
+        #   'company_name': r[2],
+        #   'service_provider_type': r[3],
+        # }
         fp.write(
-          SQL_INSERT_INTO('railways', ['name', 'type','company_name','service_provider_type'], r, IDX_NOT_QUOTED=[1, 3])
+          SQL_INSERT_INTO('railways', ['id', 'name', 'type','company_name','service_provider_type'], [str(n), r[0], str(r[1]), r[2], str(r[3])], IDX_NOT_QUOTED=[0, 2, 4])
+          # SQL_INSERT_INTO('railways', kv.keys(), kv.values(), IDX_NOT_QUOTED=[0, 2, 4])
         )
 
       # 駅の出力
-      for s in stations.values():
+      for n, s in enumerate(stations.values()):
         kv = {
+          'id': str(n),
           'name': s['stationName'],
           'building_id': str(s['building_id']),
           'railway_id': str(s['railway_id']),
         }
         fp.write(
-          SQL_INSERT_INTO('stations', kv.keys(), kv.values(), IDX_NOT_QUOTED=[1, 2])
-          # SQL_INSERT_INTO('stations', ['name','building_id','railway_id'], [s['stationName'],s['building_id'],s['railway_id']] , IDX_NOT_QUOTED=[1, 2])
+          # SQL_INSERT_INTO('stations', kv.keys(), kv.values(), IDX_NOT_QUOTED=[0, 2, 3])
+          SQL_INSERT_INTO('stations', ['id', 'name','building_id','railway_id'], [str(n), s['stationName'],str(s['building_id']),str(s['railway_id'])] , IDX_NOT_QUOTED=[0, 2, 3])
         )
 
       # for s in stations.values():
