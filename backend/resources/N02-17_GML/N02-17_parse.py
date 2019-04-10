@@ -167,7 +167,7 @@ if __name__ == '__main__':
       # TODO: IDが降順でインクリメントされること前提で組んでいるのでデータの順番が変わるとIDも変わってしまう=セーブデータの互換性が消えてしまう問題
       # 駅: 対応する路線と建物インデックスの計算
       for s in stations.values():
-        s['railway_id'] = np.where((railways[:,0] == s['railwayLineName']) & (railways[:,2] == s['operationCompany']))[0][0]
+        s['railway_id'] = np.where((railways[:,0] == s['railwayLineName']) & (railways[:,2] == s['operationCompany']))[0][0]+1
         # 駅名が完全一致している緯度経度リストを取得
         sameNameList = buildings[np.where(buildings[:,0] == s['stationName'])]
         # 上のリストの中から最も近い建物IDのインデックスを取得
@@ -175,7 +175,7 @@ if __name__ == '__main__':
         # print(sameNameList)
         # print(nearestBuildingIdx)
         # そのインデックスに対応する建物IDを取得
-        s['building_id'] = np.where(buildings[:,0] == s['stationName'])[0][nearestBuildingIdx]
+        s['building_id'] = np.where(buildings[:,0] == s['stationName'])[0][nearestBuildingIdx]+1
         # print(s['railway_id'])
         # print(s['building_id'])
         # import pdb; pdb.set_trace()
@@ -191,7 +191,7 @@ if __name__ == '__main__':
           'latlong': f"GeomFromText('POINT({' '.join(map(str,b[1]))})')"
         }
         fp.write(
-          SQL_INSERT_INTO('buildings', ['id', 'name', 'latlong'] , [str(n), b[0], f"GeomFromText('POINT({' '.join(map(str,b[1]))})')"],IDX_NOT_QUOTED=[0, 2])
+          SQL_INSERT_INTO('buildings', ['id', 'name', 'latlong'] , [str(n+1), b[0], f"GeomFromText('POINT({' '.join(map(str,b[1]))})')"],IDX_NOT_QUOTED=[0, 2])
           # SQL_INSERT_INTO('buildings', kv.keys(), kv.values(), IDX_NOT_QUOTED=[0, 2])
         )
 
@@ -206,7 +206,7 @@ if __name__ == '__main__':
         #   'service_provider_type': r[3],
         # }
         fp.write(
-          SQL_INSERT_INTO('railways', ['id', 'name', 'type','company_name','service_provider_type'], [str(n), r[0], str(r[1]), r[2], str(r[3])], IDX_NOT_QUOTED=[0, 2, 4])
+          SQL_INSERT_INTO('railways', ['id', 'name', 'type','company_name','service_provider_type'], [str(n+1), r[0], str(r[1]), r[2], str(r[3])], IDX_NOT_QUOTED=[0, 2, 4])
           # SQL_INSERT_INTO('railways', kv.keys(), kv.values(), IDX_NOT_QUOTED=[0, 2, 4])
         )
 
@@ -220,7 +220,7 @@ if __name__ == '__main__':
         }
         fp.write(
           # SQL_INSERT_INTO('stations', kv.keys(), kv.values(), IDX_NOT_QUOTED=[0, 2, 3])
-          SQL_INSERT_INTO('stations', ['id', 'name','building_id','railway_id'], [str(n), s['stationName'],str(s['building_id']),str(s['railway_id'])] , IDX_NOT_QUOTED=[0, 2, 3])
+          SQL_INSERT_INTO('stations', ['id', 'name','building_id','railway_id'], [str(n+1), s['stationName'],str(s['building_id']),str(s['railway_id'])] , IDX_NOT_QUOTED=[0, 2, 3])
         )
 
       # for s in stations.values():
