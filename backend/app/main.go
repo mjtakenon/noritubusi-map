@@ -60,6 +60,10 @@ func getStationInfoByBuildingID(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "invalid parameter")
 	}
 
+	if len(stationInfos) == 0 {
+		return c.String(http.StatusNotFound, "not found")
+	}
+
 	return c.JSON(http.StatusOK, stationInfos)
 }
 
