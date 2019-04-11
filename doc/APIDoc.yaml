@@ -115,7 +115,7 @@ paths:
             title: arrayOfBuildings
             type: array
             items:
-              $ref: "#/definitions/stationInfomation"
+              $ref: "#/definitions/buildingInfomation"
         "400":
           description: 不正なパラメータ
 
@@ -436,3 +436,22 @@ definitions:
       railwayType:
         type: integer
         example: 11
+  buildingInfomation:
+    type: object
+    properties:
+      id:
+        description: 建物ID
+        type: integer
+        example: 5297
+      name:
+        description: 駅名
+        type: string
+        example: 浜松
+      latitude:
+        description: 緯度
+        type: number
+        example: 34.70376
+      longitude:
+        description: 経度
+        type: number
+        example: 137.7353775
