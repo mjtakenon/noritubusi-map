@@ -46,10 +46,9 @@ export default {
   mounted: function () {
   this.$nextTick(function () {
     // アイコンの指定
-    // 新幹線以外
-    if(this.data.railwayName[0].indexOf("新幹線") !== -1) {
+    if(this.data.railwayName[0].indexOf("新幹線") !== -1) { // 新幹線
       this.icon="🚆"
-    } else {
+    } else { // それ以外
       this.icon="🚊"
     }
   })}

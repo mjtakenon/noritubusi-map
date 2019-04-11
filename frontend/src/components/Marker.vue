@@ -1,6 +1,5 @@
 <template>
   <l-marker :lat-lng="data" v-on:click="onClick" @l-add="$event.target.openPopup()">
-    <!-- <l-popup> <H1> {{ this.data.id }} : {{ this.data.name }} <br>{{ this.data.companyName }} : {{ this.data.railwayName }} </H1> </l-popup> -->
     <TPopup :v-show="isVisible" :data="data"></TPopup>
   </l-marker>
 </template>
@@ -27,8 +26,6 @@ export default {
   },
   methods: {
     onClick: function() {
-      console.log(this);
-      // this.popup = new TPopup();
       this.isVisible = true;
     }
   },

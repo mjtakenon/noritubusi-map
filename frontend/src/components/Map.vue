@@ -11,41 +11,16 @@
       @update:bounds="boundsUpdated"
     >
       <l-tile-layer :url="url"></l-tile-layer>
-      <!-- <l-marker v-for="(m, i) in markers" :key="i" :lat-lng="m.latlong"></l-marker> -->
       <TMarker v-for="m in markers" :key="m.id" :data="m"/>
     </l-map>
-    <!-- v-autocompleteはバグ(仕様)が多くて使いづらかったため没 -->
-    <!-- v-toolbarのfloatingは表示が崩れて難しい -->
-    <!-- <v-toolbar class="float-toolbar" dense floating extended height="200px"> -->
-      <!-- <v-btn icon @click="searchStation">
-        <v-icon>search</v-icon>
-      </v-btn>
-      <v-text-field clearable label="駅名を入力" single-line ></v-text-field> -->
-      <!-- <v-autocomplete ref="autoComplete" label="駅名を入力" :single-line="true" :items="stationList" append-icon="" clearable :search-input.sync="searchText" no-data-text="検索結果なし"></v-autocomplete> -->
-      <!-- <v-btn icon @click="getCurrentRect">
-        <v-icon>my_location</v-icon>
-      </v-btn> -->
-      <!-- <v-list>
-        <v-list-tile
-          v-for="l in stationList"
-          :key="l.id"
-          @click="stationListClicked">
-          <v-list-tile-content>
-            <v-list-tile-title v-text="l.name"></v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-      </v-list>
-    </v-toolbar> -->
     <v-layout align-start justify-start row/> 
     <br>
     <v-flex xs4 offset-xs1 sm3 offset-sm1 md2 offset-md1>
       <v-card>
         <v-toolbar>
-          <!-- <v-toolbar-side-icon></v-toolbar-side-icon> -->
           <v-btn icon @click="searchStation">
             <v-icon>search</v-icon>
           </v-btn>
-          <!-- <v-toolbar-title>Inbox</v-toolbar-title> -->
           <v-text-field clearable label="駅名を入力" single-line v-model="textField" @keyup.enter="searchStation" ></v-text-field>
           <v-btn icon @click="getCurrentRect">
             <v-icon>my_location</v-icon>
@@ -102,11 +77,7 @@ export default {
         }
       },
       markers: [],
-      stationList: [
-        {name: "東京", railwayName: "東海道本線", id: 1},
-        {name: "大阪", railwayName: "東海道本線", id: 2},
-        {name: "名古屋", railwayName: "東海道本線", id: 3},
-      ],
+      stationList: [],
       textField: "",
       hasResult: false
     };
@@ -123,7 +94,7 @@ export default {
     },
     getCurrentRect() {
       axios
-        .get(`http://${window.location.hostname}:1323/stations`, {
+        .get(`http://${window.location.hostname}:1323/buildings`, {
           params: {
             begin_latitude: this.bounds._northEast.lat,
             begin_longitude: this.bounds._northEast.lng,
@@ -140,8 +111,6 @@ export default {
             lat: elem.latitude,
             lng: elem.longitude,
             name: elem.name,
-            companyName: [elem.company], // <- Arrayで帰ってくるのであれば不要
-            railwayName: [elem.railwayName], // <- 同上
             id: elem.id
           }));
         })
@@ -168,8 +137,6 @@ export default {
             lat: elem.latitude,
             lng: elem.longitude,
             name: elem.name,
-            companyName: [elem.company], // <- Arrayで帰ってくるのであれば不要
-            railwayName: [elem.railwayName], // <- 同上
             id: elem.id }));
         // 駅名が完全一致でなければ表示をしない
         for(var n=resp.data.length-1; n>=0; n--) {
@@ -191,8 +158,8 @@ export default {
               lat: elem.latitude,
               lng: elem.longitude,
               name: elem.name,
-              companyName: [elem.company], // <- Arrayで帰ってくるのであれば不要
-              railwayName: [elem.railwayName], // <- 同上
+              // companyName: elem.company,
+              // railwayName: elem.railwayName,
               id: elem.id }));
 
             // 駅をフォーカスして表示
@@ -233,5 +200,5 @@ export default {
     }
   }
 };
-function isEmpty(val){return !val?!(val===0||val===false)?true:false:false;}
+function isEmpty(val){return !val?!val===false?true:false:false;}
 </script>
