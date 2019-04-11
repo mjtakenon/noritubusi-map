@@ -75,7 +75,7 @@ func TestStationData_New(t *testing.T) {
 	}
 }
 
-func TestStationDB_GetStationInfoInRange(t *testing.T) {
+func TestStationDB_GetBuildingInfoInRange(t *testing.T) {
 	type fields struct {
 		DB *sqlx.DB
 	}
@@ -89,7 +89,7 @@ func TestStationDB_GetStationInfoInRange(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    []StationInfo
+		want    []BuildingInfo
 		wantErr bool
 	}{
 		{
@@ -101,36 +101,18 @@ func TestStationDB_GetStationInfoInRange(t *testing.T) {
 				endLat:    "34.702267",
 				endLong:   "137.741667",
 			},
-			want: []StationInfo{
+			want: []BuildingInfo{
 				{
-					Id:                  437,
-					Name:                "新浜松",
-					Latitude:            "34.70341",
-					Longitude:           "137.73246",
-					Company:             "遠州鉄道",
-					ServiceProviderType: 4,
-					RailwayName:         "鉄道線",
-					RailwayType:         12,
+					Id:        423,
+					Name:      "新浜松",
+					Latitude:  "34.70341",
+					Longitude: "137.73246",
 				},
 				{
-					Id:                  5796,
-					Name:                "浜松",
-					Latitude:            "34.70376",
-					Longitude:           "137.7353775",
-					Company:             "東海旅客鉄道",
-					ServiceProviderType: 1,
-					RailwayName:         "東海道新幹線",
-					RailwayType:         11,
-				},
-				{
-					Id:                  5871,
-					Name:                "浜松",
-					Latitude:            "34.70406",
-					Longitude:           "137.7351175",
-					Company:             "東海旅客鉄道",
-					ServiceProviderType: 2,
-					RailwayName:         "東海道線",
-					RailwayType:         11,
+					Id:        5297,
+					Name:      "浜松",
+					Latitude:  "34.70376",
+					Longitude: "137.7353775",
 				},
 			},
 			wantErr: false,
@@ -141,13 +123,13 @@ func TestStationDB_GetStationInfoInRange(t *testing.T) {
 			s := &DB{
 				DB: tt.fields.DB,
 			}
-			got, err := s.GetStationInfoInRange(tt.args.beginLat, tt.args.beginLong, tt.args.endLat, tt.args.endLong)
+			got, err := s.GetBuildingInfoInRange(tt.args.beginLat, tt.args.beginLong, tt.args.endLat, tt.args.endLong)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("StationDB.getStationInfoInRange() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("StationDB.getBuildingInfoInRange() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("StationDB.getStationInfoInRange() = %v, want %v", got, tt.want)
+				t.Errorf("StationDB.getBuildingInfoInRange() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -179,7 +161,6 @@ func TestStationDB_GetStationInfoByID(t *testing.T) {
 				Company:             "遠州鉄道",
 				ServiceProviderType: 4,
 				RailwayName:         "鉄道線",
-				RailwayType:         12,
 			},
 			wantErr: false,
 		},
@@ -237,7 +218,6 @@ func TestStationDB_GetStationsInfoByKeyword(t *testing.T) {
 					Company:             "遠州鉄道",
 					ServiceProviderType: 4,
 					RailwayName:         "鉄道線",
-					RailwayType:         12,
 				},
 				{
 					Id:                  5796,
@@ -247,17 +227,15 @@ func TestStationDB_GetStationsInfoByKeyword(t *testing.T) {
 					Company:             "東海旅客鉄道",
 					ServiceProviderType: 1,
 					RailwayName:         "東海道新幹線",
-					RailwayType:         11,
 				},
 				{
 					Id:                  5871,
 					Name:                "浜松",
-					Latitude:            "34.70406",
-					Longitude:           "137.7351175",
+					Latitude:            "34.70376",
+					Longitude:           "137.7353775",
 					Company:             "東海旅客鉄道",
 					ServiceProviderType: 2,
 					RailwayName:         "東海道線",
-					RailwayType:         11,
 				},
 				{
 					Id:                  6005,
@@ -267,7 +245,6 @@ func TestStationDB_GetStationsInfoByKeyword(t *testing.T) {
 					Company:             "東京モノレール",
 					ServiceProviderType: 4,
 					RailwayName:         "東京モノレール羽田線",
-					RailwayType:         15,
 				},
 				{
 					Id:                  7708,
@@ -277,7 +254,6 @@ func TestStationDB_GetStationsInfoByKeyword(t *testing.T) {
 					Company:             "東日本旅客鉄道",
 					ServiceProviderType: 2,
 					RailwayName:         "東海道線",
-					RailwayType:         11,
 				},
 			},
 			wantErr: false,

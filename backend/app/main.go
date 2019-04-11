@@ -16,7 +16,7 @@ func hello(c echo.Context) error {
 	return c.String(http.StatusOK, "Hello, World!")
 }
 
-func getStationInfomationInRange(c echo.Context) error {
+func getBuildingInfoInRange(c echo.Context) error {
 	beginLat := c.QueryParam("begin_latitude")
 	beginLong := c.QueryParam("begin_longitude")
 	endLat := c.QueryParam("end_latitude")
@@ -26,7 +26,7 @@ func getStationInfomationInRange(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "invalid paramater")
 	}
 
-	stationInfo, err := DB.GetStationInfoInRange(beginLat, beginLong, endLat, endLong)
+	stationInfo, err := DB.GetBuildingInfoInRange(beginLat, beginLong, endLat, endLong)
 	if err != nil {
 		log.Println("/stations get info error:", err)
 		return c.String(http.StatusInternalServerError, "server error")
@@ -97,7 +97,7 @@ func main() {
 
 	// Routes
 	e.GET("/", hello)
-	e.GET("/stations", getStationInfomationInRange)
+	e.GET("/buildings", getBuildingInfoInRange)
 	e.GET("/stations/:stationid", getStationInfoByID)
 	e.GET("/stations/suggest", getStationNameSuggestion)
 
