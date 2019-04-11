@@ -154,7 +154,8 @@ func TestStationDB_GetStationInfoByID(t *testing.T) {
 			fields: fields{DB: SetUpDB(t)},
 			args:   args{id: 437},
 			want: StationInfo{
-				Id:                  437,
+				BuildingId:          423,
+				StationId:           437,
 				Name:                "新浜松",
 				Latitude:            "34.70341",
 				Longitude:           "137.73246",
@@ -211,7 +212,8 @@ func TestStationDB_GetStationsInfoByKeyword(t *testing.T) {
 			},
 			want: []StationInfo{
 				{
-					Id:                  437,
+					BuildingId:          423,
+					StationId:           437,
 					Name:                "新浜松",
 					Latitude:            "34.70341",
 					Longitude:           "137.73246",
@@ -220,7 +222,8 @@ func TestStationDB_GetStationsInfoByKeyword(t *testing.T) {
 					RailwayName:         "鉄道線",
 				},
 				{
-					Id:                  5796,
+					BuildingId:          5297,
+					StationId:           5796,
 					Name:                "浜松",
 					Latitude:            "34.70376",
 					Longitude:           "137.7353775",
@@ -229,7 +232,8 @@ func TestStationDB_GetStationsInfoByKeyword(t *testing.T) {
 					RailwayName:         "東海道新幹線",
 				},
 				{
-					Id:                  5871,
+					BuildingId:          5297,
+					StationId:           5871,
 					Name:                "浜松",
 					Latitude:            "34.70376",
 					Longitude:           "137.7353775",
@@ -238,7 +242,8 @@ func TestStationDB_GetStationsInfoByKeyword(t *testing.T) {
 					RailwayName:         "東海道線",
 				},
 				{
-					Id:                  6005,
+					BuildingId:          5479,
+					StationId:           6005,
 					Name:                "モノレール浜松町",
 					Latitude:            "35.655745",
 					Longitude:           "139.75667",
@@ -247,7 +252,8 @@ func TestStationDB_GetStationsInfoByKeyword(t *testing.T) {
 					RailwayName:         "東京モノレール羽田線",
 				},
 				{
-					Id:                  7708,
+					BuildingId:          6908,
+					StationId:           7708,
 					Name:                "浜松町",
 					Latitude:            "35.65541",
 					Longitude:           "139.757125",

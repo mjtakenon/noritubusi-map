@@ -16,7 +16,8 @@ type BuildingInfo struct {
 }
 
 type StationInfo struct {
-	Id                  int64  `db:"id" json:"id"`
+	BuildingId          int64  `db:"building_id" json:"building_id"`
+	StationId           int64  `db:"station_id" json:"station_id"`
 	Name                string `db:"station_name" json:"name"`
 	Latitude            string `db:"lat" json:"latitude"`
 	Longitude           string `db:"long" json:"longitude"`
@@ -26,7 +27,7 @@ type StationInfo struct {
 }
 
 func (s StationInfo) String() string {
-	return fmt.Sprintf("[%4d]%s, (%s,%s), %s, %d, %s", s.Id, s.Name, s.Latitude, s.Longitude, s.Company, s.ServiceProviderType, s.RailwayName)
+	return fmt.Sprintf("[%4d, %4d]%s, (%s,%s), %s, %d, %s", s.BuildingId, s.StationId, s.Name, s.Latitude, s.Longitude, s.Company, s.ServiceProviderType, s.RailwayName)
 }
 
 type DB struct {
@@ -56,7 +57,7 @@ func (d *DB) GetBuildingInfoInRange(beginLat, beginLong, endLat, endLong string)
 }
 
 func (d *DB) GetStationInfoByID(id int) (StationInfo, error) {
-	query := `SELECT stations.id AS id,stations.name AS station_name,ST_X(latlong) AS 'lat',ST_Y(latlong) AS 'long',company_name,service_provider_type,railways.name AS railway_line_name FROM stations INNER JOIN railways on stations.railway_id=railways.id INNER JOIN buildings on stations.building_id=buildings.id WHERE stations.id = ? ORDER BY id`
+	query := `SELECT buildings.id AS building_id,stations.id AS station_id,stations.name AS station_name,ST_X(latlong) AS 'lat',ST_Y(latlong) AS 'long',company_name,service_provider_type,railways.name AS railway_line_name FROM stations INNER JOIN railways on stations.railway_id=railways.id INNER JOIN buildings on stations.building_id=buildings.id WHERE stations.id = ? ORDER BY building_id`
 
 	var info StationInfo
 	err := d.DB.Get(&info, query, id)
@@ -66,7 +67,7 @@ func (d *DB) GetStationInfoByID(id int) (StationInfo, error) {
 }
 
 func (d *DB) GetStationsInfoByKeyword(keyword string) ([]StationInfo, error) {
-	query := `SELECT stations.id AS id,stations.name AS station_name,ST_X(latlong) AS 'lat',ST_Y(latlong) AS 'long',company_name,service_provider_type,railways.name AS railway_line_name FROM stations INNER JOIN railways on stations.railway_id=railways.id INNER JOIN buildings on stations.building_id=buildings.id WHERE stations.name like concat("%",?,"%") ORDER BY id`
+	query := `SELECT buildings.id AS building_id,stations.id AS station_id,stations.name AS station_name,ST_X(latlong) AS 'lat',ST_Y(latlong) AS 'long',company_name,service_provider_type,railways.name AS railway_line_name FROM stations INNER JOIN railways on stations.railway_id=railways.id INNER JOIN buildings on stations.building_id=buildings.id WHERE stations.name like concat("%",?,"%") ORDER BY building_id`
 
 	suggestedStations := []StationInfo{}
 	err := d.DB.Select(&suggestedStations, query, keyword)
