@@ -186,9 +186,7 @@ export default {
     stationListClicked(val) {
       axios.get(`http://${window.location.hostname}:1323/stations/` + val)
           .then(resp => {
-            // Arrayじゃないとmapができないため配列に
-            // arrayが帰ってこないのでとりあえずこれで対応
-            resp.data = [resp.data];
+            resp.data = resp.data;
             this.markers = resp.data.map(elem => ({
               lat: elem.latitude,
               lng: elem.longitude,
