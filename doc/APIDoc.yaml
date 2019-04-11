@@ -78,13 +78,13 @@ paths:
                   type: string
         "400":
           description: 不正なパラメータ
-  /stations:
+  /buildings:
     get:
       tags:
-        - station
-      summary: 駅情報取得
+        - building
+      summary: 駅(建物)情報取得
       description: ""
-      operationId: getStationsInfo
+      operationId: getBuildingsInfo
       produces:
         - application/json
       parameters:
@@ -110,15 +110,39 @@ paths:
           type: number
       responses:
         "200":
-          description: 駅情報取得が成功
+          description: 駅(建物)情報取得が成功
           schema:
-            title: arrayOfStations
+            title: arrayOfBuildings
             type: array
             items:
               $ref: "#/definitions/stationInfomation"
-
         "400":
           description: 不正なパラメータ
+
+  /building/{buildingID}:
+    get:
+      tags:
+        - building
+      summary: "駅情報取得"
+      description: ""
+      parameters:
+        - name: buildingID
+          description: "building ID"
+          required: true
+          in: path
+          type: number
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/stationInfomation"
+        400:
+          description: 不正なパラメータ
+        404:
+          description: Not Found
+
   /stations/{stationName}:
     get:
       tags:
@@ -142,6 +166,7 @@ paths:
           description: 不正なパラメータ
         404:
           description: Not Found
+
   /stations/suggest:
     get:
       tags:
@@ -377,6 +402,10 @@ definitions:
   stationInfomation:
     type: object
     properties:
+      building_id:
+        description: 建物ID
+        type: integer
+        example: 5297
       id:
         description: 駅ID
         type: integer
@@ -388,11 +417,11 @@ definitions:
       latitude:
         description: 緯度
         type: number
-        example: 34.70406000
+        example: 34.70376
       longitude:
         description: 経度
         type: number
-        example: 137.73511750
+        example: 137.7353775
       company:
         description: 運営会社
         type: string
