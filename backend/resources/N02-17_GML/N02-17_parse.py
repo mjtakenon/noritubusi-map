@@ -1,239 +1,251 @@
 #!/usr/bin/env python3
 
 import xml.etree.ElementTree as ET
-import os, sys, re, json
+import os
+import sys
+import re
+import json
 import numpy as np
 import numpy.matlib
+import itertools
 
-def get_id(xml_elem):
-  ret_val = elem.get(f"{{{ns['gml']}}}id")
-  return ret_val if ret_val is not None else "null"
+"""
+要素から "gml:id" 属性の値を取り出す
 
-def get_link(xml_elem, str_selector):
-  elem = xml_elem.find(str_selector, namespaces=ns)
-  if elem is not None:
-    if elem.get(f"{{{ns['xlink']}}}href") is not None:
-      return elem.get(f"{{{ns['xlink']}}}href").lstrip('#')
-  return "null"
+Parameters
+----------
+xml_elem : xml.etree.Element
+    属性値を取り出す対象となる XML 要素
+
+namespace_map : dict
+    XML 名前空間を解決するための連想配列
+    Key に「名前空間」、Value に「解決される値」が
+    セットされていることを想定する
+
+
+Returns
+-------
+attr_val : str
+    取り出した "gml:id" 属性値
+    該当する属性が存在しなかった場合、"null" を返す
+"""
+
+
+def get_id_attr(xml_elem, namespace_map):
+    attr_val = elem.get(f"{{{namespace_map['gml']}}}id")
+    return attr_val if attr_val is not None else "null"
+
+
+"""
+要素直下にある指定した要素の持つ "xlink:href" 属性の値を取り出す
+
+Parameters
+----------
+xml_elem : xml.etree.Element
+    "xlink:href" 属性を持つ要素を持つ親 XML 要素
+
+str_selector : str
+    xml_elem 内にある "xlink:href" 属性をもつ XML 要素名
+
+namespace_map : dict
+    XML 名前空間を解決するための連想配列
+    Key に「名前空間」、Value に「解決される値」が
+    セットされていることを想定する
+
+Returns
+-------
+attr_val : str
+    取り出した "xlink:href" 属性値
+    該当する属性が存在しなかった場合、"null" を返す
+"""
+
+
+def get_link(xml_elem, str_selector, namespace_map):
+    elem = xml_elem.find(str_selector, namespaces=namespace_map)
+    if elem is not None:
+        if elem.get(f"{{{namespace_map['xlink']}}}href") is not None:
+            return elem.get(f"{{{namespace_map['xlink']}}}href").lstrip('#')
+    return "null"
+
 
 def SQL_INSERT_INTO(TBL_NAME, KEYS, VALUES, IDX_NOT_QUOTED=[]):
-  str_keys   = ', '.join([ f"`{x}`" for x in KEYS])
-  try:
-    str_values = ', '.join([ f"'{x}'" if i not in IDX_NOT_QUOTED else x for (i, x) in enumerate(VALUES) ])
-  except TypeError as e:
-    import pdb; pdb.set_trace()
+    str_keys = ', '.join([f"`{x}`" for x in KEYS])
+    try:
+        str_values = ', '.join(
+            [f"'{x}'" if i not in IDX_NOT_QUOTED else x for (i, x) in enumerate(VALUES)])
+    except TypeError as e:
+        import pdb
+        pdb.set_trace()
 
-  return f"INSERT INTO `{TBL_NAME}` ({str_keys}) VALUES ({str_values});\n"
+    return f"INSERT INTO `{TBL_NAME}` ({str_keys}) VALUES ({str_values});\n"
+
 
 if __name__ == '__main__':
-  argc, argv = len(sys.argv), sys.argv
+    argc, argv = len(sys.argv), sys.argv
 
-  if argc != 2:
-    sys.stderr.write(f"usage: {argv[0]} [xml-file-path] \n")
-    sys.exit(-1)
-  else:
+    if argc != 2:
+        sys.stderr.write(f"usage: {argv[0]} [xml-file-path] \n")
+        sys.exit(-1)
+
+    # --------------------#
+    # --- Main Routine ---#
+    # --------------------#
+    path_xml_file = argv[1]
 
     sys.stderr.write("Pre-processing ... \n")
 
     # Get Namespace Map
-    ns = dict()
-    with open(argv[1]) as f:
-      lines = f.readlines()
-      for l in lines:
-        m = re.match(r'\s*xmlns:(.*)="(.*)".*', l)
-        if m is not None:
-          ns.update( { m.group(1): m.group(2) } )
+    namespace_map = dict()
+    with open(path_xml_file) as f:
+        for line in f.readlines():
+            m = re.match(r'\s*xmlns:(.*)="(.*)".*', line)
+            if m is not None:
+                namespace_map.update({m.group(1): m.group(2)})
 
     # XML Parse
-    tree = ET.parse(argv[1])
-    root = tree.getroot()
+    tree = ET.parse(path_xml_file)
+    root_elem = tree.getroot()
 
-    # gml:Curve
-    xml_curves = root.findall('gml:Curve', namespaces=ns)
+    # N02-17.xml は「ある駅における駅名, 路線情報, 座標リスト」がまとまっている構造ではなく、
+    # 「駅名」「路線情報」「座標リスト」というくくりでまとまっているため、扱いにくい
+    # そのため、gml:id 属性値をキーとする Key-Value マップ (連想配列, dict型)で
+    # 駅名、路線情報、座標リストを管理して、最後に、ある駅単位で情報をまとめるような処理にする
+
+    # -- gml:id 属性値について --
+    # gml:id 属性値は同一の駅についての値でも「駅名」「路線情報」「座標リスト」で異なる値を
+    # 保持しているという、やっかいな仕様になっている
+    # I.    座標リスト (gml:Curve 要素) が持つ gml:id 値は 「cv_XXXX」という形式の値となっており、
+    #       路線情報 (ksj:RailroadSection)、駅情報 (ksj:Stations) が持つ ksj:location 要素内の
+    #       xlink:href 属性値に対応している
+    # II.    gml:id 値は 「eb02_XXXXXX」という形式の値と
+    #       なっており、 が持つ ksj:railroadSection 要素内の xlink:href
+    #       属性値に対応している
+    # III.  駅情報 (ksj:Stations) が持つ gml:id 値は 「eb03_XXXXXX」という形式の値となっており、
+    #       路線情報 (ksj:RailroadSection) が持つ ksj:station 要素内の xlink:href 属性値に対応
+    #       している
+
+    # 1. Curve (座標リスト) のパース
+    # パース結果は dict 型の変数 curves に格納される
+    # curves は Key に 「gml:id 属性値」、 Value を「その駅の座標リスト」とする
+    xml_curves = root_elem.findall('gml:Curve', namespaces=namespace_map)
     curves = dict()
     for elem in xml_curves:
-      attr_id = get_id(elem)
-      pos_list = elem.find('gml:segments/gml:LineStringSegment/gml:posList', namespaces=ns)
-      pos_list = [ x.split(' ') for x in re.split(r'\n\s*', pos_list.text) if x ]
+        # gml:id 属性値の取得
+        attr_id = get_id_attr(elem, namespace_map)
+        # 座標リスト (gml:posList 要素) の取得
+        pos_list = elem.find(
+            'gml:segments/gml:LineStringSegment/gml:posList', namespaces=namespace_map)
+        # 得られる座標値を改行文字('\n')で分割し、各行を空白文字(' ')で区切り、(緯度, 経度) の list を生成
+        pos_list = [x.split(' ')
+                    for x in re.split(r'\n\s*', pos_list.text) if x]
 
-      curves.update(
-        {
-          attr_id: {
-            'posList': pos_list
-          }
-        }
-      )
+        # curves を更新
+        curves[attr_id] = pos_list
+        # curves.update(
+        #     {
+        #         attr_id: {
+        #             'posList': pos_list
+        #         }
+        #     }
+        # )
 
-    # ksj:RailroadSection
-    xml_railroad_sections = root.findall('ksj:RailroadSection', namespaces=ns)
+    # 2. RailroadSection (路線情報) のパース
+    # パース結果は dict 型の変数 railroad_sections に格納される
+    # railroad_sections は Key に 「gml:id 属性値」、
+    # Value を「路線情報を格納する dict」とする
+    # 路線情報は、ksj:RailloadSection 要素直下の各 XML 要素について、
+    # 属性名: 値 を Key-Value ペアで保持するものとする
+    # 以下に railload_sections の凡例を示す
+    # railload_sections = {
+    #   'gml:id 属性値': {
+    #     'railwayType': '鉄道区分コード (普通鉄道, 軌道, モノレールなど)',
+    #     'serviceProviderType': '事業者種別コード (JR, 新幹線, 私鉄など)',
+    #     'railwayLineName': '路線名',
+    #     'operationCompany': '運営会社名',
+    #     'location': '座標リスト を参照するためのID'
+    #   }
+    # }
+    xml_railroad_sections = root_elem.findall(
+        'ksj:RailroadSection', namespaces=namespace_map)
     railroad_sections = dict()
     for elem in xml_railroad_sections:
-      attr_id = get_id(elem)
-      rs = dict()
-      for child in elem:
-        if child.text is not None:
-          key = re.sub(f"{{{ns['ksj']}}}", "", child.tag)
-          val = child.text
-          rs.update({key: val})
-      rs['location'] = get_link(elem, 'ksj:location')
+        # gml:id 属性値の取得
+        attr_id = get_id_attr(elem, namespace_map)
+        # 路線情報を格納する dict を初期化
+        railroad_sections[attr_id] = dict()
+        # ksj:RailroadSection 内の各要素を順にたどる
+        for child in elem:
+            # 要素が値を持つ場合
+            if child.text is not None:
+                # 要素名を Key, 要素値を Value として
+                key = re.sub(f"{{{namespace_map['ksj']}}}", "", child.tag)
+                val = child.text
+                # 路線情報の dict を更新する
+                railroad_sections[attr_id][key] = val
 
-      railroad_sections.update(
-        { attr_id: rs }
-      )
+        # 'location' を設定
+        railroad_sections[attr_id]['location'] = get_link(
+            elem, 'ksj:location', namespace_map)
 
-    # ksj:Station
-    xml_stations = root.findall('ksj:Station', namespaces=ns)
+    # 3. Station (駅情報) のパース
+    # パース結果は dict 型の変数 stations に格納される
+    # stations は Key に 「gml:id 属性値」、 Value を「駅情報を格納する dict」とする
+    # 駅情報は、ksj:Station 要素直下の各 XML 要素について、属性名: 値 を Key-Value ペアで
+    # 保持するものとする
+    # 以下に stations の凡例を示す
+    # stations = {
+    #   'gml:id 属性値: {
+    #     'railwayType': '鉄道区分コード (普通鉄道, 軌道, モノレールなど)',
+    #     'serviceProviderType': '事業者種別コード (JR, 新幹線, 私鉄など)',
+    #     'railwayLineName': '路線名',
+    #     'operationCompany': '運営会社名',
+    #     'railwayLineName: '駅名',
+    #     'location': '座標リストを参照するためのID',
+    #     'railroadSection': '路線情報を参照するためのID',
+    #   }
+    # }
+    xml_stations = root_elem.findall('ksj:Station', namespaces=namespace_map)
     stations = dict()
     for elem in xml_stations:
-      attr_id = get_id(elem)
-      st = dict()
-      for child in elem:
-        if child.text is not None:
-          key = re.sub(f"{{{ns['ksj']}}}", "", child.tag)
-          val = child.text
-          st.update({key: val})
-      st['location'] = get_link(elem, 'ksj:location')
-      st['railroadSection'] = get_link(elem, 'ksj:railroadSection')
+        # gml:id 属性値の取得
+        attr_id = get_id_attr(elem, namespace_map)
+        # 駅情報を格納する dict を初期化
+        stations[attr_id] = dict()
+        # ksj:Station 内の各要素を順にたどる
+        for child in elem:
+            # 要素が値を持つ場合
+            if child.text is not None:
+                # 要素が値を持つ場合
+                key = re.sub(f"{{{namespace_map['ksj']}}}", "", child.tag)
+                val = child.text
+                # 駅情報の dict を更新する
+                stations[attr_id][key] = val
 
-      stations.update(
-        { attr_id: st }
-      )
+        # 'location', 'railroadSection' を設定
+        stations[attr_id]['location'] = get_link(
+            elem, 'ksj:location', namespace_map)
+        stations[attr_id]['railroadSection'] = get_link(
+            elem, 'ksj:railroadSection', namespace_map)
 
+    # 4. 各データセット間の統合処理
+    # 「座標リスト」「路線情報」「駅情報」間の情報をIDをもとに紐づけて、1つのデータセットに
+    # 統合する処理を行う
 
-    # Merge Datasets
+    # 駅単位のデータにしたいため、駅情報 (stations) に対し for-each を行い、統合する
     for station in stations.values():
-      if station['location'] != "null":
-        station.update({'location': curves[station['location']]})
-      # 重心計算
-      arr = np.array(station['location']['posList'], dtype=np.float64)
-      station['location']['center'] = [ f"{p:.8f}" for p in arr.mean(axis=0) ]
+        # (1) 座標リストの取得
+        # 駅情報内の 'location' 値が null 出ない場合
+        if station['location'] != "null":
+            # 'location' 値を curves から対応する座標リストで更新する
+            station['location'] = curves[station['location']]
 
-    # Print as JSON
-    # sys.stderr.write("Print as JSON ... \n")
-    # with open((os.path.splitext(argv[1])[0] + ".json"), "wt") as fp:
-    #   json.dump(stations, fp, ensure_ascii=False, indent=2, sort_keys=True, separators=(',', ': '))
+            # 重心計算
+            # 座標リストは駅の端と端の2点間の座標を持っている(？)ため、そこから重心を
+            # 計算し、駅の座標値とする
+            # 行列演算を行いたいため、 Python の list から numpy.ndarray に変換し、
+            # 'location' 値を重心値で更新する
+            arr = np.array(station['location'], dtype=np.float64)
+            station['location'] = arr.mean(axis=0).tolist()
 
-
-    # Generate SQL Seeds
-    sys.stderr.write("Print as SQL ... \n")
-
-    # Print as SQL
-    with open((os.path.splitext(argv[1])[0] + "_seeds.sql"), "wt") as fp:
-      # 1. companies
-      railways = list()
-      buildings = list()
-      for s in stations.values():
-        railways.append( (s['railwayLineName'], s['railwayType'], s['operationCompany'], s['serviceProviderType']) )
-        buildings.append( [s['stationName'], np.array([float(s['location']['center'][0]),float(s['location']['center'][1])])] )
-        
-      buildings = np.array(buildings)
-
-      # 駅: 同名かつユークリッド距離が近い駅(0.5km以内)を統合して出力
-      mergeDistanceThreshold = 0.00545
-
-      # 全ての駅でループ
-      for b in range(len(buildings)):
-        if b >= len(buildings):
-          break
-        # 駅名で検索、リスト作成
-        station = buildings[buildings[:,0] ==  buildings[b,0],:]
-        # 統合されたら削除
-        isMerged = [False] * len(station)
-        for n in range(len(station)):
-          for nn in range(len(station)):
-            # もし統合されていたら被統合対象とせずスキップ
-            if isMerged[n] or isMerged[nn] or n == nn:
-              continue
-            # 距離が一定以下だったら位置情報を追加し統合フラグをたてる 統合した駅の座標を見ていない為改善が必要
-            distance = np.linalg.norm(station[n][1][0:1] - station[nn][1][0:1])
-            if distance < mergeDistanceThreshold:
-              station[n][1] = np.append(station[n][1],station[nn][1])
-              isMerged[nn] = True
-        for n in range(len(station)):
-          if not isMerged[n]: # 被統合
-            # 位置情報の再計算
-            station[n][1] = [sum(station[n][1][0::2]) / len(station[n][1][0::2]), sum(station[n][1][1::2]) / len(station[n][1][1::2])]
-        # 親リストに反映
-        # 位置情報の更新
-        buildings[np.where(buildings[:,0] == buildings[b,0])[0][np.logical_not(isMerged)],:][0][1] = station[np.logical_not(isMerged),1]
-        # 重複駅の削除
-        buildings = np.delete(buildings,np.where(buildings[:,0] == buildings[b,0])[0][isMerged],0)
-      
-      # 路線: 重複を削除
-      # railways = np.array(list(set(railways)))
-      railways = np.array(list(dict.fromkeys(railways)))
-
-      # TODO: np.whereでの位置情報の検索が上手くいかなかったためこの形で実装したので後で修正したい
-      # TODO: IDが降順でインクリメントされること前提で組んでいるのでデータの順番が変わるとIDも変わってしまう=セーブデータの互換性が消えてしまう問題
-      # 駅: 対応する路線と建物インデックスの計算
-      for s in stations.values():
-        s['railway_id'] = np.where((railways[:,0] == s['railwayLineName']) & (railways[:,2] == s['operationCompany']))[0][0]+1
-        # 駅名が完全一致している緯度経度リストを取得
-        sameNameList = buildings[np.where(buildings[:,0] == s['stationName'])]
-        # 上のリストの中から最も近い建物IDのインデックスを取得
-        nearestBuildingIdx = np.linalg.norm(sameNameList[:,1].tolist() - np.matlib.repmat(np.array([float(s['location']['center'][0]),float(s['location']['center'][1])]),len(sameNameList),1),None,1).argmin()
-        # print(sameNameList)
-        # print(nearestBuildingIdx)
-        # そのインデックスに対応する建物IDを取得
-        s['building_id'] = np.where(buildings[:,0] == s['stationName'])[0][nearestBuildingIdx]+1
-        # print(s['railway_id'])
-        # print(s['building_id'])
-        # import pdb; pdb.set_trace()
-
-
-      # 建物の出力
-      buildings = buildings.tolist()
-      for n, b in enumerate(buildings):
-        # print(SQL_INSERT_INTO('buildings', ['name', 'latlong'] , [b[0], f"GeomFromText('POINT({' '.join(map(str,b[1]))})')"] ))
-        kv = {
-          'id': str(n),
-          'name': b[0],
-          'latlong': f"GeomFromText('POINT({' '.join(map(str,b[1]))})')"
-        }
-        fp.write(
-          SQL_INSERT_INTO('buildings', ['id', 'name', 'latlong'] , [str(n+1), b[0], f"GeomFromText('POINT({' '.join(map(str,b[1]))})')"],IDX_NOT_QUOTED=[0, 2])
-          # SQL_INSERT_INTO('buildings', kv.keys(), kv.values(), IDX_NOT_QUOTED=[0, 2])
-        )
-
-      # 路線名の出力
-      railways = list(railways)
-      for n, r in enumerate(railways):
-        # kv = {
-        #   'id': n,
-        #   'name': r[0],
-        #   'type': r[1],
-        #   'company_name': r[2],
-        #   'service_provider_type': r[3],
-        # }
-        fp.write(
-          SQL_INSERT_INTO('railways', ['id', 'name', 'type','company_name','service_provider_type'], [str(n+1), r[0], str(r[1]), r[2], str(r[3])], IDX_NOT_QUOTED=[0, 2, 4])
-          # SQL_INSERT_INTO('railways', kv.keys(), kv.values(), IDX_NOT_QUOTED=[0, 2, 4])
-        )
-
-      # 駅の出力
-      for n, s in enumerate(stations.values()):
-        kv = {
-          'id': str(n),
-          'name': s['stationName'],
-          'building_id': str(s['building_id']),
-          'railway_id': str(s['railway_id']),
-        }
-        fp.write(
-          # SQL_INSERT_INTO('stations', kv.keys(), kv.values(), IDX_NOT_QUOTED=[0, 2, 3])
-          SQL_INSERT_INTO('stations', ['id', 'name','building_id','railway_id'], [str(n+1), s['stationName'],str(s['building_id']),str(s['railway_id'])] , IDX_NOT_QUOTED=[0, 2, 3])
-        )
-
-      # for s in stations.values():
-      #   kv = {
-      #     'station_name': s['stationName'],
-      #     'center_latlong': f"GeomFromText('POINT({' '.join(s['location']['center'])})')",
-      #     'operation_company': s['operationCompany'],
-      #     'service_provider_type': s['serviceProviderType'],
-      #     'railway_line_name': s['railwayLineName'],
-      #     'railway_type': s['railwayType']
-      #   }
-      # for r in railways.values():
-      #   print(SQL_INSERT_INTO('railways', r.keys(), r.values()))
-      #   fp.write(
-      #     SQL_INSERT_INTO('stations', kv.keys(), kv.values(), IDX_NOT_QUOTED=[1, 3, 5])
-      #   )
+    import pdb
+    pdb.set_trace()
