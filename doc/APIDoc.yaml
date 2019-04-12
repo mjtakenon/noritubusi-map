@@ -406,7 +406,7 @@ definitions:
         description: 建物ID
         type: integer
         example: 5297
-      id:
+      station_id:
         description: 駅ID
         type: integer
         example: 5871
@@ -433,9 +433,6 @@ definitions:
         description: 路線名
         type: string
         example: 東海道線
-      railwayType:
-        type: integer
-        example: 11
   buildingInfomation:
     type: object
     properties:
