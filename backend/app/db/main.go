@@ -83,6 +83,15 @@ func (d *DB) GetStationsInfoByKeyword(keyword string) ([]StationInfo, error) {
 	return suggestedStations, err
 }
 
+func (d *DB) GetStationInfoByBuildingID(buildingID int) ([]StationInfo, error) {
+	query := `SELECT buildings.id AS building_id,stations.id AS station_id,stations.name AS station_name,ST_X(latlong) AS 'lat',ST_Y(latlong) AS 'long',company_name,service_provider_type,railways.name AS railway_line_name FROM stations INNER JOIN railways on stations.railway_id=railways.id INNER JOIN buildings on stations.building_id=buildings.id WHERE buildings.id = ?  ORDER BY station_id`
+
+	stationInfos := []StationInfo{}
+	err := d.DB.Select(&stationInfos, query, buildingID)
+
+	return stationInfos, err
+}
+
 func (d *DB) GetRailwaysInfoAll() ([]RailwayInfo, error) {
 	query := `SELECT * FROM railways ORDER BY id`
 

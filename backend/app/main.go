@@ -49,6 +49,24 @@ func getStationInfoByID(c echo.Context) error {
 	return c.JSON(http.StatusOK, []db.StationInfo{stationInfo})
 }
 
+func getStationInfoByBuildingID(c echo.Context) error {
+	buildingID, err := strconv.Atoi(c.Param("buildingid"))
+	if err != nil {
+		return c.String(http.StatusBadRequest, "invalid parameter")
+	}
+
+	stationInfos, err := DB.GetStationInfoByBuildingID(buildingID)
+	if err != nil {
+		return c.String(http.StatusBadRequest, "invalid parameter")
+	}
+
+	if len(stationInfos) == 0 {
+		return c.String(http.StatusNotFound, "not found")
+	}
+
+	return c.JSON(http.StatusOK, stationInfos)
+}
+
 func getStationNameSuggestion(c echo.Context) error {
 	keyword := c.QueryParam("keyword")
 	if keyword == "" {
@@ -137,6 +155,7 @@ func main() {
 	e.GET("/railways", getRailwaysInfoAll)
 	e.GET("/railways/:railName", getRailwaysInfoByQuery)
 	e.GET("/buildings", getBuildingInfoInRange)
+	e.GET("/buildings/:buildingid", getStationInfoByBuildingID)
 	e.GET("/stations/:stationid", getStationInfoByID)
 	e.GET("/stations/suggest", getStationNameSuggestion)
 

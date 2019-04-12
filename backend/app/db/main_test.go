@@ -291,6 +291,66 @@ func TestStationDB_GetStationsInfoByKeyword(t *testing.T) {
 	}
 }
 
+func TestDB_GetStationInfoByBuildingID(t *testing.T) {
+	type fields struct {
+		DB *sqlx.DB
+	}
+	type args struct {
+		buildingID int
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    []StationInfo
+		wantErr bool
+	}{
+		{
+			name:   "浜松駅",
+			fields: fields{DB: SetUpDB(t)},
+			args:   args{buildingID: 5297},
+			want: []StationInfo{
+				{
+					BuildingId:          5297,
+					StationId:           5796,
+					Name:                "浜松",
+					Latitude:            "34.70376",
+					Longitude:           "137.7353775",
+					Company:             "東海旅客鉄道",
+					ServiceProviderType: 1,
+					RailwayName:         "東海道新幹線",
+				},
+				{
+					BuildingId:          5297,
+					StationId:           5871,
+					Name:                "浜松",
+					Latitude:            "34.70376",
+					Longitude:           "137.7353775",
+					Company:             "東海旅客鉄道",
+					ServiceProviderType: 2,
+					RailwayName:         "東海道線",
+				},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			d := &DB{
+				DB: tt.fields.DB,
+			}
+			got, err := d.GetStationInfoByBuildingID(tt.args.buildingID)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("DB.GetStationInfoByBuildingID() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("DB.GetStationInfoByBuildingID() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestDB_GetRailwaysInfoAll(t *testing.T) {
 	type fields struct {
 		DB *sqlx.DB
