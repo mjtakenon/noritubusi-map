@@ -132,6 +132,9 @@ if __name__ == '__main__':
       mergeDistanceThreshold = 0.00545
 
       # 全ての駅でループ
+      # TODO: np.whereでの位置情報の検索が上手くいかなかったためこの形で実装したので後で修正したい
+      # TODO: IDが降順でインクリメントされること前提で組んでいるのでデータの順番が変わるとIDも変わってしまう=セーブデータの互換性が消えてしまう問題
+      
       for b in range(len(buildings)):
         if b >= len(buildings):
           break
@@ -160,31 +163,26 @@ if __name__ == '__main__':
         buildings = np.delete(buildings,np.where(buildings[:,0] == buildings[b,0])[0][isMerged],0)
       
       # 路線: 重複を削除
-      # railways = np.array(list(set(railways)))
       railways = np.array(list(dict.fromkeys(railways)))
 
-      # TODO: np.whereでの位置情報の検索が上手くいかなかったためこの形で実装したので後で修正したい
-      # TODO: IDが降順でインクリメントされること前提で組んでいるのでデータの順番が変わるとIDも変わってしまう=セーブデータの互換性が消えてしまう問題
       # 駅: 対応する路線と建物インデックスの計算
+      # TODO: その路線の中で何番目の駅なのかを計算する必要がある
       for s in stations.values():
         s['railway_id'] = np.where((railways[:,0] == s['railwayLineName']) & (railways[:,2] == s['operationCompany']))[0][0]+1
         # 駅名が完全一致している緯度経度リストを取得
         sameNameList = buildings[np.where(buildings[:,0] == s['stationName'])]
         # 上のリストの中から最も近い建物IDのインデックスを取得
         nearestBuildingIdx = np.linalg.norm(sameNameList[:,1].tolist() - np.matlib.repmat(np.array([float(s['location']['center'][0]),float(s['location']['center'][1])]),len(sameNameList),1),None,1).argmin()
-        # print(sameNameList)
-        # print(nearestBuildingIdx)
         # そのインデックスに対応する建物IDを取得
         s['building_id'] = np.where(buildings[:,0] == s['stationName'])[0][nearestBuildingIdx]+1
-        # print(s['railway_id'])
-        # print(s['building_id'])
-        # import pdb; pdb.set_trace()
+        
+        s['location']['posList']
+
 
 
       # 建物の出力
       buildings = buildings.tolist()
       for n, b in enumerate(buildings):
-        # print(SQL_INSERT_INTO('buildings', ['name', 'latlong'] , [b[0], f"GeomFromText('POINT({' '.join(map(str,b[1]))})')"] ))
         kv = {
           'id': str(n),
           'name': b[0],
@@ -192,22 +190,13 @@ if __name__ == '__main__':
         }
         fp.write(
           SQL_INSERT_INTO('buildings', ['id', 'name', 'latlong'] , [str(n+1), b[0], f"GeomFromText('POINT({' '.join(map(str,b[1]))})')"],IDX_NOT_QUOTED=[0, 2])
-          # SQL_INSERT_INTO('buildings', kv.keys(), kv.values(), IDX_NOT_QUOTED=[0, 2])
         )
 
       # 路線名の出力
       railways = list(railways)
       for n, r in enumerate(railways):
-        # kv = {
-        #   'id': n,
-        #   'name': r[0],
-        #   'type': r[1],
-        #   'company_name': r[2],
-        #   'service_provider_type': r[3],
-        # }
         fp.write(
           SQL_INSERT_INTO('railways', ['id', 'name', 'type','company_name','service_provider_type'], [str(n+1), r[0], str(r[1]), r[2], str(r[3])], IDX_NOT_QUOTED=[0, 2, 4])
-          # SQL_INSERT_INTO('railways', kv.keys(), kv.values(), IDX_NOT_QUOTED=[0, 2, 4])
         )
 
       # 駅の出力
@@ -219,21 +208,5 @@ if __name__ == '__main__':
           'railway_id': str(s['railway_id']),
         }
         fp.write(
-          # SQL_INSERT_INTO('stations', kv.keys(), kv.values(), IDX_NOT_QUOTED=[0, 2, 3])
           SQL_INSERT_INTO('stations', ['id', 'name','building_id','railway_id'], [str(n+1), s['stationName'],str(s['building_id']),str(s['railway_id'])] , IDX_NOT_QUOTED=[0, 2, 3])
         )
-
-      # for s in stations.values():
-      #   kv = {
-      #     'station_name': s['stationName'],
-      #     'center_latlong': f"GeomFromText('POINT({' '.join(s['location']['center'])})')",
-      #     'operation_company': s['operationCompany'],
-      #     'service_provider_type': s['serviceProviderType'],
-      #     'railway_line_name': s['railwayLineName'],
-      #     'railway_type': s['railwayType']
-      #   }
-      # for r in railways.values():
-      #   print(SQL_INSERT_INTO('railways', r.keys(), r.values()))
-      #   fp.write(
-      #     SQL_INSERT_INTO('stations', kv.keys(), kv.values(), IDX_NOT_QUOTED=[1, 3, 5])
-      #   )
