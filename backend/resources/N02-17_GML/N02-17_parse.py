@@ -30,8 +30,6 @@ attr_val : str
     取り出した "gml:id" 属性値
     該当する属性が存在しなかった場合、"null" を返す
 """
-
-
 def get_id_attr(xml_elem, namespace_map):
     attr_val = elem.get(f"{{{namespace_map['gml']}}}id")
     return attr_val if attr_val is not None else "null"
@@ -59,35 +57,12 @@ attr_val : str
     取り出した "xlink:href" 属性値
     該当する属性が存在しなかった場合、"null" を返す
 """
-
-
 def get_link(xml_elem, str_selector, namespace_map):
     elem = xml_elem.find(str_selector, namespaces=namespace_map)
     if elem is not None:
         if elem.get(f"{{{namespace_map['xlink']}}}href") is not None:
             return elem.get(f"{{{namespace_map['xlink']}}}href").lstrip('#')
     return "null"
-
-
-"""
-XML の ID 値 から ID 番号を取得する
-
-Parameters
-----------
-id_str : str
-    取り出す ID 文字列
-    「XXXXX_YYYY」のようにアンダースコア ('_') で区切られており、
-    YYYY の部分が数字のみで構成されている文字列が想定される
-
-Returns
--------
-id_num : int
-    取り出した ID 番号
-"""
-
-
-def get_id_num(id_str):
-    return int(id_str.split('_')[1])
 
 
 """
@@ -103,12 +78,38 @@ Returns
 query : str
     GeomFromText 関数表記の文字列
 """
-
-
 def SQL_GEOMFROMTEXT(latlong):
     return "GeomFromText('POINT({0:.8f} {1:.8f})')".format(*latlong)
 
 
+"""
+Key-Value データから INSERT INTO 文を生成する
+
+Parameters
+----------
+TBL_NAME : str
+    INSERT INTO 文の対象となるテーブル名
+
+KEYS : list[str]
+    INSERT INTO 文で挿入されるカラム名
+    KEYS に含まれるカラム名は TBL_NAME で指定したテーブルに
+    存在している必要がある
+
+VALUES : list[str]
+    INSERT INTO 文で挿入されるレコード値
+    VALUES の要素順は KEYS の要素順に対応している必要がある
+
+IDX_NOT_QUOTED : list[int]
+    VALUES 句において、クォーテーションを付けない要素
+    のインデックス番号を指定する。デフォルト値は [] 
+    SQL では int 型や関数の出力結果を格納する場合は、
+    クォーテーションがあるとエラーとなる。
+
+Returns
+-------
+query : str
+    生成した INSERT INTO 文
+"""
 def SQL_INSERT_INTO(TBL_NAME, KEYS, VALUES, IDX_NOT_QUOTED=[]):
     str_keys = ', '.join([f"`{x}`" for x in KEYS])
     str_values = ', '.join(
@@ -117,6 +118,10 @@ def SQL_INSERT_INTO(TBL_NAME, KEYS, VALUES, IDX_NOT_QUOTED=[]):
     return f"INSERT INTO `{TBL_NAME}` ({str_keys}) VALUES ({str_values});\n"
 
 
+
+# --------------------#
+# --- Main Routine ---#
+# --------------------#
 if __name__ == '__main__':
     argc, argv = len(sys.argv), sys.argv
 
@@ -124,14 +129,11 @@ if __name__ == '__main__':
         sys.stderr.write(f"usage: {argv[0]} [xml-file-path] \n")
         sys.exit(-1)
 
-    # --------------------#
-    # --- Main Routine ---#
-    # --------------------#
     path_xml_file = argv[1]
 
     sys.stderr.write("Generate Namespace Map ... \n")
 
-    # Get Namespace Map
+    # XML 名前空間マップの作成
     namespace_map = dict()
     with open(path_xml_file) as f:
         for line in f.readlines():
@@ -139,10 +141,11 @@ if __name__ == '__main__':
             if m is not None:
                 namespace_map.update({m.group(1): m.group(2)})
 
-    # XML Parse
+    # XML のパース
     sys.stderr.write("XML Parsing ... \n")
     tree = ET.parse(path_xml_file)
     root_elem = tree.getroot()
+
 
     # N02-17.xml は「ある駅における駅名, 路線情報, 座標リスト」がまとまっている構造ではなく、
     # 「駅名」「路線情報」「座標リスト」というくくりでまとまっているため、扱いにくい
@@ -162,6 +165,7 @@ if __name__ == '__main__':
     #       路線情報 (ksj:RailroadSection) が持つ ksj:station 要素内の xlink:href 属性値に対応
     #       している
 
+
     # 1. Curve (座標リスト) のパース
     # パース結果は dict 型の変数 curves に格納される
     # curves は Key に 「gml:id 属性値」、 Value を「その駅の座標リスト」とする
@@ -180,54 +184,9 @@ if __name__ == '__main__':
 
         # curves を更新
         curves[attr_id] = pos_list
-        # curves.update(
-        #     {
-        #         attr_id: {
-        #             'posList': pos_list
-        #         }
-        #     }
-        # )
+        
 
-    # 2. RailroadSection (路線情報) のパース
-    # パース結果は dict 型の変数 railroad_sections に格納される
-    # railroad_sections は Key に 「gml:id 属性値」、
-    # Value を「路線情報を格納する dict」とする
-    # 路線情報は、ksj:RailloadSection 要素直下の各 XML 要素について、
-    # 属性名: 値 を Key-Value ペアで保持するものとする
-    # 以下に railload_sections の凡例を示す
-    # railload_sections = {
-    #   'gml:id 属性値': {
-    #     'railwayType': '鉄道区分コード (普通鉄道, 軌道, モノレールなど)',
-    #     'serviceProviderType': '事業者種別コード (JR, 新幹線, 私鉄など)',
-    #     'railwayLineName': '路線名',
-    #     'operationCompany': '運営会社名',
-    #     'location': '座標リスト を参照するためのID'
-    #   }
-    # }
-    sys.stderr.write("Parsing -- ksj:RailroadSection ... \n")
-    xml_railroad_sections = root_elem.findall(
-        'ksj:RailroadSection', namespaces=namespace_map)
-    railroad_sections = dict()
-    for elem in xml_railroad_sections:
-        # gml:id 属性値の取得
-        attr_id = get_id_attr(elem, namespace_map)
-        # 路線情報を格納する dict を初期化
-        railroad_sections[attr_id] = dict()
-        # ksj:RailroadSection 内の各要素を順にたどる
-        for child in elem:
-            # 要素が値を持つ場合
-            if child.text is not None:
-                # 要素名を Key, 要素値を Value として
-                key = re.sub(f"{{{namespace_map['ksj']}}}", "", child.tag)
-                val = child.text
-                # 路線情報の dict を更新する
-                railroad_sections[attr_id][key] = val
-
-        # 'location' を設定
-        railroad_sections[attr_id]['locationId'] = get_link(
-            elem, 'ksj:location', namespace_map)
-
-    # 3. Station (駅情報) のパース
+    # 2. Station (駅情報) のパース
     # パース結果は dict 型の変数 stations に格納される
     # stations は Key に 「gml:id 属性値」、 Value を「駅情報を格納する dict」とする
     # 駅情報は、ksj:Station 要素直下の各 XML 要素について、属性名: 値 を Key-Value ペアで
@@ -263,41 +222,17 @@ if __name__ == '__main__':
                 if child.text is not None:
                     # 要素が値を持つ場合
                     key = re.sub(f"{{{namespace_map['ksj']}}}", "", child.tag)
-                    if key == 'stationName':
-                        val = child.text
-                        # 駅情報の dict を更新する
-                        stations[attr_id][key] = val
+                    val = child.text
+                    # 駅情報の dict を更新する
+                    stations[attr_id][key] = val
 
-            # 'location', 'railroadSection' を設定
-            stations[attr_id]['locationId'] = get_link(
-                elem, 'ksj:location', namespace_map)
-            stations[attr_id]['railroadSectionId'] = get_link(
-                elem, 'ksj:railroadSection', namespace_map)
+            # 'location' を設定
+            location_id = get_link(elem, 'ksj:location', namespace_map)
+            stations[attr_id]['location'] = np.array(curves[location_id], dtype=np.float64).mean(axis=0).tolist()
 
-    # 4. 各データセット間の統合処理
-    # 「座標リスト」「路線情報」「駅情報」間の情報をIDをもとに紐づけて、1つのデータセットに
-    # 統合する処理を行う
 
-    sys.stderr.write("Merge datasets ... \n")
 
-    # datasets = {
-    #     k: {
-    #         'stationName': v['stationName'],
-    #         'location': np.array(curves[v['locationId']], dtype=np.float64).mean(axis=0).tolist(),
-    #         'railroadSection': { **railroad_sections[v['railroadSectionId']], **{ 'railroadSectionId': v['railroadSectionId'] }}
-    #     } for k, v in stations.items()
-    # }
-
-    datasets = [
-        {
-            'stationId': k,
-            'stationName': v['stationName'],
-            'location': np.array(curves[v['locationId']], dtype=np.float64).mean(axis=0).tolist(),
-            'railroadSection': {**railroad_sections[v['railroadSectionId']], **{'railroadSectionId': v['railroadSectionId']}}
-        } for k, v in stations.items()
-    ]
-
-    # 5. 同一駅舎内の駅を統合する処理 (これ大事)
+    # 3. 同一駅舎内の駅を統合する処理 (これ大事)
 
     # 駅統合の緯度, 経度の閾値 (〜450 m )
     merge_distance_threshold = 0.00545
@@ -305,59 +240,84 @@ if __name__ == '__main__':
     # (1) 駅名称に重複があるものをまとめる
     #     collection.Counter はリスト要素の重複数をカウントしてくれる
     #     これを利用して、駅名 ( 'stationName' ) の重複カウントを行う
-    count = Counter([v['stationName'] for v in datasets])
+    count = Counter([v['stationName'] for v in stations.values()])
     duplicated_names = [k for k, v in count.items() if v != 1]
 
-    # 統合結果は dict 型の変数 merge_stations に格納する
+    # 統合結果は dict 型の変数 merged_stations に格納する
     # Key を 「重複している駅名称」、Value を
     # 「駅名称(駅名, 路線名, 運営会社) とクラスタ番号のリスト」
     # とする
-    merge_stations = dict()
+    merged_stations = dict()
 
     sys.stderr.write("Merge stations ... \n")
 
     for name in duplicated_names:
         # name に一致する駅情報を list 型の変数 dup_stations に取り出す
-        dup_stations = [v for v in datasets if v['stationName'] == name]
+        dup_stations = [v for v in stations.values() if v['stationName'] == name]
         # 座標リストを numpy.ndarray に変換する
-        datas = np.array([v['location']
-                          for v in dup_stations], dtype=np.float64)
+        datas = np.array( [ v['location'] for v in dup_stations ], dtype=np.float64)
         # (2) scikit-learn の MeanShift でクラスタリング
         #     引数 bandwidth は統合する際の閾値
         labels = MeanShift(
             bandwidth=merge_distance_threshold).fit_predict(datas)
 
-        # 統合結果で merge_stations を更新
-        # merge_stations[name] = [
+        # 統合結果で merged_stations を更新
+        # merged_stations[name] = [
         #     tuple(['{0}駅 ({2} {1})'.format(*a), str(b)]) for a, b in zip(dup_stations.keys(), labels)]
 
-        merge_stations[name] = dict()
+        merged_stations[name] = dict()
         for label_num, station in zip(labels, dup_stations):
-            if label_num not in merge_stations[name]:
-                merge_stations[name][label_num] = dict()
-                merge_stations[name][label_num]['stations'] = list()
-            merge_stations[name][label_num]['stations'].append(station)
+            if label_num not in merged_stations[name]:
+                merged_stations[name][label_num] = dict()
+                merged_stations[name][label_num]['stations'] = list()
+            merged_stations[name][label_num]['stations'].append(station)
 
-        for v in merge_stations[name].values():
+        for v in merged_stations[name].values():
             v['center_latlng'] = np.array(
                 [vv['location'] for vv in v['stations']], dtype=np.float64).mean(axis=0).tolist()
 
-        # merge_stations[name] = {
+        # merged_stations[name] = {
         #     a: b for a, b in zip(labels, samples.items())
         # }
 
-    # 統合結果を JSON 出力 (仮)
-    # with open('merge_stations.json', 'wt') as f:
-    #     json.dump(merge_stations, f, ensure_ascii=False)
+    #  4. 重複のない駅舎を統合する処理 (これ忘れてた)
 
-    sql_buildings = list()
-    sql_stations = list()
-    sql_railways = dict()
+    sys.stderr.write("Get single stations ... \n")
 
-    building_id = 1
-    for building_name, buildings in merge_stations.items():
+    # 複数駅舎を持たない駅名のリストを生成
+    non_duplicated_names = [k for k, v in count.items() if v == 1]
+    # merged_stations と同様のスキームになるように、 single_stations を生成
+    single_stations = {
+        k: {
+            0: {
+                'stations': [v for v in stations.values() if v['stationName'] == k],
+                'center_latlng': [v['location'] for v in stations.values() if v['stationName'] == k][0]
+            }
+        } for k in non_duplicated_names
+    }
+
+    # single_stations を merged_stations に統合
+    merged_stations.update(single_stations)
+
+    # 5. SQL の生成
+    # '1_schema.sql' に定義したスキーマに合わせた INSERT INTO 文を生成する
+    # buildings, stations, railways 間は id によるリレーションがあるため、
+    # id 値を設定しながら SQL を生成する
+
+    sys.stderr.write ("Genrate SQL ... \n")
+
+
+    # buildings, stations, railways の SQL 文を格納する
+    sql_buildings, sql_stations, sql_railways = list(), list(), dict()
+
+    # リレーション用の ID 値の初期化
+    station_id, building_id, railway_id = 1, 1, 1
+    
+
+    for building_name, buildings in merged_stations.items():
         for building in buildings.values():
-            # buildings (id, name, latlong)
+
+            # sql_buildings に現在の駅舎情報を追加
             sql_buildings.append(
                 tuple([
                     building_id,
@@ -366,31 +326,64 @@ if __name__ == '__main__':
                 ])
             )
 
+            # buildings が持つ駅を station としてループ
             for station in building['stations']:
-                station_id = get_id_num(station['stationId'])
-                railway_id = get_id_num(
-                    station['railroadSection']['railroadSectionId'])
+                
+                # railways は (路線名, 運営会社) のペアでユニーク
+                # であるため、これをキーとして sql_railways に
+                # 路線情報を格納する
+                key_sql_railways = tuple([ 
+                    station['railwayLineName'],
+                    station['operationCompany'] 
+                ])
 
-                if railway_id not in sql_railways:
-                    sql_railways[railway_id] = tuple([
+                # 現在見ている駅の路線情報が sql_railways に含まれていない場合 
+                if key_sql_railways not in sql_railways:
+                    
+                    # sql_railways に現在の路線情報を追加
+                    sql_railways[key_sql_railways] = tuple([
                         railway_id,
-                        station['railroadSection']['railwayLineName'],
-                        int(station['railroadSection']['railwayType']),
-                        station['railroadSection']['operationCompany'],
-                        int(station['railroadSection']['serviceProviderType']),
+                        station['railwayLineName'],
+                        int(station['railwayType']),
+                        station['operationCompany'],
+                        int(station['serviceProviderType']),
                     ])
+                    
+                    # 今格納した路線情報のID値 (railway_id) を
+                    # station_railway_id にセットする
+                    # station_railway_id は sql_stations への
+                    # 格納時に利用される
+                    station_railway_id = railway_id
 
+                    # railway_id をインクリメント
+                    railway_id += 1
+
+                # すでに路線情報が格納されている場合
+                else:
+                    
+                    # 格納されている路線情報の ID 値を取り出す
+                    station_railway_id = sql_railways[key_sql_railways][0]
+
+                # sql_stations に現在の駅情報を追加
                 sql_stations.append(
                     tuple([
                         station_id,
                         station['stationName'],
                         building_id,
-                        railway_id
+                        station_railway_id
                     ])
                 )
 
+                # station_id をインクリメント
+                station_id += 1
+
+            # building_id をインクリメント
             building_id += 1
 
+    sys.stderr.write('Write SQL as "seeds.sql" ... \n')
+
+
+    # 生成した SQL クエリを 'seeds.sql' ファイルに出力
     with open('seeds.sql', 'wt') as f:
 
         for query in sql_buildings:
