@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 
-import xml.etree.ElementTree as ET
 import os
 import sys
 import re
 import json
-import numpy as np
-import numpy.matlib
 import itertools
+from collections import Counter
+import xml.etree.ElementTree as ET
+import numpy as np
+from sklearn.cluster import MeanShift
 
 """
 要素から "gml:id" 属性の値を取り出す
@@ -92,7 +93,7 @@ if __name__ == '__main__':
     # --------------------#
     path_xml_file = argv[1]
 
-    sys.stderr.write("Pre-processing ... \n")
+    sys.stderr.write("Generate Namespace Map ... \n")
 
     # Get Namespace Map
     namespace_map = dict()
@@ -103,6 +104,7 @@ if __name__ == '__main__':
                 namespace_map.update({m.group(1): m.group(2)})
 
     # XML Parse
+    sys.stderr.write("XML Parsing ... \n")
     tree = ET.parse(path_xml_file)
     root_elem = tree.getroot()
 
@@ -127,6 +129,7 @@ if __name__ == '__main__':
     # 1. Curve (座標リスト) のパース
     # パース結果は dict 型の変数 curves に格納される
     # curves は Key に 「gml:id 属性値」、 Value を「その駅の座標リスト」とする
+    sys.stderr.write("Parsing -- gml:Curve ... \n")
     xml_curves = root_elem.findall('gml:Curve', namespaces=namespace_map)
     curves = dict()
     for elem in xml_curves:
@@ -165,6 +168,7 @@ if __name__ == '__main__':
     #     'location': '座標リスト を参照するためのID'
     #   }
     # }
+    sys.stderr.write("Parsing -- ksj:RailroadSection ... \n")
     xml_railroad_sections = root_elem.findall(
         'ksj:RailroadSection', namespaces=namespace_map)
     railroad_sections = dict()
@@ -204,6 +208,7 @@ if __name__ == '__main__':
     #     'railroadSection': '路線情報を参照するためのID',
     #   }
     # }
+    sys.stderr.write("Parsing -- ksj:Station ... \n")
     xml_stations = root_elem.findall('ksj:Station', namespaces=namespace_map)
     stations = dict()
     for elem in xml_stations:
@@ -231,7 +236,10 @@ if __name__ == '__main__':
     # 「座標リスト」「路線情報」「駅情報」間の情報をIDをもとに紐づけて、1つのデータセットに
     # 統合する処理を行う
 
+    sys.stderr.write("Merge datasets ... \n")
+
     # 駅単位のデータにしたいため、駅情報 (stations) に対し for-each を行い、統合する
+    datasets = dict()
     for station in stations.values():
         # (1) 座標リストの取得
         # 駅情報内の 'location' 値が null 出ない場合
@@ -247,5 +255,52 @@ if __name__ == '__main__':
             arr = np.array(station['location'], dtype=np.float64)
             station['location'] = arr.mean(axis=0).tolist()
 
-    import pdb
-    pdb.set_trace()
+        dict_key = [station['stationName'],
+                    station['railwayLineName'], station['operationCompany']]
+        datasets[tuple(dict_key)] = station
+
+    # 5. 同一駅舎内の駅を統合する処理 (これ大事)
+
+    # 駅統合の緯度, 経度の閾値 (〜450 m )
+    merge_distance_threshold = 0.00545
+
+    # (1) 駅名称に重複があるものをまとめる
+    #     collection.Counter はリスト要素の重複数をカウントしてくれる
+    #     これを利用して、駅名 ( 'stationName' ) の重複カウントを行う
+    count = Counter([v['stationName'] for v in datasets.values()])
+    duplicated_names = [k for k, v in count.items() if v != 1]
+
+    # 統合結果は dict 型の変数 merge_stations に格納する
+    # Key を 「重複している駅名称」、Value を
+    # 「駅名称(駅名, 路線名, 運営会社) とクラスタ番号のリスト」
+    # とする
+    merge_stations = dict()
+
+    sys.stderr.write("Merge stations ... \n")
+
+    for name in duplicated_names:
+        # name に一致する駅情報を dict 型の変数 samples に取り出す
+        # Key はユニークにする必要があるため、(駅名, 路線名, 運営会社名) の
+        # tuple を Key に、Value をその駅の座標値とする
+        samples = {
+            tuple([
+                v['stationName'],
+                v['railwayLineName'],
+                v['operationCompany']
+            ]): v['location']
+            for v in datasets.values() if v['stationName'] == name
+        }
+        # 座標リストを numpy.ndarray に変換する
+        datas = np.array(list(samples.values()), dtype=np.float64)
+        # (2) scikit-learn の MeanShift でクラスタリング
+        #     引数 bandwidth は統合する際の閾値
+        labels = MeanShift(
+            bandwidth=merge_distance_threshold).fit_predict(datas)
+
+        # 統合結果で merge_stations を更新
+        merge_stations[name] = [
+            tuple(['{0}駅 ({2} {1})'.format(*a), str(b)]) for a, b in zip(samples.keys(), labels)]
+
+    # 統合結果を JSON 出力 (仮)
+    with open('merge_stations.json', 'wt') as f:
+        json.dump(merge_stations, f, ensure_ascii=False)
