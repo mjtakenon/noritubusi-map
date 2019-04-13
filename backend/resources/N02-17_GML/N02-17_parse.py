@@ -214,23 +214,29 @@ if __name__ == '__main__':
     for elem in xml_stations:
         # gml:id 属性値の取得
         attr_id = get_id_attr(elem, namespace_map)
-        # 駅情報を格納する dict を初期化
-        stations[attr_id] = dict()
-        # ksj:Station 内の各要素を順にたどる
-        for child in elem:
-            # 要素が値を持つ場合
-            if child.text is not None:
-                # 要素が値を持つ場合
-                key = re.sub(f"{{{namespace_map['ksj']}}}", "", child.tag)
-                val = child.text
-                # 駅情報の dict を更新する
-                stations[attr_id][key] = val
 
-        # 'location', 'railroadSection' を設定
-        stations[attr_id]['location'] = get_link(
-            elem, 'ksj:location', namespace_map)
-        stations[attr_id]['railroadSection'] = get_link(
-            elem, 'ksj:railroadSection', namespace_map)
+        # 'ksj:location' 要素または 'ksj:railroadSection' 要素を持たないものは、スキップ
+        if get_link(elem, 'ksj:location', namespace_map) != "null" and get_link(
+            elem, 'ksj:railroadSection', namespace_map) != "null":
+            
+            # 駅情報を格納する dict を初期化
+            stations[attr_id] = dict()
+            # ksj:Station 内の各要素を順にたどる
+            for child in elem:
+                # 要素が値を持つ場合
+                if child.text is not None:
+                    # 要素が値を持つ場合
+                    key = re.sub(f"{{{namespace_map['ksj']}}}", "", child.tag)
+                    if key == 'stationName':
+                        val = child.text
+                        # 駅情報の dict を更新する
+                        stations[attr_id][key] = val
+
+            # 'location', 'railroadSection' を設定
+            stations[attr_id]['location'] = get_link(
+                elem, 'ksj:location', namespace_map)
+            stations[attr_id]['railroadSection'] = get_link(
+                elem, 'ksj:railroadSection', namespace_map)
 
     # 4. 各データセット間の統合処理
     # 「座標リスト」「路線情報」「駅情報」間の情報をIDをもとに紐づけて、1つのデータセットに
@@ -238,26 +244,12 @@ if __name__ == '__main__':
 
     sys.stderr.write("Merge datasets ... \n")
 
-    # 駅単位のデータにしたいため、駅情報 (stations) に対し for-each を行い、統合する
-    datasets = dict()
-    for station in stations.values():
-        # (1) 座標リストの取得
-        # 駅情報内の 'location' 値が null 出ない場合
-        if station['location'] != "null":
-            # 'location' 値を curves から対応する座標リストで更新する
-            station['location'] = curves[station['location']]
-
-            # 重心計算
-            # 座標リストは駅の端と端の2点間の座標を持っている(？)ため、そこから重心を
-            # 計算し、駅の座標値とする
-            # 行列演算を行いたいため、 Python の list から numpy.ndarray に変換し、
-            # 'location' 値を重心値で更新する
-            arr = np.array(station['location'], dtype=np.float64)
-            station['location'] = arr.mean(axis=0).tolist()
-
-        dict_key = [station['stationName'],
-                    station['railwayLineName'], station['operationCompany']]
-        datasets[tuple(dict_key)] = station
+    datasets = { 
+        k:{ 
+            'stationName': v['stationName'],
+            'location': np.array(curves[v['location']], dtype=np.float64).mean(axis=0).tolist(),
+            'railroadSection': railroad_sections[v['railroadSection']]
+        } for k, v in stations.items() }
 
     # 5. 同一駅舎内の駅を統合する処理 (これ大事)
 
@@ -285,8 +277,8 @@ if __name__ == '__main__':
         samples = {
             tuple([
                 v['stationName'],
-                v['railwayLineName'],
-                v['operationCompany']
+                v['railroadSection']['railwayLineName'],
+                v['railroadSection']['operationCompany']
             ]): v['location']
             for v in datasets.values() if v['stationName'] == name
         }
@@ -298,9 +290,19 @@ if __name__ == '__main__':
             bandwidth=merge_distance_threshold).fit_predict(datas)
 
         # 統合結果で merge_stations を更新
-        merge_stations[name] = [
-            tuple(['{0}駅 ({2} {1})'.format(*a), str(b)]) for a, b in zip(samples.keys(), labels)]
+        # merge_stations[name] = [
+        #     tuple(['{0}駅 ({2} {1})'.format(*a), str(b)]) for a, b in zip(samples.keys(), labels)]
+
+        merge_stations[name] = dict()
+        for label_num, item in zip(labels, samples.items()):
+            if label_num not in merge_stations[name]:
+                merge_stations[name][label_num] = list()
+            merge_stations[name][label_num].append(item)
+
+        # merge_stations[name] = {
+        #     a: b for a, b in zip(labels, samples.items())
+        # }
 
     # 統合結果を JSON 出力 (仮)
-    with open('merge_stations.json', 'wt') as f:
-        json.dump(merge_stations, f, ensure_ascii=False)
+    # with open('merge_stations.json', 'wt') as f:
+    #     json.dump(merge_stations, f, ensure_ascii=False)
