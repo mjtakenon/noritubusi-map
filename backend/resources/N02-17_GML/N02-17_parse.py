@@ -69,14 +69,50 @@ def get_link(xml_elem, str_selector, namespace_map):
     return "null"
 
 
+"""
+XML の ID 値 から ID 番号を取得する
+
+Parameters
+----------
+id_str : str
+    取り出す ID 文字列
+    「XXXXX_YYYY」のようにアンダースコア ('_') で区切られており、
+    YYYY の部分が数字のみで構成されている文字列が想定される
+
+Returns
+-------
+id_num : int
+    取り出した ID 番号
+"""
+
+
+def get_id_num(id_str):
+    return int(id_str.split('_')[1])
+
+
+"""
+緯度, 経度の配列から MySQL の GeomFromText 関数表記を得る
+
+Parameters
+----------
+latlong : list[float, float]
+    緯度, 経度の配列
+
+Returns
+-------
+query : str
+    GeomFromText 関数表記の文字列
+"""
+
+
+def SQL_GEOMFROMTEXT(latlong):
+    return "GeomFromText('POINT({0:.8f} {1:.8f})')".format(*latlong)
+
+
 def SQL_INSERT_INTO(TBL_NAME, KEYS, VALUES, IDX_NOT_QUOTED=[]):
     str_keys = ', '.join([f"`{x}`" for x in KEYS])
-    try:
-        str_values = ', '.join(
-            [f"'{x}'" if i not in IDX_NOT_QUOTED else x for (i, x) in enumerate(VALUES)])
-    except TypeError as e:
-        import pdb
-        pdb.set_trace()
+    str_values = ', '.join(
+        [f"'{x}'" if i not in IDX_NOT_QUOTED else str(x) for (i, x) in enumerate(VALUES)])
 
     return f"INSERT INTO `{TBL_NAME}` ({str_keys}) VALUES ({str_values});\n"
 
@@ -188,7 +224,7 @@ if __name__ == '__main__':
                 railroad_sections[attr_id][key] = val
 
         # 'location' を設定
-        railroad_sections[attr_id]['location'] = get_link(
+        railroad_sections[attr_id]['locationId'] = get_link(
             elem, 'ksj:location', namespace_map)
 
     # 3. Station (駅情報) のパース
@@ -217,8 +253,8 @@ if __name__ == '__main__':
 
         # 'ksj:location' 要素または 'ksj:railroadSection' 要素を持たないものは、スキップ
         if get_link(elem, 'ksj:location', namespace_map) != "null" and get_link(
-            elem, 'ksj:railroadSection', namespace_map) != "null":
-            
+                elem, 'ksj:railroadSection', namespace_map) != "null":
+
             # 駅情報を格納する dict を初期化
             stations[attr_id] = dict()
             # ksj:Station 内の各要素を順にたどる
@@ -233,9 +269,9 @@ if __name__ == '__main__':
                         stations[attr_id][key] = val
 
             # 'location', 'railroadSection' を設定
-            stations[attr_id]['location'] = get_link(
+            stations[attr_id]['locationId'] = get_link(
                 elem, 'ksj:location', namespace_map)
-            stations[attr_id]['railroadSection'] = get_link(
+            stations[attr_id]['railroadSectionId'] = get_link(
                 elem, 'ksj:railroadSection', namespace_map)
 
     # 4. 各データセット間の統合処理
@@ -244,12 +280,22 @@ if __name__ == '__main__':
 
     sys.stderr.write("Merge datasets ... \n")
 
-    datasets = { 
-        k:{ 
+    # datasets = {
+    #     k: {
+    #         'stationName': v['stationName'],
+    #         'location': np.array(curves[v['locationId']], dtype=np.float64).mean(axis=0).tolist(),
+    #         'railroadSection': { **railroad_sections[v['railroadSectionId']], **{ 'railroadSectionId': v['railroadSectionId'] }}
+    #     } for k, v in stations.items()
+    # }
+
+    datasets = [
+        {
+            'stationId': k,
             'stationName': v['stationName'],
-            'location': np.array(curves[v['location']], dtype=np.float64).mean(axis=0).tolist(),
-            'railroadSection': railroad_sections[v['railroadSection']]
-        } for k, v in stations.items() }
+            'location': np.array(curves[v['locationId']], dtype=np.float64).mean(axis=0).tolist(),
+            'railroadSection': {**railroad_sections[v['railroadSectionId']], **{'railroadSectionId': v['railroadSectionId']}}
+        } for k, v in stations.items()
+    ]
 
     # 5. 同一駅舎内の駅を統合する処理 (これ大事)
 
@@ -259,7 +305,7 @@ if __name__ == '__main__':
     # (1) 駅名称に重複があるものをまとめる
     #     collection.Counter はリスト要素の重複数をカウントしてくれる
     #     これを利用して、駅名 ( 'stationName' ) の重複カウントを行う
-    count = Counter([v['stationName'] for v in datasets.values()])
+    count = Counter([v['stationName'] for v in datasets])
     duplicated_names = [k for k, v in count.items() if v != 1]
 
     # 統合結果は dict 型の変数 merge_stations に格納する
@@ -271,19 +317,11 @@ if __name__ == '__main__':
     sys.stderr.write("Merge stations ... \n")
 
     for name in duplicated_names:
-        # name に一致する駅情報を dict 型の変数 samples に取り出す
-        # Key はユニークにする必要があるため、(駅名, 路線名, 運営会社名) の
-        # tuple を Key に、Value をその駅の座標値とする
-        samples = {
-            tuple([
-                v['stationName'],
-                v['railroadSection']['railwayLineName'],
-                v['railroadSection']['operationCompany']
-            ]): v['location']
-            for v in datasets.values() if v['stationName'] == name
-        }
+        # name に一致する駅情報を list 型の変数 dup_stations に取り出す
+        dup_stations = [v for v in datasets if v['stationName'] == name]
         # 座標リストを numpy.ndarray に変換する
-        datas = np.array(list(samples.values()), dtype=np.float64)
+        datas = np.array([v['location']
+                          for v in dup_stations], dtype=np.float64)
         # (2) scikit-learn の MeanShift でクラスタリング
         #     引数 bandwidth は統合する際の閾値
         labels = MeanShift(
@@ -291,13 +329,18 @@ if __name__ == '__main__':
 
         # 統合結果で merge_stations を更新
         # merge_stations[name] = [
-        #     tuple(['{0}駅 ({2} {1})'.format(*a), str(b)]) for a, b in zip(samples.keys(), labels)]
+        #     tuple(['{0}駅 ({2} {1})'.format(*a), str(b)]) for a, b in zip(dup_stations.keys(), labels)]
 
         merge_stations[name] = dict()
-        for label_num, item in zip(labels, samples.items()):
+        for label_num, station in zip(labels, dup_stations):
             if label_num not in merge_stations[name]:
-                merge_stations[name][label_num] = list()
-            merge_stations[name][label_num].append(item)
+                merge_stations[name][label_num] = dict()
+                merge_stations[name][label_num]['stations'] = list()
+            merge_stations[name][label_num]['stations'].append(station)
+
+        for v in merge_stations[name].values():
+            v['center_latlng'] = np.array(
+                [vv['location'] for vv in v['stations']], dtype=np.float64).mean(axis=0).tolist()
 
         # merge_stations[name] = {
         #     a: b for a, b in zip(labels, samples.items())
@@ -306,3 +349,76 @@ if __name__ == '__main__':
     # 統合結果を JSON 出力 (仮)
     # with open('merge_stations.json', 'wt') as f:
     #     json.dump(merge_stations, f, ensure_ascii=False)
+
+    sql_buildings = list()
+    sql_stations = list()
+    sql_railways = dict()
+
+    building_id = 1
+    for building_name, buildings in merge_stations.items():
+        for building in buildings.values():
+            # buildings (id, name, latlong)
+            sql_buildings.append(
+                tuple([
+                    building_id,
+                    building_name,
+                    SQL_GEOMFROMTEXT(building['center_latlng'])
+                ])
+            )
+
+            for station in building['stations']:
+                station_id = get_id_num(station['stationId'])
+                railway_id = get_id_num(
+                    station['railroadSection']['railroadSectionId'])
+
+                if railway_id not in sql_railways:
+                    sql_railways[railway_id] = tuple([
+                        railway_id,
+                        station['railroadSection']['railwayLineName'],
+                        int(station['railroadSection']['railwayType']),
+                        station['railroadSection']['operationCompany'],
+                        int(station['railroadSection']['serviceProviderType']),
+                    ])
+
+                sql_stations.append(
+                    tuple([
+                        station_id,
+                        station['stationName'],
+                        building_id,
+                        railway_id
+                    ])
+                )
+
+            building_id += 1
+
+    with open('seeds.sql', 'wt') as f:
+
+        for query in sql_buildings:
+            f.write(
+                SQL_INSERT_INTO(
+                    'buildings',
+                    ['id', 'name', 'latlong'],
+                    query,
+                    [0, 2]
+                )
+            )
+
+        for query in sql_railways.values():
+            f.write(
+                SQL_INSERT_INTO(
+                    'railways',
+                    ['id', 'name', 'type', 'company_name', 'service_provider_type'],
+                    query,
+                    [0, 2, 4]
+                )
+            )
+
+        for query in sql_stations:
+            f.write(
+                SQL_INSERT_INTO(
+                    'stations',
+                    ['id', 'name', 'building_id', 'railway_id'],
+                    query,
+                    [0, 2, 3]
+                )
+            )
