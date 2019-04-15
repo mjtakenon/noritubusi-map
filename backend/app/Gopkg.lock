@@ -86,11 +86,13 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:520c8ed6c442eed074caf8c1d874d2b0241edbe59729199f6bdf1db99f2ccb9f"
+  digest = "1:acdf5e5265ec3cd816f209664ed2945c47870fe7af45586d6e6be20e247e4291"
   name = "golang.org/x/crypto"
   packages = [
     "acme",
     "acme/autocert",
+    "bcrypt",
+    "blowfish",
   ]
   pruneopts = "UT"
   revision = "74369b46fc6756741c016591724fd1cb8e26845f"
@@ -119,6 +121,7 @@
     "github.com/jmoiron/sqlx",
     "github.com/labstack/echo",
     "github.com/labstack/echo/middleware",
+    "golang.org/x/crypto/bcrypt",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
