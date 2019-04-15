@@ -1,12 +1,16 @@
-INSERT INTO `user_records` (`user_id`,`station_id`) VALUES ('mjtakenon',2115);
-INSERT INTO `user_records` (`user_id`,`station_id`) VALUES ('mjtakenon',2116);
-INSERT INTO `user_records` (`user_id`,`station_id`) VALUES ('mjtakenon',2117);
-INSERT INTO `user_records` (`user_id`,`station_id`) VALUES ('mjtakenon',2118);
-INSERT INTO `user_records` (`user_id`,`station_id`) VALUES ('mjtakenon',2119);
-INSERT INTO `user_records` (`user_id`,`station_id`) VALUES ('mjtakenon',2120);
-INSERT INTO `user_records` (`user_id`,`station_id`) VALUES ('mjtakenon',2121);
-INSERT INTO `user_records` (`user_id`,`station_id`) VALUES ('mjtakenon',2122);
-INSERT INTO `user_records` (`user_id`,`station_id`) VALUES ('mjtakenon',2123);
-INSERT INTO `user_records` (`user_id`,`station_id`) VALUES ('mjtakenon',2124);
-INSERT INTO `user_records` (`user_id`,`station_id`) VALUES ('mjtakenon',2125);
-INSERT INTO `user_records` (`user_id`,`station_id`) VALUES ('mjtakenon',2126);
+INSERT INTO `users` (`id`,`hashed_password`) VALUES ('mjtakenon','$2a$08$7ICkosVBtcQrHhHWJnnql.ZaPSXOFDuGaEqHfZmRVdPKox0hUKMrS');  -- Password: 'password'
+
+INSERT INTO `user_records` (`user_id`,`building_id`) VALUES ('mjtakenon',1980);
+INSERT INTO `user_records` (`user_id`,`building_id`) VALUES ('mjtakenon',1981);
+INSERT INTO `user_records` (`user_id`,`building_id`) VALUES ('mjtakenon',1982);
+INSERT INTO `user_records` (`user_id`,`building_id`) VALUES ('mjtakenon',1983);
+INSERT INTO `user_records` (`user_id`,`building_id`) VALUES ('mjtakenon',1984);
+INSERT INTO `user_records` (`user_id`,`building_id`) VALUES ('mjtakenon',1985);
+INSERT INTO `user_records` (`user_id`,`building_id`) VALUES ('mjtakenon',1986);
+INSERT INTO `user_records` (`user_id`,`building_id`) VALUES ('mjtakenon',1987);
+INSERT INTO `user_records` (`user_id`,`building_id`) VALUES ('mjtakenon',1988);
+INSERT INTO `user_records` (`user_id`,`building_id`) VALUES ('mjtakenon',1989);
+INSERT INTO `user_records` (`user_id`,`building_id`) VALUES ('mjtakenon',1990);
+INSERT INTO `user_records` (`user_id`,`building_id`) VALUES ('mjtakenon',1991);
+INSERT INTO `user_records` (`user_id`,`building_id`) VALUES ('mjtakenon',1992);
+INSERT INTO `user_records` (`user_id`,`building_id`) VALUES ('mjtakenon',1993);

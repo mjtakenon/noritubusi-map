@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `stations` (
   `building_id`            INT NOT NULL,
   PRIMARY KEY (`id`),
   -- FOREIGN KEY(列名) REFERENCES 親テーブル名(親列名)
-  FOREIGN KEY (`building_id`) REFERENCES buildings(`id`), 
-  FOREIGN KEY (`railway_id`) REFERENCES railways(`id`) ,
+  FOREIGN KEY (`building_id`) REFERENCES buildings(`id`),
+  FOREIGN KEY (`railway_id`) REFERENCES railways(`id`),
   INDEX (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
