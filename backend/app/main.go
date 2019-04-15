@@ -81,6 +81,38 @@ func getStationNameSuggestion(c echo.Context) error {
 	return c.JSON(http.StatusOK, stationInfos)
 }
 
+func getRailwaysInfoAll(c echo.Context) error {
+	railwayInfos, err := DB.GetRailwaysInfoAll()
+
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "server error")
+	}
+
+	return c.JSON(http.StatusOK, railwayInfos)
+}
+
+func getRailwaysInfoByQuery(c echo.Context) error {
+	query := c.Param("query")
+	if query == "" {
+		return c.String(http.StatusBadRequest, "invalid parameter")
+	}
+
+	id, err := strconv.Atoi(query)
+
+	railwayInfos := []db.RailwayInfo{}
+	if err != nil {
+		railwayInfos, err = DB.GetRailwaysInfoByName(query)
+	} else {
+		railwayInfos, err = DB.GetRailwaysInfoByID(id)
+	}
+
+	if err != nil {
+		return c.String(http.StatusNotFound, "not found")
+	}
+
+	return c.JSON(http.StatusOK, railwayInfos)
+}
+
 var (
 	DB db.DB
 )
@@ -115,6 +147,8 @@ func main() {
 
 	// Routes
 	e.GET("/", hello)
+	e.GET("/railways", getRailwaysInfoAll)
+	e.GET("/railways/:query", getRailwaysInfoByQuery)
 	e.GET("/buildings", getBuildingInfoInRange)
 	e.GET("/buildings/:buildingid", getStationInfoByBuildingID)
 	e.GET("/stations/:stationid", getStationInfoByID)

@@ -350,3 +350,151 @@ func TestDB_GetStationInfoByBuildingID(t *testing.T) {
 		})
 	}
 }
+
+func TestDB_GetRailwaysInfoAll(t *testing.T) {
+	type fields struct {
+		DB *sqlx.DB
+	}
+
+	tt := struct {
+		name    string
+		fields  fields
+		want    int
+		wantErr bool
+	}{
+		name:    "Number of railways info",
+		fields:  fields{DB: SetUpDB(t)},
+		want:    605,
+		wantErr: false,
+	}
+
+	t.Run(tt.name, func(t *testing.T) {
+		d := &DB{
+			DB: tt.fields.DB,
+		}
+		got, err := d.GetRailwaysInfoAll()
+		if (err != nil) != tt.wantErr {
+			t.Errorf("DB.GetRailwaysInfoAll() error = %v, wantErr %v", err, tt.wantErr)
+			return
+		}
+		if !reflect.DeepEqual(len(got), tt.want) {
+			t.Errorf("len(DB.GetRailwaysInfoAll()) = %d, want %d", len(got), tt.want)
+		}
+	})
+}
+
+func TestDB_GetRailwaysInfoByID(t *testing.T) {
+	type fields struct {
+		DB *sqlx.DB
+	}
+	type args struct {
+		id int
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    []RailwayInfo
+		wantErr bool
+	}{
+		{
+			name:   "Odakyu Odawara Line",
+			fields: fields{DB: SetUpDB(t)},
+			args: args{
+				id: 214,
+			},
+			want: []RailwayInfo{
+				{
+					Id:                  214,
+					Name:                "小田原線",
+					Type:                12,
+					Company:             "小田急電鉄",
+					ServiceProviderType: 4,
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name:   "error case",
+			fields: fields{DB: SetUpDB(t)},
+			args: args{
+				id: 999,
+			},
+			want:    []RailwayInfo{},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			d := &DB{
+				DB: tt.fields.DB,
+			}
+			got, err := d.GetRailwaysInfoByID(tt.args.id)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("DB.GetRailwaysInfoByID() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("DB.GetRailwaysInfoByID() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestDB_GetRailwaysInfoByName(t *testing.T) {
+	type fields struct {
+		DB *sqlx.DB
+	}
+	type args struct {
+		name string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    []RailwayInfo
+		wantErr bool
+	}{
+		{
+			name:   "Odakyu Odawara Line",
+			fields: fields{DB: SetUpDB(t)},
+			args: args{
+				name: "小田原線",
+			},
+			want: []RailwayInfo{
+				{
+					Id:                  214,
+					Name:                "小田原線",
+					Type:                12,
+					Company:             "小田急電鉄",
+					ServiceProviderType: 4,
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name:   "error case",
+			fields: fields{DB: SetUpDB(t)},
+			args: args{
+				name: "ああああ",
+			},
+			want:    []RailwayInfo{},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			d := &DB{
+				DB: tt.fields.DB,
+			}
+			got, err := d.GetRailwaysInfoByName(tt.args.name)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("DB.GetRailwaysInfoByName() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("DB.GetRailwaysInfoByName() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
