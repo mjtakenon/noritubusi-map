@@ -3,9 +3,12 @@ package main
 import (
 	"log"
 	"net/http"
-	"noritubusi-map/backend/app/db"
 	"os"
 	"strconv"
+
+	"golang.org/x/crypto/bcrypt"
+
+	"noritubusi-map/backend/app/db"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
@@ -113,6 +116,29 @@ func getRailwaysInfoByQuery(c echo.Context) error {
 	return c.JSON(http.StatusOK, railwayInfos)
 }
 
+func createUser(c echo.Context) error {
+	//パラメータ検査
+	userID := c.FormValue("userid")
+	password := c.FormValue("password")
+	if userID == "" || password == "" {
+		return c.String(http.StatusBadRequest, "invalid parameter")
+	}
+
+	//ハッシュ化
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "server error")
+	}
+
+	err = DB.InsertUser(userID, string(hash))
+	if err != nil {
+		return c.String(http.StatusBadRequest, "exist")
+	}
+
+	return c.String(http.StatusOK, "ok")
+}
+
 var (
 	DB db.DB
 )
@@ -147,12 +173,17 @@ func main() {
 
 	// Routes
 	e.GET("/", hello)
+
 	e.GET("/railways", getRailwaysInfoAll)
 	e.GET("/railways/:query", getRailwaysInfoByQuery)
+
 	e.GET("/buildings", getBuildingInfoInRange)
 	e.GET("/buildings/:buildingid", getStationInfoByBuildingID)
+
 	e.GET("/stations/:stationid", getStationInfoByID)
 	e.GET("/stations/suggest", getStationNameSuggestion)
+
+	e.POST("/signup", createUser)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":1323"))
