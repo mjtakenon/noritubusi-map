@@ -369,9 +369,26 @@ paths:
         - user
       summary: 入力されたユーザ情報受取
       description: ""
+      consumes:
+        - "application/x-www-form-urlencoded"
+      parameters:
+        - name: "userid"
+          in: formData
+          description: The user name for login
+          required: true
+          type: string
+        - name: "password"
+          in: formData
+          description: The password for login in clear text
+          required: true
+          type: string
       responses:
         "200":
           description: OK
+        "400":
+          description: "不正な文字列"
+        "500":
+          description: "登録失敗"
 securityDefinitions:
   petstore_auth:
     type: oauth2
@@ -450,7 +467,7 @@ definitions:
         type: string
         example: 小田原線
       type:
-        # description: 
+        # description:
         type: number
         example: 12
       company:
@@ -458,6 +475,6 @@ definitions:
         type: string
         example: 小田急電鉄
       serviceProviderType:
-        # description: 
+        # description:
         type: number
         example: 4
