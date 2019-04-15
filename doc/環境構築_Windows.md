@@ -38,16 +38,19 @@ $ git lfs pull
 # docker-compose のインストール
 $ sudo apt install docker-compose
 # DOCKER_HOST 環境変数の設定
-$ echo "export DOCKER_HOST='tcp://0.0.0.0:2375'" > ~/.bashrc
+$ echo "export DOCKER_HOST='tcp://0.0.0.0:2375'" >> ~/.bashrc
+# パスから/mntを削除(今後 docker-compose は dc で使う)
+$ echo 'alias dc='"'"'env PWD=${PWD#/mnt} docker-compose'"'" >> ~/.bashrc
 
 # リポジトリの 'backend' ディレクトリに移動
 $ cd noritubusi-map/backend
 
+
 # 既存の docker イメージがある場合は削除 (初回の環境構築時はおそらく不要)
-$ docker-compose down --rmi all --volumes --remove-orphans
+$ dc down --rmi all --volumes --remove-orphans
 # docker イメージのビルドと立ち上げ
-$ docker-compose build
-$ docker-compose up -d && docker-compose logs -f
+$ dc build
+$ dc up -d && dc logs -f
 ```
 * `http://localhost:1323/` にアクセスして `Hello World!` と表示されれば OK
 * ただしこのままだとCORSエラーが出るので仮にCORS-Allowプラグインを導入する
@@ -61,7 +64,7 @@ $ docker-compose up -d && docker-compose logs -f
 # node.js 用バージョン管理ツール 'Nodebrew' のインストール
 $ curl -L git.io/nodebrew | perl - setup
 # Nodebrew のパスを通す
-$ echo "export PATH=$HOME/.nodebrew/current/bin:$PATH" > ~/.bashrc
+$ echo 'export PATH=$HOME/.nodebrew/current/bin:$PATH' >> ~/.bashrc
 
 # node.js (v.10.15.3) を Nodebrew 経由でインストール
 $ nodebrew install-binary v10.15.3
@@ -80,4 +83,4 @@ $ yarn
 # 開発用フロントエンドサーバー立ち上げ
 $ yarn serve
 ```
-* `http://localhost:8080` にアクセスしてマップが表示されればOK
+* chrome系のWebブラウザで `http://localhost:8080` にアクセスしてマップが表示されればOK
