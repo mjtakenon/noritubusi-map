@@ -92,16 +92,16 @@ func getRailwaysInfoAll(c echo.Context) error {
 }
 
 func getRailwaysInfoByQuery(c echo.Context) error {
-	railName := c.Param("railName")
-	if railName == "" {
+	query := c.Param("query")
+	if query == "" {
 		return c.String(http.StatusBadRequest, "invalid parameter")
 	}
 
-	id, err := strconv.Atoi(railName)
+	id, err := strconv.Atoi(query)
 
 	railwayInfos := []db.RailwayInfo{}
 	if err != nil {
-		railwayInfos, err = DB.GetRailwaysInfoByName(railName)
+		railwayInfos, err = DB.GetRailwaysInfoByName(query)
 	} else {
 		railwayInfos, err = DB.GetRailwaysInfoByID(id)
 	}
@@ -148,7 +148,7 @@ func main() {
 	// Routes
 	e.GET("/", hello)
 	e.GET("/railways", getRailwaysInfoAll)
-	e.GET("/railways/:railName", getRailwaysInfoByQuery)
+	e.GET("/railways/:query", getRailwaysInfoByQuery)
 	e.GET("/buildings", getBuildingInfoInRange)
 	e.GET("/buildings/:buildingid", getStationInfoByBuildingID)
 	e.GET("/stations/:stationid", getStationInfoByID)

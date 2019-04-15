@@ -31,18 +31,11 @@ paths:
             title: arrayOfRailways
             type: array
             items:
-              title: railway
-              description: "路線情報"
-              type: object
-              properties:
-                name:
-                  description: 路線名
-                  type: string
-                number:
-                  description: 駅数
-                  type: integer
+              $ref: "#/definitions/railwayInfomation"
+        404:
+          description: Not Found
 
-  /railways/{railName}:
+  /railways/{query}:
     get:
       tags:
         - railway
@@ -54,30 +47,23 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: railName
+        - name: query
           in: path
           description: 路線名、もしくは路線ID
           required: true
           type: string
       responses:
-        "200":
-          description: 路線情報取得が成功
+        200:
+          description: OK
           schema:
-            title: arrayOfStations
+            title: arrayOfRailways
             type: array
             items:
-              title: station
-              description: 駅情報
-              type: object
-              properties:
-                id:
-                  description: 駅ID
-                  type: integer
-                name:
-                  description: 駅名
-                  type: string
-        "400":
+              $ref: "#/definitions/railwayInfomation"
+        400:
           description: 不正なパラメータ
+        404:
+          description: Not Found
   /buildings:
     get:
       tags:
@@ -452,3 +438,26 @@ definitions:
         description: 経度
         type: number
         example: 137.7353775
+  railwayInfomation:
+    type: object
+    properties:
+      id:
+        description: 路線ID
+        type: integer
+        example: 214
+      name:
+        description: 路線名
+        type: string
+        example: 小田原線
+      type:
+        # description: 
+        type: number
+        example: 12
+      company:
+        description: 運行会社
+        type: string
+        example: 小田急電鉄
+      serviceProviderType:
+        # description: 
+        type: number
+        example: 4
