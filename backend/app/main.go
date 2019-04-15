@@ -99,23 +99,18 @@ func getRailwaysInfoByQuery(c echo.Context) error {
 
 	id, err := strconv.Atoi(railName)
 
+	railwayInfos := []db.RailwayInfo{}
 	if err != nil {
-		railwayInfos, err := DB.GetRailwaysInfoByName(railName)
-
-		if err != nil {
-			return c.String(http.StatusNotFound, "not found")
-		}
-
-		return c.JSON(http.StatusOK, railwayInfos)
+		railwayInfos, err = DB.GetRailwaysInfoByName(railName)
 	} else {
-		railwayInfos, err := DB.GetRailwaysInfoByID(id)
-
-		if err != nil {
-			return c.String(http.StatusNotFound, "not found")
-		}
-
-		return c.JSON(http.StatusOK, railwayInfos)
+		railwayInfos, err = DB.GetRailwaysInfoByID(id)
 	}
+
+	if err != nil {
+		return c.String(http.StatusNotFound, "not found")
+	}
+
+	return c.JSON(http.StatusOK, railwayInfos)
 }
 
 var (
