@@ -124,7 +124,8 @@ if __name__ == '__main__':
       buildings = list()
       for s in stations.values():
         railways.append( (s['railwayLineName'], s['railwayType'], s['operationCompany'], s['serviceProviderType']) )
-        buildings.append( [s['stationName'], np.array([float(s['location']['center'][0]),float(s['location']['center'][1])])] )
+        # 駅名,駅中心座標, 駅に接続している路線数
+        buildings.append( [s['stationName'], np.array([float(s['location']['center'][0]),float(s['location']['center'][1])]) , 1])
         
       buildings = np.array(buildings)
 
@@ -148,6 +149,8 @@ if __name__ == '__main__':
             distance = np.linalg.norm(station[n][1][0:1] - station[nn][1][0:1])
             if distance < mergeDistanceThreshold:
               station[n][1] = np.append(station[n][1],station[nn][1])
+              # 駅サイズも統合
+              station[n][2] += station[nn][2]
               isMerged[nn] = True
         for n in range(len(station)):
           if not isMerged[n]: # 被統合
@@ -156,6 +159,8 @@ if __name__ == '__main__':
         # 親リストに反映
         # 位置情報の更新
         buildings[np.where(buildings[:,0] == buildings[b,0])[0][np.logical_not(isMerged)],:][0][1] = station[np.logical_not(isMerged),1]
+        # 駅接続路線数
+        buildings[np.where(buildings[:,0] == buildings[b,0])[0][np.logical_not(isMerged)][0]][2] = station[np.logical_not(isMerged),2][0]
         # 重複駅の削除
         buildings = np.delete(buildings,np.where(buildings[:,0] == buildings[b,0])[0][isMerged],0)
       
@@ -185,13 +190,13 @@ if __name__ == '__main__':
       buildings = buildings.tolist()
       for n, b in enumerate(buildings):
         # print(SQL_INSERT_INTO('buildings', ['name', 'latlong'] , [b[0], f"GeomFromText('POINT({' '.join(map(str,b[1]))})')"] ))
-        kv = {
-          'id': str(n),
-          'name': b[0],
-          'latlong': f"GeomFromText('POINT({' '.join(map(str,b[1]))})')"
-        }
+        # kv = {
+        #   'id': str(n),
+        #   'name': b[0],
+        #   'latlong': f"GeomFromText('POINT({' '.join(map(str,b[1]))})')"
+        # }
         fp.write(
-          SQL_INSERT_INTO('buildings', ['id', 'name', 'latlong'] , [str(n+1), b[0], f"GeomFromText('POINT({' '.join(map(str,b[1]))})')"],IDX_NOT_QUOTED=[0, 2])
+          SQL_INSERT_INTO('buildings', ['id', 'name', 'latlong', 'connected_railways_num'] , [str(n+1), b[0], f"GeomFromText('POINT({' '.join(map(str,b[1]))})')", str(b[2])],IDX_NOT_QUOTED=[0, 2, 3])
           # SQL_INSERT_INTO('buildings', kv.keys(), kv.values(), IDX_NOT_QUOTED=[0, 2])
         )
 
@@ -212,12 +217,12 @@ if __name__ == '__main__':
 
       # 駅の出力
       for n, s in enumerate(stations.values()):
-        kv = {
-          'id': str(n),
-          'name': s['stationName'],
-          'building_id': str(s['building_id']),
-          'railway_id': str(s['railway_id']),
-        }
+        # kv = {
+        #   'id': str(n),
+        #   'name': s['stationName'],
+        #   'building_id': str(s['building_id']),
+        #   'railway_id': str(s['railway_id']),
+        # }
         fp.write(
           # SQL_INSERT_INTO('stations', kv.keys(), kv.values(), IDX_NOT_QUOTED=[0, 2, 3])
           SQL_INSERT_INTO('stations', ['id', 'name','building_id','railway_id'], [str(n+1), s['stationName'],str(s['building_id']),str(s['railway_id'])] , IDX_NOT_QUOTED=[0, 2, 3])
