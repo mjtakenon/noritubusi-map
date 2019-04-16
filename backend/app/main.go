@@ -196,10 +196,10 @@ func main() {
 
 	// session store connect
 	sqlstore, err := mysqlstore.NewMySQLStoreFromConnection(DB.DB.DB, "session", "/", 60*60*24*7, []byte("sessionid"))
-
 	if err != nil {
 		e.Logger.Fatal("Session Store Error:", err)
 	}
+	defer sqlstore.Close()
 
 	// Middleware
 	e.Use(middleware.Logger())
