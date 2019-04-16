@@ -383,12 +383,12 @@ paths:
           required: true
           type: string
       responses:
-        "200":
+        "201":
           description: OK
         "400":
           description: "不正な文字列"
         "500":
-          description: "登録失敗"
+          description: "サーバーエラー"
 securityDefinitions:
   petstore_auth:
     type: oauth2
