@@ -10,8 +10,11 @@ import (
 
 	"noritubusi-map/backend/app/db"
 
+	"github.com/gorilla/sessions"
 	"github.com/labstack/echo"
+	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/middleware"
+	"github.com/srinathgs/mysqlstore"
 )
 
 // Handler
@@ -19,6 +22,7 @@ func hello(c echo.Context) error {
 	return c.String(http.StatusOK, "Hello, World!")
 }
 
+// TODO: 返し方を見直す(JSONやText,もしくはNoContentか…)
 func getBuildingInfoInRange(c echo.Context) error {
 	beginLat := c.QueryParam("begin_latitude")
 	beginLong := c.QueryParam("begin_longitude")
@@ -136,7 +140,35 @@ func createUser(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "exist")
 	}
 
-	return c.String(http.StatusOK, "ok")
+	//仮に有効期限1週間に設定
+	if err = saveSession(userID, 60*60*24*7, c); err != nil {
+		return c.String(http.StatusInternalServerError, "cookie store failed")
+	}
+
+	return c.String(http.StatusCreated, "ok")
+}
+
+// remember meオプション等によって有効期限変える？
+func saveSession(userID string, maxAge int, c echo.Context) error {
+	sess, err := session.Get("session", c)
+
+	if err != nil {
+		return err
+	}
+
+	sess.Options = &sessions.Options{
+		Path:     "/",
+		MaxAge:   maxAge,
+		HttpOnly: true,
+	}
+
+	sess.Values["userID"] = userID
+
+	if err := sess.Save(c.Request(), c.Response()); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 var (
@@ -156,20 +188,28 @@ func main() {
 	// Echo instance
 	e := echo.New()
 
-	// Middleware
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
-
-	// CORS
-	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"http://localhost:8080"},
-	}))
-
 	// stationInfo DB connect
 	err := DB.New(stationInfoDBUserName, stationInfoDBPassword, stationInfoDBAddress, stationInfoDBName)
 	if err != nil {
 		e.Logger.Fatal("station DB Connection Error:", err)
 	}
+
+	// session store connect
+	sqlstore, err := mysqlstore.NewMySQLStoreFromConnection(DB.DB.DB, "session", "/", 60*60*24*7, []byte("sessionid"))
+
+	if err != nil {
+		e.Logger.Fatal("Session Store Error:", err)
+	}
+
+	// Middleware
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
+	e.Use(session.Middleware(sqlstore))
+
+	// CORS
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"http://localhost:8080"},
+	}))
 
 	// Routes
 	e.GET("/", hello)
