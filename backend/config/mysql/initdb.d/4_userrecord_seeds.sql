@@ -1,4 +1,4 @@
-INSERT INTO `users` (`id`,`hashed_password`) VALUES ('mjtakenon','$2a$08$7ICkosVBtcQrHhHWJnnql.ZaPSXOFDuGaEqHfZmRVdPKox0hUKMrS');  -- Password: 'password'
+INSERT INTO `users` (`id`,`hashed_password`) VALUES ('mjtakenon','$2a$10$uy.XzaOpSaPVPTCo6PW6k.C3x9mB9ZIrpiotuRwflR3JYzXIEeovy');  -- Password: 'password'
 
 INSERT INTO `user_records` (`user_id`,`building_id`) VALUES ('mjtakenon',1980);
 INSERT INTO `user_records` (`user_id`,`building_id`) VALUES ('mjtakenon',1981);
