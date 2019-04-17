@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS `railways` (
   `id`                     INT NOT NULL AUTO_INCREMENT,
   `name`                   VARCHAR(128) NOT NULL,
   PRIMARY KEY (`id`),
-  INDEX (`company_name`)
+  INDEX (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `stations` (
