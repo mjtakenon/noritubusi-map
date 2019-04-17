@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS `buildings` (
   `id`                     INT NOT NULL AUTO_INCREMENT,
   `name`                   VARCHAR(128) NOT NULL,
   `latlong`                GEOMETRY NOT NULL,
-  `connected_railway_num`  TINYINT UNSIGNED NOT NULL,
+  `connected_railways_num`  TINYINT UNSIGNED NOT NULL,
   PRIMARY KEY (`id`),
   SPATIAL INDEX (`latlong`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
