@@ -5,6 +5,56 @@ from attrdict import AttrDict
 import json
 import sys
 
+"""
+Key-Value データから INSERT INTO 文を生成する
+
+Parameters
+----------
+TBL_NAME : str
+    INSERT INTO 文の対象となるテーブル名
+
+KEYS : list[str]
+    INSERT INTO 文で挿入されるカラム名
+    KEYS に含まれるカラム名は TBL_NAME で指定したテーブルに
+    存在している必要がある
+
+VALUES : list[str]
+    INSERT INTO 文で挿入されるレコード値
+    VALUES の要素順は KEYS の要素順に対応している必要がある
+
+IDX_NOT_QUOTED : list[int]
+    VALUES 句において、クォーテーションを付けない要素
+    のインデックス番号を指定する。デフォルト値は [] 
+    SQL では int 型や関数の出力結果を格納する場合は、
+    クォーテーションがあるとエラーとなる。
+
+Returns
+-------
+query : str
+    生成した INSERT INTO 文
+"""
+def SQL_INSERT_INTO(TBL_NAME, KEYS, VALUES, IDX_NOT_QUOTED=[]):
+    str_keys = ', '.join([f"`{x}`" for x in KEYS])
+    str_values = ', '.join(
+        [f"'{x}'" if i not in IDX_NOT_QUOTED else str(x) for (i, x) in enumerate(VALUES)])
+
+    return f"INSERT INTO `{TBL_NAME}` ({str_keys}) VALUES ({str_values});\n"
+
+"""
+緯度, 経度の配列から MySQL の GeomFromText 関数表記を得る
+
+Parameters
+----------
+latlong : list[float, float]
+    緯度, 経度の配列
+
+Returns
+-------
+query : str
+    GeomFromText 関数表記の文字列
+"""
+def SQL_GEOMFROMTEXT(latlong):
+    return "GeomFromText('POINT({0:.8f} {1:.8f})')".format(*latlong)
 
 def proc(path_to_json):
 
@@ -45,7 +95,7 @@ def proc(path_to_json):
             # すでに一度登録している場合
             else:
                 # ref_railways_id を登録されているデータから参照してセット
-                ref_railways_id = railways[railway.name.ja]
+                ref_railways_id = railways[railway.name.ja]['id']
 
             # station: その県に所属する任意の路線が持つ駅(駅舎)
             # このデータは
@@ -78,8 +128,7 @@ def proc(path_to_json):
                 # すでに一度登録している場合
                 else:
                     # ref_buildings_id を登録されているデータから参照してセット
-                    ref_buildings_id = buildings[latlong_station]
-
+                    ref_buildings_id = buildings[latlong_station]['id']
                 # stations への登録
                 # railway.stations はその路線の全駅のリストだが、
                 # そのなかの各駅には、「その駅がある駅舎にある他の路線」について
@@ -90,12 +139,14 @@ def proc(path_to_json):
                         tuple([station.name.ja, railway.name.ja]): {
                             'id': stations_id,
                             'name': station.name.ja,
-                            'railways_id': ref_railways_id,
+                            'railway_id': ref_railways_id,
                             'building_id': ref_buildings_id,
                             'num_in_railway': num_in_railway
                         }
                     }
                 )
+                # stationsのidをインクリメント
+                stations_id += 1
 
     return buildings, stations, railways
 
@@ -110,3 +161,35 @@ if __name__ == '__main__':
     else:
 
         buildings, stations, railways = proc(argv[1])
+        # 生成した SQL クエリを 'seeds.sql' ファイルに出力
+
+        with open('seeds.sql', 'wt') as f:
+            for v in buildings.values():
+                f.write(
+                    SQL_INSERT_INTO(
+                        'buildings',
+                        ['id', 'name', 'latlong','connected_railways_num'],
+                        [v['id'], v['name'], SQL_GEOMFROMTEXT(v['latlong']), v['connected_railways_num']], 
+                        [0, 2, 3]
+                    )
+                )
+
+            for v in railways.values():
+                f.write(
+                    SQL_INSERT_INTO(
+                        'railways',
+                        ['id', 'name'],
+                        [v['id'], v['name']],
+                        [0]
+                    )
+                )
+
+            for v in stations.values():
+                f.write(
+                    SQL_INSERT_INTO(
+                        'stations',
+                        ['id', 'name', 'railway_id', 'building_id', 'num_in_railway'],
+                        [v['id'], v['name'], v['railway_id'], v['building_id'], v['num_in_railway']],
+                        [0, 2, 3, 4]
+                    )
+                )
