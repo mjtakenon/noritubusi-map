@@ -58,7 +58,7 @@ def SQL_GEOMFROMTEXT(latlong):
 
 def proc(path_to_json):
 
-    raw_data = [AttrDict(x) for x in json.load(open(path_to_json))]
+    raw_data = [AttrDict(x) for x in json.load(open(path_to_json, encoding='utf-8'))]
 
     buildings = dict()
     railways = dict()
@@ -68,8 +68,8 @@ def proc(path_to_json):
 
     # prefecture: 県
     for prefecture in raw_data:
-        sys.stderr.write(f" Prefecture[{prefecture.name.ja}] ... \r")
-        sys.stderr.flush()
+        print(f" Prefecture[{prefecture.name.ja}] ... \r")
+        # sys.stderr.flush()
         # railway: その県が持つ路線
         # このデータは
         # 「県」→「その県がもつ路線」→「その路線の駅とその駅にある他の路線」
