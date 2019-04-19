@@ -4,6 +4,8 @@
 from attrdict import AttrDict
 import json
 import sys
+import numpy as np
+from sklearn.cluster import MeanShift
 
 """
 Key-Value データから INSERT INTO 文を生成する
@@ -148,7 +150,39 @@ def proc(path_to_json):
                 # stationsのidをインクリメント
                 stations_id += 1
 
-    return buildings, stations, railways
+    # 近い位置にある同名駅の統合
+    buildingsArray = np.array([list(buildings[i].values()) for i in list(buildings.keys())])
+    stationsArray = np.array([list(stations[i].values()) for i in list(stations.keys())])
+
+    # 統合処理済かどうかのフラグ
+    buildingsArray = np.array([ np.append(b, False) for b in buildingsArray ])
+    # ラベルに従って統合    
+    deleteIdx = list()
+    for b in buildingsArray :
+        if b[4] :
+            continue
+        # 同名駅のリストを取得
+        sameNameIdx = np.where(b[1] == buildingsArray[:,1])
+        buildingsArray[sameNameIdx,4] = True
+        # 緯度経度が近ければ統合
+        # 統合する閾値(500m)
+        mergeDistanceThreshold = 0.00545
+        latlongs = np.array([p for p in buildingsArray[sameNameIdx,2][0]] , dtype=np.float64)
+        labels = MeanShift(bandwidth = mergeDistanceThreshold).fit_predict(latlongs)
+        
+        for l in range(max(labels)+1):
+            for d in range(np.sum(labels==l)-1):
+                # 位置情報を統合(そのbuildingsを消し、stationsのbuildings_idが存在したら置き換える)
+                idx = buildingsArray[sameNameIdx[0][np.where(labels==l)[0]]][d+1,0] 
+                deleteIdx.append(idx)
+                # stationsにbuilding_idが含まれていたら置き換える
+                for a in np.where(stationsArray[:,3] == str(idx))[0]:
+                    stationsArray[a,3] = str(buildingsArray[sameNameIdx[0][np.where(labels==l)[0]]][0,0])
+    # あとでstationsのbuilding_idの更新?
+    buildingsArray = np.delete(buildingsArray, np.array(deleteIdx)-1, 0) # idなので+1されているものをidxに変換する
+    buildingsArray = np.delete(buildingsArray, 4, 1) # マージしたかのフラグは不要なので消す
+
+    return buildingsArray, stationsArray, railways
 
 
 if __name__ == '__main__':
@@ -164,12 +198,12 @@ if __name__ == '__main__':
         # 生成した SQL クエリを 'seeds.sql' ファイルに出力
 
         with open('seeds.sql', 'wt') as f:
-            for v in buildings.values():
+            for v in buildings:
                 f.write(
                     SQL_INSERT_INTO(
                         'buildings',
                         ['id', 'name', 'latlong','connected_railways_num'],
-                        [v['id'], v['name'], SQL_GEOMFROMTEXT(v['latlong']), v['connected_railways_num']], 
+                        [v[0], v[1], SQL_GEOMFROMTEXT(v[2]), v[3]], 
                         [0, 2, 3]
                     )
                 )
@@ -184,12 +218,12 @@ if __name__ == '__main__':
                     )
                 )
 
-            for v in stations.values():
+            for v in stations:
                 f.write(
                     SQL_INSERT_INTO(
                         'stations',
                         ['id', 'name', 'railway_id', 'building_id', 'num_in_railway'],
-                        [v['id'], v['name'], v['railway_id'], v['building_id'], v['num_in_railway']],
+                        [v[0], v[1], v[2], v[3], v[4]],
                         [0, 2, 3, 4]
                     )
                 )
