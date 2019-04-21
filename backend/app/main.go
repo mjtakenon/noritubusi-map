@@ -10,6 +10,7 @@ import (
 
 	"noritubusi-map/backend/app/db"
 
+	"github.com/asaskevich/govalidator"
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo-contrib/session"
@@ -124,7 +125,8 @@ func createUser(c echo.Context) error {
 	//パラメータ検査
 	userID := c.FormValue("userid")
 	password := c.FormValue("password")
-	if userID == "" || password == "" {
+	if userID == "" || password == "" ||
+		!govalidator.IsAlphanumeric(userID) || !govalidator.IsByteLength(userID, 1, 128) {
 		return c.String(http.StatusBadRequest, "invalid parameter")
 	}
 
