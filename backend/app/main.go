@@ -150,6 +150,38 @@ func createUser(c echo.Context) error {
 	return c.String(http.StatusCreated, "ok")
 }
 
+func signin(c echo.Context) error {
+	userID := c.FormValue("userid")
+	password := c.FormValue("password")
+	if userID == "" || password == "" {
+		return c.String(http.StatusBadRequest, "invalid parameter")
+	}
+
+	//ユーザ情報取得
+	userInfo, err := DB.GetUserInfoByUserID(userID)
+	if err != nil {
+		return c.String(http.StatusUnauthorized, "login failed")
+	}
+
+	//パスワード比較
+	if err := bcrypt.CompareHashAndPassword([]byte(userInfo.HashedPassword), []byte(password)); err != nil {
+		return c.String(http.StatusUnauthorized, "login failed")
+	}
+
+	//ログイン成功
+	saveSession(userID, 60*60*24*7, c)
+
+	return c.String(http.StatusOK, "success login")
+}
+
+func signout(c echo.Context) error {
+	if err := deleteSession(c); err != nil {
+		return c.String(http.StatusInternalServerError, "failed logout")
+	}
+
+	return c.String(http.StatusOK, "success logout")
+}
+
 // remember meオプション等によって有効期限変える？
 func saveSession(userID string, maxAge int, c echo.Context) error {
 	sess, err := session.Get("session", c)
@@ -170,6 +202,19 @@ func saveSession(userID string, maxAge int, c echo.Context) error {
 		return err
 	}
 
+	return nil
+}
+
+func deleteSession(c echo.Context) error {
+	sess, err := session.Get("session", c)
+
+	if err != nil {
+		return err
+	}
+
+	if err := sess.Store().(*mysqlstore.MySQLStore).Delete(c.Request(), c.Response(), sess); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -226,6 +271,9 @@ func main() {
 	e.GET("/stations/suggest", getStationNameSuggestion)
 
 	e.POST("/signup", createUser)
+
+	e.POST("/signin", signin)
+	e.DELETE("signin", signout)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":1323"))
