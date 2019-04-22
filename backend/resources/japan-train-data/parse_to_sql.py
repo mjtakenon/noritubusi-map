@@ -151,38 +151,40 @@ def proc(path_to_json):
                 stations_id += 1
 
     # 近い位置にある同名駅の統合
-    buildingsArray = np.array([list(buildings[i].values()) for i in list(buildings.keys())])
-    stationsArray = np.array([list(stations[i].values()) for i in list(stations.keys())])
-
-    # 統合処理済かどうかのフラグ
-    buildingsArray = np.array([ np.append(b, False) for b in buildingsArray ])
+    buildings_array = np.array( [ list(building.values()) for building in buildings.values() ] )
+    stations_array = np.array( [ list(station.values()) for station in stations.values() ] )
+    # 統合処理用のフラグ
+    buildings_array = np.array([ np.append(b, False) for b in buildings_array ])
     # ラベルに従って統合    
     deleteIdx = list()
-    for b in buildingsArray :
+    for b in buildings_array :
         if b[4] :
             continue
         # 同名駅のリストを取得
-        sameNameIdx = np.where(b[1] == buildingsArray[:,1])
-        buildingsArray[sameNameIdx,4] = True
+        same_name_idx = np.where(b[1] == buildings_array[:,1])
+        buildings_array[same_name_idx,4] = True
         # 緯度経度が近ければ統合
-        # 統合する閾値(500m)
-        mergeDistanceThreshold = 0.00545
-        latlongs = np.array([p for p in buildingsArray[sameNameIdx,2][0]] , dtype=np.float64)
-        labels = MeanShift(bandwidth = mergeDistanceThreshold).fit_predict(latlongs)
+        # 1つの駅として統合する閾値(500m)
+        MERGE_DISTANCE_THRESHOLD = 0.00545
+        latlongs = np.array([p for p in buildings_array[same_name_idx,2][0]] , dtype=np.float64)
+        labels = MeanShift(bandwidth = MERGE_DISTANCE_THRESHOLD).fit_predict(latlongs)
         
+        # stationsのbuilding_idを更新
         for l in range(max(labels)+1):
             for d in range(np.sum(labels==l)-1):
                 # 位置情報を統合(そのbuildingsを消し、stationsのbuildings_idが存在したら置き換える)
-                idx = buildingsArray[sameNameIdx[0][np.where(labels==l)[0]]][d+1,0] 
+                idx = buildings_array[same_name_idx[0][np.where(labels==l)[0]]][d+1,0] 
                 deleteIdx.append(idx)
                 # stationsにbuilding_idが含まれていたら置き換える
-                for a in np.where(stationsArray[:,3] == str(idx))[0]:
-                    stationsArray[a,3] = str(buildingsArray[sameNameIdx[0][np.where(labels==l)[0]]][0,0])
-    # あとでstationsのbuilding_idの更新?
-    buildingsArray = np.delete(buildingsArray, np.array(deleteIdx)-1, 0) # idなので+1されているものをidxに変換する
-    buildingsArray = np.delete(buildingsArray, 4, 1) # マージしたかのフラグは不要なので消す
+                for a in np.where(stations_array[:,3] == str(idx))[0]:
+                    stations_array[a,3] = str(buildings_array[same_name_idx[0][np.where(labels==l)[0]]][0,0])
+    
+    # idからインデックスへの変換を行い(デクリメントする)、統合された駅をリストから消去する
+    buildings_array = np.delete(buildings_array, np.array(deleteIdx)-1, 0)
+     # 統合処理用のフラグは不要なので消す
+    buildings_array = np.delete(buildings_array, 4, 1)
 
-    return buildingsArray, stationsArray, railways
+    return buildings_array, stations_array, railways
 
 
 if __name__ == '__main__':
