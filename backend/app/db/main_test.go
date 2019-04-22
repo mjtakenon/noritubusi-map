@@ -15,7 +15,7 @@ func SetUpDB(t *testing.T) *sqlx.DB {
 	password := "password"
 	address := "localhost:3314"
 	dbName := "noritubusi_map"
-	db, err := sqlx.Connect("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s", userName, password, address, dbName))
+	db, err := sqlx.Connect("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=true", userName, password, address, dbName))
 
 	if err != nil {
 		t.Errorf("DB Connection Error:%v", err)

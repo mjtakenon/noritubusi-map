@@ -44,7 +44,7 @@ type DB struct {
 
 func (d *DB) New(userName, password, address, dbName string) error {
 	//userName:password@protocol(adress)/dbName
-	db, err := sqlx.Connect("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s", userName, password, address, dbName))
+	db, err := sqlx.Connect("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=true", userName, password, address, dbName))
 
 	if err != nil {
 		log.Println("DB Connection Error:", err)
