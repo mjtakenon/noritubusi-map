@@ -13,25 +13,33 @@
       <l-tile-layer :url="url"></l-tile-layer>
       <TMarker v-for="m in markers" :key="m.id" :data="m"/>
     </l-map>
-    <v-layout align-start justify-start row/> 
+    <v-layout align-start justify-start row/>
     <br>
     <v-flex xs4 offset-xs1 sm3 offset-sm1 md2 offset-md1>
       <v-card>
         <v-toolbar>
-          <v-btn icon @click="searchStation">
+          <!-- <v-btn icon @click="searchStation"> -->
+          <v-btn icon>
             <v-icon>search</v-icon>
           </v-btn>
-          <v-text-field clearable label="駅名を入力" single-line v-model="textField" @keyup.enter="searchStation" ></v-text-field>
+          <v-text-field
+            clearable
+            label="駅名を入力"
+            single-line
+            v-model="textField"
+            @keyup.enter="searchStation"
+          ></v-text-field>
           <v-btn icon @click="getCurrentRect">
             <v-icon>my_location</v-icon>
           </v-btn>
         </v-toolbar>
-        <v-list v-show="hasResult">
+        <v-list v-show="stationList.length">
           <!-- array.slice はバックエンドでやるべき -->
           <v-list-tile
             v-for="l in stationList.slice(0, 5)"
             :key="l.id"
-            @click="stationListClicked(l.id)">
+            @click="onClickStationList(l.id)"
+          >
             <v-list-tile-content>
               <v-list-tile-title v-text="l.name"></v-list-tile-title>
               <v-list-tile-sub-title v-text="l.railwayName"></v-list-tile-sub-title>
@@ -86,12 +94,15 @@ export default {
     zoomUpdated(zoom) {
       this.zoom = zoom;
     },
+
     centerUpdated(center) {
       this.center = center;
     },
+
     boundsUpdated(bounds) {
       this.bounds = bounds;
     },
+
     getCurrentRect() {
       axios
         .get(`http://${window.location.hostname}:1323/buildings`, {
@@ -118,87 +129,105 @@ export default {
           console.log(`Axios ERROR!: ${err}`);
         });
     },
-    // DBからstrをキーワードに駅検索
-    getStationList(str) {
-      axios.get(`http://${window.location.hostname}:1323/stations/suggest?keyword=` + str)
-        .then(resp => {
-          console.log(resp.data);
-      })
+
+    getStationListByKeyword(keyword) {
+      console.log(`Keyword: ${keyword}`);
+
+      axios.get(`http://${window.location.hostname}:1323/stations/suggest?keyword=${keyword}`).then(resp => {
+        let stationList = Array();
+
+        stationList = resp.data.map(elem => ({
+          lat: elem.latitude,
+          lng: elem.longitude,
+          stationName: elem.name,
+          railwayName: elem.railwayName,
+          orderInRailway: elem.orderInRailway,
+          stationId: elem.station_id,
+          buildingId: elem.building_id
+        }));
+
+        return stationList;
+      });
     },
+
+    getStationById(stationId) {
+      let stationInfo;
+
+      axios.get(`http://${window.location.hostname}:1323/stations/${stationId}`).then(resp => {
+        stationInfo = resp.data.map(elem => ({
+          name: elem.name,
+          lat: elem.latitude,
+          lng: elem.longitude,
+          railwayName: elem.railwayName,
+          orderInRailway: elem.orderInRailway
+        }));
+      });
+
+      return stationInfo;
+    },
+
+    forcusToStation(stationInfo) {
+      this.$refs.mainMap.mapObject.panTo([stationInfo.lat, stationInfo.lng]);
+    },
+
+    checkCompleteMatchAndForcus(keyword) {
+      const matchedToKeywordCompletely = this.stationList.filter(elem => elem.stationName == keyword);
+
+      if (matchedToKeywordCompletely.length > 0) {
+        this.forcusToStation(matchedToKeywordCompletely[0]);
+      }
+    },
+
+    // DBからstrをキーワードに駅検索
     // 駅名で検索・移動
     // 駅検索
-    searchStation() {
-      console.log("search:" + this.textField);
-      // TODO: 別の関数を呼び出すとReferenceErrorる
-      // getStationList(this.textField);
-      axios.get(`http://${window.location.hostname}:1323/stations/suggest?keyword=` + this.textField)
-        .then(resp => {
-          this.markers = resp.data.map(elem => ({
-            lat: elem.latitude,
-            lng: elem.longitude,
-            name: elem.name,
-            id: elem.id }));
-        // 駅名が完全一致でなければ表示をしない
-        for(var n=resp.data.length-1; n>=0; n--) {
-          if(this.markers[n].name !== this.textField) {
-            this.markers.splice(n, 1);
-          }
-        }
-        // もし完全一致する駅が存在すれば検索結果の1つ目の駅にフォーカス
-        if(this.markers.length >= 1){
-          this.$refs.mainMap.mapObject.panTo([this.markers[0].lat,this.markers[0].lng]);
-        }
-      })
-    },
-    stationListClicked(val) {
-      axios.get(`http://${window.location.hostname}:1323/stations/` + val)
-          .then(resp => {
-            resp.data = resp.data;
-            this.markers = resp.data.map(elem => ({
-              lat: elem.latitude,
-              lng: elem.longitude,
-              name: elem.name,
-              // companyName: elem.company,
-              // railwayName: elem.railwayName,
-              id: elem.id }));
 
-            // 駅をフォーカスして表示
-            this.$refs.mainMap.mapObject.panTo([this.markers[0].lat,this.markers[0].lng]);
-          })
+    searchStation() {
+      console.log("::Called:: searchStation");
+      let keyword = this.textField;
+
+      this.stationList = this.getStationListByKeyword(keyword);
+
+      // もし完全一致する駅が存在すれば検索結果の1つ目の駅にフォーカス
+      this.checkCompleteMatchAndForcus(keyword);
+    },
+
+    onClickStationList(stationId) {
+      console.log("::Called:: onClickStationList");
+      const stationInfo = this.getStationById(stationId);
+
+      this.forcusToStation(stationInfo);
     }
   },
-  mounted: function () {
-  this.$nextTick(function () {
-    // 初期位置・ズームの設定
-    this.bounds = this.$refs.mainMap.mapObject.getBounds();
-  })},
+  mounted: function() {
+    this.$nextTick(function() {
+      // 初期位置・ズームの設定
+      this.bounds = this.$refs.mainMap.mapObject.getBounds();
+    });
+  },
   watch: {
     textField(str) {
-      // console.log("textField :" + str);
+      console.log("::Called:: textField");
       // 何も入力されてなければリストは非表示
-      if(isEmpty(str)) {
+      if (isEmpty(str)) {
         this.hasResult = false;
-      } 
+      }
       // 入力された文字列が駅名に一致すればリストに表示
       // 文字列が入力されていて一致がなければ最後のリストを表示し続ける
       else {
-          axios.get(`http://${window.location.hostname}:1323/stations/suggest?keyword=` + this.textField)
-          .then(resp => {
-            var list = resp.data.map(elem => ({
-            lat: elem.latitude,
-            lng: elem.longitude,
-            name: elem.name,
-            companyName: elem.company,
-            railwayName: elem.railwayName,
-            id: elem.id }));
-            if (list.length >= 1) {
-              this.stationList = list;
-              this.hasResult = true;
-            }
-          })
+        const stationList = this.getStationListByKeyword(this.textField);
+
+        console.log(stationList);
+
+        if (stationList.length >= 1) {
+          this.stationList = stationList;
+          this.hasResult = true;
+        }
       }
     }
   }
 };
-function isEmpty(val){return !val?!val===false?true:false:false;}
+function isEmpty(val) {
+  return !val ? (!val === false ? true : false) : false;
+}
 </script>
