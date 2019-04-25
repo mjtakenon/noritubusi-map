@@ -27,8 +27,8 @@ type StationInfo struct {
 	Name           string `db:"station_name" json:"name"`
 	Latitude       string `db:"lat" json:"latitude"`
 	Longitude      string `db:"long" json:"longitude"`
-	RailwayName    string `db:"railway_line_name" json:"railwayName"`
-	OrderInRailway int64  `db:"num_in_railway" json:"orderInRailway"`
+	RailwayName    string `db:"railway_line_name" json:"railway_line_name"`
+	OrderInRailway int64  `db:"num_in_railway" json:"order_in_railway"`
 }
 
 func (s StationInfo) String() string {
