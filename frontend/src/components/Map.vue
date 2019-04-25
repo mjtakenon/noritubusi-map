@@ -33,7 +33,7 @@
             <v-icon>my_location</v-icon>
           </v-btn>
         </v-toolbar>
-        <v-list v-show="stationList.length">
+        <v-list v-show="hasResult">
           <!-- array.slice はバックエンドでやるべき -->
           <v-list-tile
             v-for="stationInfo in stationList.slice(0, 5)"
@@ -143,8 +143,8 @@ export default {
           lat: elem.latitude,
           lng: elem.longitude,
           stationName: elem.name,
-          railwayName: elem.railwayName,
-          orderInRailway: elem.orderInRailway,
+          railwayName: elem.railway_line_name,
+          orderInRailway: elem.order_in_railway,
           stationId: elem.station_id,
           buildingId: elem.building_id
         }));
@@ -164,8 +164,8 @@ export default {
           name: elem.name,
           lat: elem.latitude,
           lng: elem.longitude,
-          railwayName: elem.railwayName,
-          orderInRailway: elem.orderInRailway
+          railwayName: elem.railway_name,
+          orderInRailway: elem.order_in_railway
         }));
 
         return stationInfo[0];
@@ -223,14 +223,6 @@ export default {
       console.log("::Called:: onClickStationList");
 
       this.forcusToStation(stationInfo);
-
-      // this.getStationById(stationId)
-      //   .then(stationInfo => {
-      //     this.forcusToStation(stationInfo);
-      //   })
-      //   .catch(error => {
-      //     console.error(error);
-      //   });
     }
   },
   mounted: function() {
@@ -242,10 +234,12 @@ export default {
   watch: {
     textField(str) {
       console.log("::Called:: textField");
+
       // 何も入力されてなければリストは非表示
       if (isEmpty(str)) {
         this.hasResult = false;
       }
+
       // 入力された文字列が駅名に一致すればリストに表示
       // 文字列が入力されていて一致がなければ最後のリストを表示し続ける
       else {
@@ -263,7 +257,8 @@ export default {
     }
   }
 };
-function isEmpty(val) {
-  return !val ? (!val === false ? true : false) : false;
+
+function isEmpty(str) {
+  return !str || /^\s*$/.test(str);
 }
 </script>
