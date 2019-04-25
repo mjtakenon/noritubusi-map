@@ -42,3 +42,8 @@ $ git lfs pull
   (http://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-N02-v2_3.html)
 * 路線図データをDBに登録
   (https://qiita.com/mima_ita/items/243922b3d5178f0315e0)
+
+## Thanks
+
+- [adieuadieu/japan-train-data](https://github.com/adieuadieu/japan-train-data)
+	- 路線情報DBとして利用
