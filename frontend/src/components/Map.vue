@@ -29,20 +29,20 @@
             v-model="textField"
             @keyup.enter="searchStation"
           ></v-text-field>
-          <v-btn icon @click="getCurrentRect">
+          <v-btn icon @click="onClickMyLocationIcon">
             <v-icon>my_location</v-icon>
           </v-btn>
         </v-toolbar>
         <v-list v-show="stationList.length">
           <!-- array.slice はバックエンドでやるべき -->
           <v-list-tile
-            v-for="l in stationList.slice(0, 5)"
-            :key="l.id"
-            @click="onClickStationList(l.id)"
+            v-for="stationInfo in stationList.slice(0, 5)"
+            :key="stationInfo.stationId"
+            @click="onClickStationList(stationInfo)"
           >
             <v-list-tile-content>
-              <v-list-tile-title v-text="l.name"></v-list-tile-title>
-              <v-list-tile-sub-title v-text="l.railwayName"></v-list-tile-sub-title>
+              <v-list-tile-title v-text="stationInfo.stationName"></v-list-tile-title>
+              <v-list-tile-sub-title v-text="stationInfo.railwayName"></v-list-tile-sub-title>
             </v-list-tile-content>
           </v-list-tile>
         </v-list>
@@ -103,37 +103,40 @@ export default {
       this.bounds = bounds;
     },
 
-    getCurrentRect() {
-      axios
-        .get(`http://${window.location.hostname}:1323/buildings`, {
-          params: {
-            begin_latitude: this.bounds._northEast.lat,
-            begin_longitude: this.bounds._northEast.lng,
-            end_latitude: this.bounds._southWest.lat,
-            end_longitude: this.bounds._southWest.lng
+    async getMarkersInCurrentRect() {
+      try {
+        let resp = await axios.get(
+          `
+          http://${window.location.hostname}:1323/buildings`,
+          {
+            params: {
+              begin_latitude: this.bounds._northEast.lat,
+              begin_longitude: this.bounds._northEast.lng,
+              end_latitude: this.bounds._southWest.lat,
+              end_longitude: this.bounds._southWest.lng
+            }
           }
-        })
-        .then(resp => {
-          console.log("Axios SUCCESS!");
-          console.log(`response: ${resp}`);
-          console.log(`status: ${resp.status}`);
-          console.log(resp.data);
-          this.markers = resp.data.map(elem => ({
-            lat: elem.latitude,
-            lng: elem.longitude,
-            name: elem.name,
-            id: elem.id
-          }));
-        })
-        .catch(err => {
-          console.log(`Axios ERROR!: ${err}`);
-        });
+        );
+
+        let markers = resp.data.map(elem => ({
+          lat: elem.latitude,
+          lng: elem.longitude,
+          name: elem.name,
+          id: elem.id
+        }));
+
+        return markers;
+      } catch (error) {
+        console.error("ERROR @ getMarkersInCurrentRect ");
+        throw error;
+      }
     },
 
-    getStationListByKeyword(keyword) {
+    async getStationListByKeyword(keyword) {
       console.log(`Keyword: ${keyword}`);
 
-      axios.get(`http://${window.location.hostname}:1323/stations/suggest?keyword=${keyword}`).then(resp => {
+      try {
+        let resp = await axios.get(`http://${window.location.hostname}:1323/stations/suggest?keyword=${keyword}`);
         let stationList = Array();
 
         stationList = resp.data.map(elem => ({
@@ -147,26 +150,34 @@ export default {
         }));
 
         return stationList;
-      });
+      } catch (error) {
+        console.error(`ERROR @ getStationListByKeyword (${keyword})`);
+        throw error;
+      }
     },
 
-    getStationById(stationId) {
-      let stationInfo;
+    async getStationById(stationId) {
+      try {
+        let resp = await axios.get(`http://${window.location.hostname}:1323/stations/${stationId}`);
 
-      axios.get(`http://${window.location.hostname}:1323/stations/${stationId}`).then(resp => {
-        stationInfo = resp.data.map(elem => ({
+        let stationInfo = resp.data.map(elem => ({
           name: elem.name,
           lat: elem.latitude,
           lng: elem.longitude,
           railwayName: elem.railwayName,
           orderInRailway: elem.orderInRailway
         }));
-      });
 
-      return stationInfo;
+        return stationInfo[0];
+      } catch (error) {
+        console.error(`ERROR @ getStationById (${stationId})`);
+        throw error;
+      }
     },
 
     forcusToStation(stationInfo) {
+      console.log("CALLED @ focusToStation");
+      console.log(stationInfo);
       this.$refs.mainMap.mapObject.panTo([stationInfo.lat, stationInfo.lng]);
     },
 
@@ -186,17 +197,40 @@ export default {
       console.log("::Called:: searchStation");
       let keyword = this.textField;
 
-      this.stationList = this.getStationListByKeyword(keyword);
+      this.getStationListByKeyword(keyword)
+        .then(stationList => {
+          this.stationList = stationList;
+        })
+        .catch(error => {
+          console.error(error);
+        });
 
       // もし完全一致する駅が存在すれば検索結果の1つ目の駅にフォーカス
       this.checkCompleteMatchAndForcus(keyword);
     },
 
-    onClickStationList(stationId) {
+    onClickMyLocationIcon() {
+      this.getMarkersInCurrentRect()
+        .then(markers => {
+          this.markers = markers;
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    },
+
+    onClickStationList(stationInfo) {
       console.log("::Called:: onClickStationList");
-      const stationInfo = this.getStationById(stationId);
 
       this.forcusToStation(stationInfo);
+
+      // this.getStationById(stationId)
+      //   .then(stationInfo => {
+      //     this.forcusToStation(stationInfo);
+      //   })
+      //   .catch(error => {
+      //     console.error(error);
+      //   });
     }
   },
   mounted: function() {
@@ -215,14 +249,16 @@ export default {
       // 入力された文字列が駅名に一致すればリストに表示
       // 文字列が入力されていて一致がなければ最後のリストを表示し続ける
       else {
-        const stationList = this.getStationListByKeyword(this.textField);
-
-        console.log(stationList);
-
-        if (stationList.length >= 1) {
-          this.stationList = stationList;
-          this.hasResult = true;
-        }
+        this.getStationListByKeyword(this.textField)
+          .then(stationList => {
+            if (stationList.length >= 1) {
+              this.stationList = stationList;
+              this.hasResult = true;
+            }
+          })
+          .catch(error => {
+            console.log(error);
+          });
       }
     }
   }
