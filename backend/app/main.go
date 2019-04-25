@@ -54,7 +54,7 @@ func getStationInfoByID(c echo.Context) error {
 		return c.String(http.StatusNotFound, "not found")
 	}
 
-	return c.JSON(http.StatusOK, []db.StationInfo{stationInfo})
+	return c.JSON(http.StatusOK, stationInfo)
 }
 
 func getStationInfoByBuildingID(c echo.Context) error {
