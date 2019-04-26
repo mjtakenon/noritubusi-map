@@ -9,10 +9,12 @@ import (
 )
 
 type BuildingInfo struct {
-	Id                   int64  `db:"id" json:"id"`
-	Name                 string `db:"name" json:"name"`
+	BuildingId     			 int64  `db:"building_id" json:"building_id"`
+	StationId      			 int64  `db:"station_id" json:"station_id"`
+	Name                 string `db:"building_name" json:"name"`
 	Latitude             string `db:"lat" json:"latitude"`
 	Longitude            string `db:"long" json:"longitude"`
+	RailwayLineName      string `db:"railway_line_name" json:"railway_line_name"`
 	ConnectedRailwaysNum int64  `db:"connected_railways_num" json:"connected_railways_num"`
 }
 
@@ -53,7 +55,7 @@ func (d *DB) New(userName, password, address, dbName string) error {
 }
 
 func (d *DB) GetBuildingInfoInRange(beginLat, beginLong, endLat, endLong string) ([]BuildingInfo, error) {
-	query := `SELECT id,name,ST_X(latlong) AS 'lat',ST_Y(latlong) AS 'long' ,connected_railways_num FROM buildings WHERE MBRContains(ST_GeomFromText(CONCAT("LINESTRING(",?," ",?,",",?," ", ?,")")),latlong) ORDER BY id`
+	query := `SELECT buildings.id AS building_id, stations.id AS station_id, buildings.name AS building_name, ST_X(buildings.latlong) AS 'lat',ST_Y(buildings.latlong) AS 'long',railways.name AS railway_line_name , connected_railways_num FROM buildings INNER JOIN stations on stations.building_id=buildings.id INNER JOIN railways on stations.railway_id=railways.id WHERE MBRContains(ST_GeomFromText(CONCAT("LINESTRING(",?," ",?,",",?," ", ?,")")),latlong) ORDER BY buildings.id`
 
 	infos := []BuildingInfo{}
 	err := d.DB.Select(&infos, query, beginLat, beginLong, endLat, endLong)
