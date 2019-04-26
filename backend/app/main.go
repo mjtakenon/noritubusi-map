@@ -173,6 +173,21 @@ func saveSession(userID string, maxAge int, c echo.Context) error {
 	return nil
 }
 
+// 構造体
+type BuildingInfo struct {
+	BuildingID int64  `json:"building_id"`
+	Name       string `json:"name"`
+	Latitude   string `json:"latitude"`
+	Longitude  string `json:"longitude"`
+	lines      []Line `json:"lines"`
+}
+
+type Line struct {
+	RailwayName    string `json:"railway_name"`
+	StationID      int64  `json:"station_id"`
+	OrderInRailWay int64  `json:"order_in_railway"`
+}
+
 var (
 	DB db.DB
 )
