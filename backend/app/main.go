@@ -179,13 +179,38 @@ type BuildingInfo struct {
 	Name       string `json:"name"`
 	Latitude   string `json:"latitude"`
 	Longitude  string `json:"longitude"`
-	lines      []Line `json:"lines"`
+	Lines      []Line `json:"lines"`
 }
 
 type Line struct {
 	RailwayName    string `json:"railway_name"`
 	StationID      int64  `json:"station_id"`
 	OrderInRailWay int64  `json:"order_in_railway"`
+}
+
+func convertStationInfo2BuildingInfo(stationInfos []db.StationInfo) (ret []BuildingInfo) {
+	prevID := int64(0)
+	var buildingInfo BuildingInfo
+	for _, info := range stationInfos {
+		if prevID != info.BuildingId {
+			if prevID != 0 {
+				ret = append(ret, buildingInfo)
+			}
+			prevID = info.BuildingId
+			buildingInfo = BuildingInfo{
+				BuildingID: info.BuildingId,
+				Name:       info.Name,
+				Latitude:   info.Latitude,
+				Longitude:  info.Longitude,
+			}
+		}
+
+		buildingInfo.Lines = append(buildingInfo.Lines, Line{RailwayName: info.RailwayName,
+			StationID:      info.StationId,
+			OrderInRailWay: info.OrderInRailway,
+		})
+	}
+	return ret
 }
 
 var (
