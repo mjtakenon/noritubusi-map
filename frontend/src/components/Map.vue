@@ -6,19 +6,18 @@
       :options="{ zoomControl: false }"
       :zoom="zoom"
       :center="center"
-      @update:zoom="zoomUpdated"
-      @update:center="centerUpdated"
-      @update:bounds="boundsUpdated"
+      @update:zoom="onUpdateZoom"
+      @update:center="onUpdateCenter"
+      @update:bounds="onUpdateBounds"
     >
-      <l-tile-layer :url="url"></l-tile-layer>
-      <TMarker v-for="m in markers" :key="m.id" :data="m"/>
+      <l-tile-layer :url="urlTileMap"></l-tile-layer>
+      <TMarker v-for="marker in markerList" :key="m.id" :data="marker"/>
     </l-map>
     <v-layout align-start justify-start row/>
     <br>
     <v-flex xs4 offset-xs1 sm3 offset-sm1 md2 offset-md1>
       <v-card>
         <v-toolbar>
-          <!-- <v-btn icon @click="searchStation"> -->
           <v-btn icon>
             <v-icon>search</v-icon>
           </v-btn>
@@ -67,42 +66,42 @@ export default {
   },
   data() {
     return {
-      // url: "http://{s}.tile.osm.org/{z}/{x}/{y}.png",
-      url: "https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png",
+      // urlTileMap: Leaflet.js のタイルマップのURL
+      urlTileMap: "https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png", // 地理院地図
+      // urlTileMap: "http://{s}.tile.osm.org/{z}/{x}/{y}.png",                   // OpenStreetMap
+
+      // zoom: Leaflet.js Map のズームスケール
       zoom: 14,
+      // center: Leaflet.js Map の中心座標
       center: {
         lat: 35.680446,
         lng: 139.761801
       },
+      // bounds: Leaflet.js Mapの表示範囲
       bounds: {
+        // 左下の座標
         _southWest: {
           lat: 35.63532680480169,
           lng: 139.73910056054595
         },
+        // 右上の座標
         _northEast: {
           lat: 35.691113860493594,
           lng: 139.79489050805572
         }
       },
-      markers: [],
+      // markerList: 地図上にプロットされるマーカーのリスト
+      markerList: [],
+      // stationList: キーワード検索結果のリスト
       stationList: [],
+      // textField: キーワード検索欄の文字列
       textField: "",
+      // hasResult: キーワード検索の結果があるかどうかのフラグ
       hasResult: false
     };
   },
   methods: {
-    zoomUpdated(zoom) {
-      this.zoom = zoom;
-    },
-
-    centerUpdated(center) {
-      this.center = center;
-    },
-
-    boundsUpdated(bounds) {
-      this.bounds = bounds;
-    },
-
+    // 現在位置にある駅舎一覧を取得する
     async getMarkersInCurrentRect() {
       try {
         let resp = await axios.get(
@@ -132,6 +131,7 @@ export default {
       }
     },
 
+    // キーワードから駅を検索して、駅一覧リストを取得する
     async getStationListByKeyword(keyword) {
       console.log(`Keyword: ${keyword}`);
 
@@ -156,6 +156,7 @@ export default {
       }
     },
 
+    // 駅 ID から駅情報を取得する
     async getStationById(stationId) {
       try {
         let resp = await axios.get(`http://${window.location.hostname}:1323/stations/${stationId}`);
@@ -175,26 +176,23 @@ export default {
       }
     },
 
+    // 駅情報内にある緯度経度の位置にフォーカスする
     forcusToStation(stationInfo) {
-      console.log("CALLED @ focusToStation");
-      console.log(stationInfo);
       this.$refs.mainMap.mapObject.panTo([stationInfo.lat, stationInfo.lng]);
     },
 
+    // キーワードに完全一致した駅にフォーカスする
     checkCompleteMatchAndForcus(keyword) {
       const matchedToKeywordCompletely = this.stationList.filter(elem => elem.stationName == keyword);
 
       if (matchedToKeywordCompletely.length > 0) {
+        // マッチした中で1番目の駅にフォーカス
         this.forcusToStation(matchedToKeywordCompletely[0]);
       }
     },
 
-    // DBからstrをキーワードに駅検索
-    // 駅名で検索・移動
-    // 駅検索
-
+    // キーワードに基づく駅検索
     searchStation() {
-      console.log("::Called:: searchStation");
       let keyword = this.textField;
 
       this.getStationListByKeyword(keyword)
@@ -205,44 +203,67 @@ export default {
           console.error(error);
         });
 
-      // もし完全一致する駅が存在すれば検索結果の1つ目の駅にフォーカス
+      // もし完全一致する駅が存在すれば検索結果の
+      // 1つ目の駅にフォーカス
       this.checkCompleteMatchAndForcus(keyword);
     },
 
+    /*****************************************************************/
+    /************************** Event Handlers ***********************/
+    /*****************************************************************/
+
+    // ツールバーの「現在地」アイコンを押したとき
     onClickMyLocationIcon() {
       this.getMarkersInCurrentRect()
-        .then(markers => {
-          this.markers = markers;
+        .then(markerList => {
+          this.markerList = markerList;
         })
         .catch(error => {
           console.error(error);
         });
     },
 
+    // キーワード検索結果の候補をクリックしたとき
     onClickStationList(stationInfo) {
-      console.log("::Called:: onClickStationList");
-
       this.forcusToStation(stationInfo);
+    },
+
+    /**********************************/
+    /*******  Map (Leaflet.js)  *******/
+    /**********************************/
+
+    // ズームスケールが変更されたとき
+    onUpdateZoom(zoom) {
+      this.zoom = zoom;
+    },
+
+    // 中心座標が変更されたとき
+    onUpdateCenter(center) {
+      this.center = center;
+    },
+
+    // 表示範囲が変更されたとき
+    onUpdateBounds(bounds) {
+      this.bounds = bounds;
     }
   },
+
+  // このコンポーネントがマウントされたときに実行される処理
   mounted: function() {
     this.$nextTick(function() {
       // 初期位置・ズームの設定
       this.bounds = this.$refs.mainMap.mapObject.getBounds();
     });
   },
-  watch: {
-    textField(str) {
-      console.log("::Called:: textField");
 
-      // 何も入力されてなければリストは非表示
+  // 変数の監視処理
+  watch: {
+    // textField: キーワード検索文字列
+    textField(str) {
+      // 何も入力されてなければリストを非表示
       if (isEmpty(str)) {
         this.hasResult = false;
-      }
-
-      // 入力された文字列が駅名に一致すればリストに表示
-      // 文字列が入力されていて一致がなければ最後のリストを表示し続ける
-      else {
+      } else {
         this.getStationListByKeyword(this.textField)
           .then(stationList => {
             if (stationList.length >= 1) {
@@ -258,6 +279,7 @@ export default {
   }
 };
 
+// 空文字列かどうかチェックする関数
 function isEmpty(str) {
   return !str || /^\s*$/.test(str);
 }
