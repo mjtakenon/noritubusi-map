@@ -34,13 +34,13 @@ func getBuildingInfoInRange(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "invalid paramater")
 	}
 
-	stationInfo, err := DB.GetBuildingInfoInRange(beginLat, beginLong, endLat, endLong)
+	stationInfo, err := DB.GetStationInfoInRange(beginLat, beginLong, endLat, endLong)
 	if err != nil {
 		log.Println("/stations get info error:", err)
 		return c.String(http.StatusInternalServerError, "server error")
 	}
 
-	return c.JSON(http.StatusOK, stationInfo)
+	return c.JSON(http.StatusOK, convertStationInfo2BuildingInfo(stationInfo))
 }
 
 func getStationInfoByID(c echo.Context) error {
@@ -189,9 +189,14 @@ type Line struct {
 }
 
 func convertStationInfo2BuildingInfo(stationInfos []db.StationInfo) (ret []BuildingInfo) {
+	//現在の建物番号
 	prevID := int64(0)
+
 	var buildingInfo BuildingInfo
+
+	// BuildingInfo構造体に詰め替え
 	for _, info := range stationInfos {
+		// 前と異なる建物番号
 		if prevID != info.BuildingId {
 			if prevID != 0 {
 				ret = append(ret, buildingInfo)
@@ -205,11 +210,16 @@ func convertStationInfo2BuildingInfo(stationInfos []db.StationInfo) (ret []Build
 			}
 		}
 
+		// 路線情報追加
 		buildingInfo.Lines = append(buildingInfo.Lines, Line{RailwayName: info.RailwayName,
 			StationID:      info.StationId,
 			OrderInRailWay: info.OrderInRailway,
 		})
 	}
+
+	// 最後に触ったBuildingInfoの追加
+	ret = append(ret, buildingInfo)
+
 	return ret
 }
 
