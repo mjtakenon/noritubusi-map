@@ -89,6 +89,20 @@ func getStationNameSuggestion(c echo.Context) error {
 	return c.JSON(http.StatusOK, stationInfos)
 }
 
+func getBuildingNameSuggestion(c echo.Context) error {
+	keyword := c.QueryParam("keyword")
+	if keyword == "" {
+		return c.String(http.StatusBadRequest, "invalid parameter")
+	}
+
+	stationInfos, err := DB.GetStationsInfoByKeyword(keyword)
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "server error")
+	}
+
+	return c.JSON(http.StatusOK, convertStationInfo2BuildingInfo(stationInfos))
+}
+
 func getRailwaysInfoAll(c echo.Context) error {
 	railwayInfos, err := DB.GetRailwaysInfoAll()
 
@@ -271,6 +285,7 @@ func main() {
 
 	e.GET("/buildings", getBuildingInfoInRange)
 	e.GET("/buildings/:buildingid", getStationInfoByBuildingID)
+	e.GET("/buildings/suggest", getBuildingNameSuggestion)
 
 	e.GET("/stations/:stationid", getStationInfoByID)
 	e.GET("/stations/suggest", getStationNameSuggestion)
