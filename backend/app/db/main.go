@@ -9,24 +9,30 @@ import (
 )
 
 type BuildingInfo struct {
-	Id        int64  `db:"id" json:"id"`
-	Name      string `db:"name" json:"name"`
-	Latitude  string `db:"lat" json:"latitude"`
-	Longitude string `db:"long" json:"longitude"`
+	Id                   int64  `db:"id" json:"id"`
+	Name                 string `db:"name" json:"name"`
+	Latitude             string `db:"lat" json:"latitude"`
+	Longitude            string `db:"long" json:"longitude"`
+	ConnectedRailwaysNum int64  `db:"connected_railways_num" json:"connected_railways_num"`
+}
+
+type RailwayInfo struct {
+	Id   int64  `db:"id" json:"id"`
+	Name string `db:"name" json:"name"`
 }
 
 type StationInfo struct {
-	Id                  int64  `db:"id" json:"id"`
-	Name                string `db:"station_name" json:"name"`
-	Latitude            string `db:"lat" json:"latitude"`
-	Longitude           string `db:"long" json:"longitude"`
-	Company             string `db:"company_name" json:"company"`
-	ServiceProviderType int64  `db:"service_provider_type" json:"serviceProviderType"`
-	RailwayName         string `db:"railway_line_name" json:"railwayName"`
+	BuildingId     int64  `db:"building_id" json:"building_id"`
+	StationId      int64  `db:"station_id" json:"station_id"`
+	Name           string `db:"station_name" json:"name"`
+	Latitude       string `db:"lat" json:"latitude"`
+	Longitude      string `db:"long" json:"longitude"`
+	RailwayName    string `db:"railway_line_name" json:"railway_line_name"`
+	OrderInRailway int64  `db:"num_in_railway" json:"order_in_railway"`
 }
 
 func (s StationInfo) String() string {
-	return fmt.Sprintf("[%4d]%s, (%s,%s), %s, %d, %s", s.Id, s.Name, s.Latitude, s.Longitude, s.Company, s.ServiceProviderType, s.RailwayName)
+	return fmt.Sprintf("[%4d, %4d]%s, (%s,%s),  %s ,%d", s.BuildingId, s.StationId, s.Name, s.Latitude, s.Longitude, s.RailwayName, s.OrderInRailway)
 }
 
 type DB struct {
@@ -47,7 +53,7 @@ func (d *DB) New(userName, password, address, dbName string) error {
 }
 
 func (d *DB) GetBuildingInfoInRange(beginLat, beginLong, endLat, endLong string) ([]BuildingInfo, error) {
-	query := `SELECT id,name,ST_X(latlong) AS 'lat',ST_Y(latlong) AS 'long' FROM buildings WHERE MBRContains(ST_GeomFromText(CONCAT("LINESTRING(",?," ",?,",",?," ", ?,")")),latlong) ORDER BY id`
+	query := `SELECT id,name,ST_X(latlong) AS 'lat',ST_Y(latlong) AS 'long' ,connected_railways_num FROM buildings WHERE MBRContains(ST_GeomFromText(CONCAT("LINESTRING(",?," ",?,",",?," ", ?,")")),latlong) ORDER BY id`
 
 	infos := []BuildingInfo{}
 	err := d.DB.Select(&infos, query, beginLat, beginLong, endLat, endLong)
@@ -56,7 +62,7 @@ func (d *DB) GetBuildingInfoInRange(beginLat, beginLong, endLat, endLong string)
 }
 
 func (d *DB) GetStationInfoByID(id int) (StationInfo, error) {
-	query := `SELECT stations.id AS id,stations.name AS station_name,ST_X(latlong) AS 'lat',ST_Y(latlong) AS 'long',company_name,service_provider_type,railways.name AS railway_line_name FROM stations INNER JOIN railways on stations.railway_id=railways.id INNER JOIN buildings on stations.building_id=buildings.id WHERE stations.id = ? ORDER BY id`
+	query := `SELECT buildings.id AS building_id,stations.id AS station_id,stations.name AS station_name,ST_X(latlong) AS 'lat',ST_Y(latlong) AS 'long',railways.name AS railway_line_name ,num_in_railway FROM stations INNER JOIN railways on stations.railway_id=railways.id INNER JOIN buildings on stations.building_id=buildings.id WHERE stations.id = ? ORDER BY building_id`
 
 	var info StationInfo
 	err := d.DB.Get(&info, query, id)
@@ -66,10 +72,46 @@ func (d *DB) GetStationInfoByID(id int) (StationInfo, error) {
 }
 
 func (d *DB) GetStationsInfoByKeyword(keyword string) ([]StationInfo, error) {
-	query := `SELECT stations.id AS id,stations.name AS station_name,ST_X(latlong) AS 'lat',ST_Y(latlong) AS 'long',company_name,service_provider_type,railways.name AS railway_line_name FROM stations INNER JOIN railways on stations.railway_id=railways.id INNER JOIN buildings on stations.building_id=buildings.id WHERE stations.name like concat("%",?,"%") ORDER BY id`
+	query := `SELECT buildings.id AS building_id,stations.id AS station_id,stations.name AS station_name,ST_X(latlong) AS 'lat',ST_Y(latlong) AS 'long',railways.name AS railway_line_name ,num_in_railway FROM stations INNER JOIN railways on stations.railway_id=railways.id INNER JOIN buildings on stations.building_id=buildings.id WHERE stations.name like concat("%",?,"%") ORDER BY building_id`
 
 	suggestedStations := []StationInfo{}
 	err := d.DB.Select(&suggestedStations, query, keyword)
 
 	return suggestedStations, err
+}
+
+func (d *DB) GetStationInfoByBuildingID(buildingID int) ([]StationInfo, error) {
+	query := `SELECT buildings.id AS building_id,stations.id AS station_id,stations.name AS station_name,ST_X(latlong) AS 'lat',ST_Y(latlong) AS 'long',railways.name AS railway_line_name ,num_in_railway FROM stations INNER JOIN railways on stations.railway_id=railways.id INNER JOIN buildings on stations.building_id=buildings.id WHERE buildings.id = ?  ORDER BY station_id`
+
+	stationInfos := []StationInfo{}
+	err := d.DB.Select(&stationInfos, query, buildingID)
+
+	return stationInfos, err
+}
+
+func (d *DB) GetRailwaysInfoAll() ([]RailwayInfo, error) {
+	query := `SELECT * FROM railways ORDER BY id`
+
+	railways := []RailwayInfo{}
+	err := d.DB.Select(&railways, query)
+
+	return railways, err
+}
+
+func (d *DB) GetRailwaysInfoByID(id int) ([]RailwayInfo, error) {
+	query := `SELECT * FROM railways WHERE id = ? ORDER BY id`
+
+	railways := []RailwayInfo{}
+	err := d.DB.Select(&railways, query, id)
+
+	return railways, err
+}
+
+func (d *DB) GetRailwaysInfoByName(name string) ([]RailwayInfo, error) {
+	query := `SELECT * FROM railways WHERE name = ? ORDER BY id`
+
+	railways := []RailwayInfo{}
+	err := d.DB.Select(&railways, query, name)
+
+	return railways, err
 }
