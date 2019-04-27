@@ -202,11 +202,12 @@ type Line struct {
 	OrderInRailWay int64  `json:"order_in_railway"`
 }
 
-func convertStationInfo2BuildingInfo(stationInfos []db.StationInfo) (ret []BuildingInfo) {
+func convertStationInfo2BuildingInfo(stationInfos []db.StationInfo) []BuildingInfo {
 	//現在の建物番号
 	prevID := int64(0)
 
 	var buildingInfo BuildingInfo
+	ret := []BuildingInfo{}
 
 	// BuildingInfo構造体に詰め替え
 	for _, info := range stationInfos {
@@ -232,7 +233,9 @@ func convertStationInfo2BuildingInfo(stationInfos []db.StationInfo) (ret []Build
 	}
 
 	// 最後に触ったBuildingInfoの追加
-	ret = append(ret, buildingInfo)
+	if prevID != 0 {
+		ret = append(ret, buildingInfo)
+	}
 
 	return ret
 }
