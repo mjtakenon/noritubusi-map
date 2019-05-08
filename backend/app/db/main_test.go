@@ -103,16 +103,18 @@ func TestStationDB_GetBuildingInfoInRange(t *testing.T) {
 			},
 			want: []BuildingInfo{
 				{
-					Id:        423,
-					Name:      "新浜松",
-					Latitude:  "34.70341",
-					Longitude: "137.73246",
+					Id:                   4594,
+					Name:                 "浜松",
+					Latitude:             "34.703866",
+					Longitude:            "137.734759",
+					ConnectedRailwaysNum: 3,
 				},
 				{
-					Id:        5297,
-					Name:      "浜松",
-					Latitude:  "34.70376",
-					Longitude: "137.7353775",
+					Id:                   4980,
+					Name:                 "新浜松",
+					Latitude:             "34.703402",
+					Longitude:            "137.732456",
+					ConnectedRailwaysNum: 3,
 				},
 			},
 			wantErr: false,
@@ -150,25 +152,24 @@ func TestStationDB_GetStationInfoByID(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:   "Shin-Hamamatsu(No.437)",
+			name:   "Shin-Hamamatsu(No.8677)",
 			fields: fields{DB: SetUpDB(t)},
-			args:   args{id: 437},
+			args:   args{id: 8677},
 			want: StationInfo{
-				BuildingId:          423,
-				StationId:           437,
-				Name:                "新浜松",
-				Latitude:            "34.70341",
-				Longitude:           "137.73246",
-				Company:             "遠州鉄道",
-				ServiceProviderType: 4,
-				RailwayName:         "鉄道線",
+				BuildingId:     4980,
+				StationId:      8677,
+				Name:           "新浜松",
+				Latitude:       "34.703402",
+				Longitude:      "137.732456",
+				RailwayName:    "遠州鉄道鉄道線",
+				OrderInRailway: 1,
 			},
 			wantErr: false,
 		},
 		{
 			name:    "not found id number",
 			fields:  fields{DB: SetUpDB(t)},
-			args:    args{id: 12345},
+			args:    args{id: 13000},
 			want:    StationInfo{},
 			wantErr: true,
 		},
@@ -212,54 +213,58 @@ func TestStationDB_GetStationsInfoByKeyword(t *testing.T) {
 			},
 			want: []StationInfo{
 				{
-					BuildingId:          423,
-					StationId:           437,
-					Name:                "新浜松",
-					Latitude:            "34.70341",
-					Longitude:           "137.73246",
-					Company:             "遠州鉄道",
-					ServiceProviderType: 4,
-					RailwayName:         "鉄道線",
+					BuildingId:     2125,
+					StationId:      4421,
+					Name:           "浜松町",
+					Latitude:       "35.655391",
+					Longitude:      "139.757135",
+					RailwayName:    "JR山手線",
+					OrderInRailway: 27,
 				},
 				{
-					BuildingId:          5297,
-					StationId:           5796,
-					Name:                "浜松",
-					Latitude:            "34.70376",
-					Longitude:           "137.7353775",
-					Company:             "東海旅客鉄道",
-					ServiceProviderType: 1,
-					RailwayName:         "東海道新幹線",
+					BuildingId:     2125,
+					StationId:      5838,
+					Name:           "浜松町",
+					Latitude:       "35.655391",
+					Longitude:      "139.757135",
+					RailwayName:    "東京モノレール",
+					OrderInRailway: 1,
 				},
 				{
-					BuildingId:          5297,
-					StationId:           5871,
-					Name:                "浜松",
-					Latitude:            "34.70376",
-					Longitude:           "137.7353775",
-					Company:             "東海旅客鉄道",
-					ServiceProviderType: 2,
-					RailwayName:         "東海道線",
+					BuildingId:     2125,
+					StationId:      6116,
+					Name:           "浜松町",
+					Latitude:       "35.655391",
+					Longitude:      "139.757135",
+					RailwayName:    "JR京浜東北線",
+					OrderInRailway: 25,
 				},
 				{
-					BuildingId:          5479,
-					StationId:           6005,
-					Name:                "モノレール浜松町",
-					Latitude:            "35.655745",
-					Longitude:           "139.75667",
-					Company:             "東京モノレール",
-					ServiceProviderType: 4,
-					RailwayName:         "東京モノレール羽田線",
+					BuildingId:     4594,
+					StationId:      8517,
+					Name:           "浜松",
+					Latitude:       "34.703866",
+					Longitude:      "137.734759",
+					RailwayName:    "JR東海道本線(熱海～浜松)",
+					OrderInRailway: 34,
 				},
 				{
-					BuildingId:          6908,
-					StationId:           7708,
-					Name:                "浜松町",
-					Latitude:            "35.65541",
-					Longitude:           "139.757125",
-					Company:             "東日本旅客鉄道",
-					ServiceProviderType: 2,
-					RailwayName:         "東海道線",
+					BuildingId:     4594,
+					StationId:      8819,
+					Name:           "浜松",
+					Latitude:       "34.703866",
+					Longitude:      "137.734759",
+					RailwayName:    "JR東海道本線(浜松～岐阜)",
+					OrderInRailway: 1,
+				},
+				{
+					BuildingId:     4980,
+					StationId:      8677,
+					Name:           "新浜松",
+					Latitude:       "34.703402",
+					Longitude:      "137.732456",
+					RailwayName:    "遠州鉄道鉄道線",
+					OrderInRailway: 1,
 				},
 			},
 			wantErr: false,
@@ -308,27 +313,26 @@ func TestDB_GetStationInfoByBuildingID(t *testing.T) {
 		{
 			name:   "浜松駅",
 			fields: fields{DB: SetUpDB(t)},
-			args:   args{buildingID: 5297},
+			args:   args{buildingID: 4594},
 			want: []StationInfo{
+
 				{
-					BuildingId:          5297,
-					StationId:           5796,
-					Name:                "浜松",
-					Latitude:            "34.70376",
-					Longitude:           "137.7353775",
-					Company:             "東海旅客鉄道",
-					ServiceProviderType: 1,
-					RailwayName:         "東海道新幹線",
+					BuildingId:     4594,
+					StationId:      8517,
+					Name:           "浜松",
+					Latitude:       "34.703866",
+					Longitude:      "137.734759",
+					RailwayName:    "JR東海道本線(熱海～浜松)",
+					OrderInRailway: 34,
 				},
 				{
-					BuildingId:          5297,
-					StationId:           5871,
-					Name:                "浜松",
-					Latitude:            "34.70376",
-					Longitude:           "137.7353775",
-					Company:             "東海旅客鉄道",
-					ServiceProviderType: 2,
-					RailwayName:         "東海道線",
+					BuildingId:     4594,
+					StationId:      8819,
+					Name:           "浜松",
+					Latitude:       "34.703866",
+					Longitude:      "137.734759",
+					RailwayName:    "JR東海道本線(浜松～岐阜)",
+					OrderInRailway: 1,
 				},
 			},
 			wantErr: false,
@@ -364,7 +368,7 @@ func TestDB_GetRailwaysInfoAll(t *testing.T) {
 	}{
 		name:    "Number of railways info",
 		fields:  fields{DB: SetUpDB(t)},
-		want:    605,
+		want:    587,
 		wantErr: false,
 	}
 
@@ -398,18 +402,15 @@ func TestDB_GetRailwaysInfoByID(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:   "Odakyu Odawara Line",
+			name:   "Odakyu Enoshima Line",
 			fields: fields{DB: SetUpDB(t)},
 			args: args{
-				id: 214,
+				id: 204,
 			},
 			want: []RailwayInfo{
 				{
-					Id:                  214,
-					Name:                "小田原線",
-					Type:                12,
-					Company:             "小田急電鉄",
-					ServiceProviderType: 4,
+					Id:   204,
+					Name: "小田急江ノ島線",
 				},
 			},
 			wantErr: false,
@@ -456,18 +457,15 @@ func TestDB_GetRailwaysInfoByName(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:   "Odakyu Odawara Line",
+			name:   "Odakyu Enoshima Line",
 			fields: fields{DB: SetUpDB(t)},
 			args: args{
-				name: "小田原線",
+				name: "小田急江ノ島線",
 			},
 			want: []RailwayInfo{
 				{
-					Id:                  214,
-					Name:                "小田原線",
-					Type:                12,
-					Company:             "小田急電鉄",
-					ServiceProviderType: 4,
+					Id:   204,
+					Name: "小田急江ノ島線",
 				},
 			},
 			wantErr: false,
@@ -494,6 +492,81 @@ func TestDB_GetRailwaysInfoByName(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("DB.GetRailwaysInfoByName() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestDB_GetStationInfoInRange(t *testing.T) {
+	type fields struct {
+		DB *sqlx.DB
+	}
+	type args struct {
+		beginLat  string
+		beginLong string
+		endLat    string
+		endLong   string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    []StationInfo
+		wantErr bool
+	}{
+		{
+			name:   "near Hamamatsu station",
+			fields: fields{DB: SetUpDB(t)},
+			args: args{
+				beginLat:  "34.705549",
+				beginLong: "137.729265",
+				endLat:    "34.702267",
+				endLong:   "137.741667",
+			},
+			want: []StationInfo{
+				{
+					BuildingId:     4594,
+					StationId:      8517,
+					Name:           "浜松",
+					Latitude:       "34.703866",
+					Longitude:      "137.734759",
+					RailwayName:    "JR東海道本線(熱海～浜松)",
+					OrderInRailway: 34,
+				},
+				{
+					BuildingId:     4594,
+					StationId:      8819,
+					Name:           "浜松",
+					Latitude:       "34.703866",
+					Longitude:      "137.734759",
+					RailwayName:    "JR東海道本線(浜松～岐阜)",
+					OrderInRailway: 1,
+				},
+				{
+					BuildingId:     4980,
+					StationId:      8677,
+					Name:           "新浜松",
+					Latitude:       "34.703402",
+					Longitude:      "137.732456",
+					RailwayName:    "遠州鉄道鉄道線",
+					OrderInRailway: 1,
+				},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			d := &DB{
+				DB: tt.fields.DB,
+			}
+			got, err := d.GetStationInfoInRange(tt.args.beginLat, tt.args.beginLong, tt.args.endLat, tt.args.endLong)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("DB.GetStationInfoInRange() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("DB.GetStationInfoInRange() = %v, want %v", got, tt.want)
 			}
 		})
 	}
