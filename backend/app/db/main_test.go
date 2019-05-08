@@ -15,7 +15,7 @@ func SetUpDB(t *testing.T) *sqlx.DB {
 	password := "password"
 	address := "localhost:3314"
 	dbName := "noritubusi_map"
-	db, err := sqlx.Connect("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s", userName, password, address, dbName))
+	db, err := sqlx.Connect("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=true", userName, password, address, dbName))
 
 	if err != nil {
 		t.Errorf("DB Connection Error:%v", err)
@@ -492,6 +492,81 @@ func TestDB_GetRailwaysInfoByName(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("DB.GetRailwaysInfoByName() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestDB_GetStationInfoInRange(t *testing.T) {
+	type fields struct {
+		DB *sqlx.DB
+	}
+	type args struct {
+		beginLat  string
+		beginLong string
+		endLat    string
+		endLong   string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    []StationInfo
+		wantErr bool
+	}{
+		{
+			name:   "near Hamamatsu station",
+			fields: fields{DB: SetUpDB(t)},
+			args: args{
+				beginLat:  "34.705549",
+				beginLong: "137.729265",
+				endLat:    "34.702267",
+				endLong:   "137.741667",
+			},
+			want: []StationInfo{
+				{
+					BuildingId:     4594,
+					StationId:      8517,
+					Name:           "浜松",
+					Latitude:       "34.703866",
+					Longitude:      "137.734759",
+					RailwayName:    "JR東海道本線(熱海～浜松)",
+					OrderInRailway: 34,
+				},
+				{
+					BuildingId:     4594,
+					StationId:      8819,
+					Name:           "浜松",
+					Latitude:       "34.703866",
+					Longitude:      "137.734759",
+					RailwayName:    "JR東海道本線(浜松～岐阜)",
+					OrderInRailway: 1,
+				},
+				{
+					BuildingId:     4980,
+					StationId:      8677,
+					Name:           "新浜松",
+					Latitude:       "34.703402",
+					Longitude:      "137.732456",
+					RailwayName:    "遠州鉄道鉄道線",
+					OrderInRailway: 1,
+				},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			d := &DB{
+				DB: tt.fields.DB,
+			}
+			got, err := d.GetStationInfoInRange(tt.args.beginLat, tt.args.beginLong, tt.args.endLat, tt.args.endLong)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("DB.GetStationInfoInRange() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("DB.GetStationInfoInRange() = %v, want %v", got, tt.want)
 			}
 		})
 	}
