@@ -63,6 +63,15 @@ func (d *DB) GetBuildingInfoInRange(beginLat, beginLong, endLat, endLong string)
 	return infos, err
 }
 
+func (d *DB) GetStationInfoInRange(beginLat, beginLong, endLat, endLong string) ([]StationInfo, error) {
+	query := `SELECT buildings.id AS building_id,stations.id AS station_id,stations.name AS station_name,ST_X(latlong) AS 'lat',ST_Y(latlong) AS 'long',railways.name AS railway_line_name ,num_in_railway FROM stations INNER JOIN railways on stations.railway_id=railways.id INNER JOIN buildings on stations.building_id=buildings.id WHERE MBRContains(ST_GeomFromText(CONCAT("LINESTRING(",?," ",?,",",?," ", ?,")")),latlong) ORDER BY building_id`
+
+	infos := []StationInfo{}
+	err := d.DB.Select(&infos, query, beginLat, beginLong, endLat, endLong)
+
+	return infos, err
+}
+
 func (d *DB) GetStationInfoByID(id int) (StationInfo, error) {
 	query := `SELECT buildings.id AS building_id,stations.id AS station_id,stations.name AS station_name,ST_X(latlong) AS 'lat',ST_Y(latlong) AS 'long',railways.name AS railway_line_name ,num_in_railway FROM stations INNER JOIN railways on stations.railway_id=railways.id INNER JOIN buildings on stations.building_id=buildings.id WHERE stations.id = ? ORDER BY building_id`
 
