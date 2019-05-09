@@ -21,13 +21,13 @@ export default {
   },
   data() {
     return {
-      isVisible: false,
+      isVisible: false
     };
   },
   methods: {
     onClick: function() {
       this.isVisible = true;
     }
-  },
+  }
 };
 </script>
