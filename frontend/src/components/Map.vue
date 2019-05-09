@@ -13,8 +13,8 @@
       <l-tile-layer :url="urlTileMap"></l-tile-layer>
       <TMarker v-for="marker in markerList" :key="m.id" :data="marker"/>
     </l-map>
-    <v-layout align-start justify-start row/>
-    <br>
+
+    <!-- <v-layout align-start justify-start row/>
     <v-flex xs4 offset-xs1 sm3 offset-sm1 md2 offset-md1>
       <v-card>
         <v-toolbar>
@@ -33,7 +33,6 @@
           </v-btn>
         </v-toolbar>
         <v-list v-show="hasResult">
-          <!-- array.slice はバックエンドでやるべき -->
           <v-list-tile
             v-for="stationInfo in stationList.slice(0, 5)"
             :key="stationInfo.stationId"
@@ -46,10 +45,38 @@
           </v-list-tile>
         </v-list>
       </v-card>
-    </v-flex>
+    </v-flex> -->
+    <div class="pa-3">
+      <v-toolbar dense floating>
+        <v-btn icon>
+          <v-icon>search</v-icon>
+        </v-btn>
+        <v-text-field
+          clearable
+          label="乗車駅を入力"
+          single-line
+          v-model="textField"
+          @keyup.enter="searchStation"
+        ></v-text-field>
+        <v-btn icon @click="onClickMyLocationIcon">
+          <v-icon>my_location</v-icon>
+        </v-btn>
+      </v-toolbar>
+      <v-list v-show="hasResult">
+        <v-list-tile
+          v-for="stationInfo in stationList.slice(0, 5)"
+          :key="stationInfo.stationId"
+          @click="onClickStationList(stationInfo)"
+        >
+          <v-list-tile-content>
+            <v-list-tile-title v-text="stationInfo.stationName"></v-list-tile-title>
+            <v-list-tile-sub-title v-text="stationInfo.railwayName"></v-list-tile-sub-title>
+          </v-list-tile-content>
+        </v-list-tile>
+      </v-list>
+    </div>
   </div>
 </template>
-
 <script>
 // Module: vue2-leaflet
 import { LMap, LTileLayer } from "vue2-leaflet";
