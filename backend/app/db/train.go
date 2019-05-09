@@ -9,12 +9,10 @@ import (
 )
 
 type BuildingInfo struct {
-	BuildingId     			 int64  `db:"building_id" json:"building_id"`
-	StationId      			 int64  `db:"station_id" json:"station_id"`
-	Name                 string `db:"building_name" json:"name"`
+	Id                   int64  `db:"id" json:"id"`
+	Name                 string `db:"name" json:"name"`
 	Latitude             string `db:"lat" json:"latitude"`
 	Longitude            string `db:"long" json:"longitude"`
-	RailwayLineName      string `db:"railway_line_name" json:"railway_line_name"`
 	ConnectedRailwaysNum int64  `db:"connected_railways_num" json:"connected_railways_num"`
 }
 
@@ -43,7 +41,7 @@ type DB struct {
 
 func (d *DB) New(userName, password, address, dbName string) error {
 	//userName:password@protocol(adress)/dbName
-	db, err := sqlx.Connect("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s", userName, password, address, dbName))
+	db, err := sqlx.Connect("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=true", userName, password, address, dbName))
 
 	if err != nil {
 		log.Println("DB Connection Error:", err)
@@ -55,9 +53,18 @@ func (d *DB) New(userName, password, address, dbName string) error {
 }
 
 func (d *DB) GetBuildingInfoInRange(beginLat, beginLong, endLat, endLong string) ([]BuildingInfo, error) {
-	query := `SELECT buildings.id AS building_id, stations.id AS station_id, buildings.name AS building_name, ST_X(buildings.latlong) AS 'lat',ST_Y(buildings.latlong) AS 'long',railways.name AS railway_line_name , connected_railways_num FROM buildings INNER JOIN stations on stations.building_id=buildings.id INNER JOIN railways on stations.railway_id=railways.id WHERE MBRContains(ST_GeomFromText(CONCAT("LINESTRING(",?," ",?,",",?," ", ?,")")),latlong) ORDER BY buildings.id`
+	query := `SELECT id,name,ST_X(latlong) AS 'lat',ST_Y(latlong) AS 'long' ,connected_railways_num FROM buildings WHERE MBRContains(ST_GeomFromText(CONCAT("LINESTRING(",?," ",?,",",?," ", ?,")")),latlong) ORDER BY id`
 
 	infos := []BuildingInfo{}
+	err := d.DB.Select(&infos, query, beginLat, beginLong, endLat, endLong)
+
+	return infos, err
+}
+
+func (d *DB) GetStationInfoInRange(beginLat, beginLong, endLat, endLong string) ([]StationInfo, error) {
+	query := `SELECT buildings.id AS building_id,stations.id AS station_id,stations.name AS station_name,ST_X(latlong) AS 'lat',ST_Y(latlong) AS 'long',railways.name AS railway_line_name ,num_in_railway FROM stations INNER JOIN railways on stations.railway_id=railways.id INNER JOIN buildings on stations.building_id=buildings.id WHERE MBRContains(ST_GeomFromText(CONCAT("LINESTRING(",?," ",?,",",?," ", ?,")")),latlong) ORDER BY building_id`
+
+	infos := []StationInfo{}
 	err := d.DB.Select(&infos, query, beginLat, beginLong, endLat, endLong)
 
 	return infos, err

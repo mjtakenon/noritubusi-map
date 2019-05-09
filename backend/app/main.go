@@ -34,13 +34,13 @@ func getBuildingInfoInRange(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "invalid paramater")
 	}
 
-	stationInfo, err := DB.GetBuildingInfoInRange(beginLat, beginLong, endLat, endLong)
+	stationInfo, err := DB.GetStationInfoInRange(beginLat, beginLong, endLat, endLong)
 	if err != nil {
 		log.Println("/stations get info error:", err)
 		return c.String(http.StatusInternalServerError, "server error")
 	}
 
-	return c.JSON(http.StatusOK, stationInfo)
+	return c.JSON(http.StatusOK, convertStationInfo2BuildingInfo(stationInfo))
 }
 
 func getStationInfoByID(c echo.Context) error {
@@ -87,6 +87,20 @@ func getStationNameSuggestion(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, stationInfos)
+}
+
+func getBuildingNameSuggestion(c echo.Context) error {
+	keyword := c.QueryParam("keyword")
+	if keyword == "" {
+		return c.String(http.StatusBadRequest, "invalid parameter")
+	}
+
+	stationInfos, err := DB.GetStationsInfoByKeyword(keyword)
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "server error")
+	}
+
+	return c.JSON(http.StatusOK, convertStationInfo2BuildingInfo(stationInfos))
 }
 
 func getRailwaysInfoAll(c echo.Context) error {
@@ -150,6 +164,38 @@ func createUser(c echo.Context) error {
 	return c.String(http.StatusCreated, "ok")
 }
 
+func signin(c echo.Context) error {
+	userID := c.FormValue("userid")
+	password := c.FormValue("password")
+	if userID == "" || password == "" {
+		return c.String(http.StatusBadRequest, "invalid parameter")
+	}
+
+	//ユーザ情報取得
+	userInfo, err := DB.GetUserInfoByUserID(userID)
+	if err != nil {
+		return c.String(http.StatusUnauthorized, "login failed")
+	}
+
+	//パスワード比較
+	if err := bcrypt.CompareHashAndPassword([]byte(userInfo.HashedPassword), []byte(password)); err != nil {
+		return c.String(http.StatusUnauthorized, "login failed")
+	}
+
+	//ログイン成功
+	saveSession(userID, 60*60*24*7, c)
+
+	return c.String(http.StatusOK, "success login")
+}
+
+func signout(c echo.Context) error {
+	if err := deleteSession(c); err != nil {
+		return c.String(http.StatusInternalServerError, "failed logout")
+	}
+
+	return c.String(http.StatusOK, "success logout")
+}
+
 // remember meオプション等によって有効期限変える？
 func saveSession(userID string, maxAge int, c echo.Context) error {
 	sess, err := session.Get("session", c)
@@ -171,6 +217,72 @@ func saveSession(userID string, maxAge int, c echo.Context) error {
 	}
 
 	return nil
+}
+
+func deleteSession(c echo.Context) error {
+	sess, err := session.Get("session", c)
+
+	if err != nil {
+		return err
+	}
+
+	if err := sess.Store().(*mysqlstore.MySQLStore).Delete(c.Request(), c.Response(), sess); err != nil {
+		return err
+	}
+	return nil
+}
+
+// 構造体
+type BuildingInfo struct {
+	BuildingID int64  `json:"building_id"`
+	Name       string `json:"name"`
+	Latitude   string `json:"latitude"`
+	Longitude  string `json:"longitude"`
+	Lines      []Line `json:"lines"`
+}
+
+type Line struct {
+	RailwayName    string `json:"railway_name"`
+	StationID      int64  `json:"station_id"`
+	OrderInRailWay int64  `json:"order_in_railway"`
+}
+
+func convertStationInfo2BuildingInfo(stationInfos []db.StationInfo) []BuildingInfo {
+	//現在の建物番号
+	prevID := int64(0)
+
+	var buildingInfo BuildingInfo
+	ret := []BuildingInfo{}
+
+	// BuildingInfo構造体に詰め替え
+	for _, info := range stationInfos {
+		// 前と異なる建物番号
+		if prevID != info.BuildingId {
+			if prevID != 0 {
+				ret = append(ret, buildingInfo)
+			}
+			prevID = info.BuildingId
+			buildingInfo = BuildingInfo{
+				BuildingID: info.BuildingId,
+				Name:       info.Name,
+				Latitude:   info.Latitude,
+				Longitude:  info.Longitude,
+			}
+		}
+
+		// 路線情報追加
+		buildingInfo.Lines = append(buildingInfo.Lines, Line{RailwayName: info.RailwayName,
+			StationID:      info.StationId,
+			OrderInRailWay: info.OrderInRailway,
+		})
+	}
+
+	// 最後に触ったBuildingInfoの追加
+	if prevID != 0 {
+		ret = append(ret, buildingInfo)
+	}
+
+	return ret
 }
 
 var (
@@ -221,11 +333,15 @@ func main() {
 
 	e.GET("/buildings", getBuildingInfoInRange)
 	e.GET("/buildings/:buildingid", getStationInfoByBuildingID)
+	e.GET("/buildings/suggest", getBuildingNameSuggestion)
 
 	e.GET("/stations/:stationid", getStationInfoByID)
 	e.GET("/stations/suggest", getStationNameSuggestion)
 
 	e.POST("/signup", createUser)
+
+	e.POST("/signin", signin)
+	e.DELETE("signin", signout)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":1323"))
