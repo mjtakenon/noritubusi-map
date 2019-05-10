@@ -29,9 +29,6 @@
           <v-btn icon>
             <v-icon>search</v-icon>
           </v-btn>
-          <!-- <v-btn icon @click="onClickMyLocationIcon">
-            <v-icon>my_location</v-icon>
-          </v-btn> -->
         </v-toolbar>
       </v-card-text>
       <!-- サジェストのリスト -->
@@ -39,15 +36,35 @@
         <v-list subheader absolute avatar v-show="hasResult" style="background-color:#f5f5f5; border-radius:0px 0px 10px 10px;">
           <v-subheader>候補...</v-subheader>
           <v-list-tile
-            v-for="stationInfo in stationList.slice(0, 5)"
-            :key="stationInfo.stationId"
-            @click="onClickStationList(stationInfo)" >
+            v-for="buildingInfo in buildingList.slice(0, 5)"
+            :key="buildingInfo.stationId"
+            @click="onClickStationList(buildingInfo)" >
             <v-list-tile-avatar>
               <v-icon large>train</v-icon>
             </v-list-tile-avatar>
             <v-list-tile-content>
-              <v-list-tile-title v-text="stationInfo.stationName"></v-list-tile-title>
-              <v-list-tile-sub-title v-text="stationInfo.railwayName"></v-list-tile-sub-title>
+              <v-list-tile-title v-text="buildingInfo.name"></v-list-tile-title>
+              <!-- <v-list-tile-sub-title 
+                v-text="lines.railway_name" 
+                v-for="lines in buildingInfo.lines.slice(0, 3)" 
+                :key="lines.station_id">
+              </v-list-tile-sub-title> -->
+              <v-list-tile-sub-title>
+                <div v-if="buildingInfo.lines.length>=2">
+                  <v-text
+                  v-for="lines in buildingInfo.lines.slice(0, 3)"
+                  :key="lines.station_id"
+                  v-text="lines.railway_name + '，' "
+                  ></v-text>
+                </div>
+                <div v-else>
+                  <v-text
+                  v-for="lines in buildingInfo.lines.slice(0, 3)"
+                  :key="lines.station_id"
+                  v-text="lines.railway_name"
+                  ></v-text>
+                </div>
+              </v-list-tile-sub-title>
             </v-list-tile-content>
           </v-list-tile>
         </v-list>
@@ -58,8 +75,8 @@
           fab
           bottom
           right
-          style="margin-bottom:75px;"
-          color="pink"
+          style="margin-bottom:75px; color:gray; background-color:gray;"
+          color="gray"
         >
           <v-icon>my_location</v-icon>
         </v-btn>
@@ -120,8 +137,9 @@ export default {
       },
       // markerList: 地図上にプロットされるマーカーのリスト
       markerList: [],
-      // stationList: キーワード検索結果のリスト
+      // stationList,buildingList: キーワード検索結果のリスト
       stationList: [],
+      buildingList: [],
       // textField: キーワード検索欄の文字列
       textField: "",
       // hasResult: キーワード検索の結果があるかどうかのフラグ
@@ -159,8 +177,31 @@ export default {
         throw error;
       }
     },
+    
+    // キーワードから駅を検索して、駅一覧リストを取得する(建物単位)
+    async getBuildingListByKeyword(keyword) {
+      console.log(`Keyword: ${keyword}`);
 
-    // キーワードから駅を検索して、駅一覧リストを取得する
+      try {
+        let resp = await axios.get(`http://${window.location.hostname}:1323/buildings/suggest?keyword=${keyword}`);
+        let buildingList = Array();
+
+        buildingList = resp.data.map(elem => ({
+          lat: elem.latitude,
+          lng: elem.longitude,
+          name: elem.name,
+          id: elem.building_id,
+          lines: elem.lines
+        }));
+
+        return buildingList;
+      } catch (error) {
+        console.error(`ERROR @ getBuildingListByKeyword (${keyword})`);
+        throw error;
+      }
+    },
+
+    // キーワードから駅を検索して、駅一覧リストを取得する(駅単位)
     async getStationListByKeyword(keyword) {
       console.log(`Keyword: ${keyword}`);
 
@@ -294,10 +335,10 @@ export default {
       if (isEmpty(str)) {
         this.hasResult = false;
       } else {
-        this.getStationListByKeyword(this.textField)
-          .then(stationList => {
-            if (stationList.length >= 1) {
-              this.stationList = stationList;
+        this.getBuildingListByKeyword(this.textField)
+          .then(buildingList => {
+            if (buildingList.length >= 1) {
+              this.buildingList = buildingList;
               this.hasResult = true;
             }
           })

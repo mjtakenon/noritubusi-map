@@ -1,10 +1,7 @@
 <template>
   <l-popup>
-    ID:{{ this.data.id }}
-    <br>
+    <!-- ID:{{ this.data.id }} -->
     <H1>{{ this.data.name }}</H1>
-    <!-- <H1>{{ this.data.lines[0].railway_name }}</H1> -->
-    <!-- <H2> 🚊  {{ this.data.companyName }} : {{ this.data.railwayName }} </H2>  -->
     <v-list dense>
       <v-list-tile
         v-for="(l, idx) in this.data.lines"
@@ -13,7 +10,6 @@
       >
         <v-list-tile-avatar>
           <H2>{{icon}}</H2>
-          <!-- <v-icon :class="[item.iconClass]">{{ item.icon }}</v-icon> -->
         </v-list-tile-avatar>
         <v-list-tile-content>
           <v-list-tile-title>{{ data.lines[idx].railway_name }}</v-list-tile-title>
