@@ -11,44 +11,13 @@
       @update:bounds="onUpdateBounds"
     >
       <l-tile-layer :url="urlTileMap"></l-tile-layer>
-      <TMarker v-for="marker in markerList" :key="m.id" :data="marker"/>
+      <TMarker v-for="marker in markerList" :key="marker.id" :data="marker"/>
     </l-map>
-<!-- 元のやつ -->
-    <!-- <v-layout align-start justify-start row/>
-    <v-flex xs4 offset-xs1 sm3 offset-sm1 md2 offset-md1>
-      <v-card>
-        <v-toolbar>
-          <v-btn icon>
-            <v-icon>search</v-icon>
-          </v-btn>
-          <v-text-field
-            clearable
-            label="駅名を入力"
-            single-line
-            v-model="textField"
-            @keyup.enter="searchStation"
-          ></v-text-field>
-          <v-btn icon @click="onClickMyLocationIcon">
-            <v-icon>my_location</v-icon>
-          </v-btn>
-        </v-toolbar>
-        <v-list v-show="hasResult">
-          <v-list-tile
-            v-for="stationInfo in stationList.slice(0, 5)"
-            :key="stationInfo.stationId"
-            @click="onClickStationList(stationInfo)"
-          >
-            <v-list-tile-content>
-              <v-list-tile-title v-text="stationInfo.stationName"></v-list-tile-title>
-              <v-list-tile-sub-title v-text="stationInfo.railwayName"></v-list-tile-sub-title>
-            </v-list-tile-content>
-          </v-list-tile>
-        </v-list>
-      </v-card>
-    </v-flex> -->
-
+    <!-- floatingっぽく見せるためのpadding -->
     <div class="pa-3">
+      <!-- 検索フィールドの幅を指定 -->
       <v-card-text style="width: 320px; position: relative;">
+        <!-- 検索フィールド -->
         <v-toolbar absolute flat height="50px" style="border-radius:10px 10px 0px 0px;">
           <v-toolbar-side-icon></v-toolbar-side-icon>
           <v-text-field
@@ -60,11 +29,12 @@
           <v-btn icon>
             <v-icon>search</v-icon>
           </v-btn>
-          <v-btn icon @click="onClickMyLocationIcon">
+          <!-- <v-btn icon @click="onClickMyLocationIcon">
             <v-icon>my_location</v-icon>
-          </v-btn>
+          </v-btn> -->
         </v-toolbar>
       </v-card-text>
+      <!-- サジェストのリスト -->
       <v-card-text style="width: 352px; position: relative; top: -20px; left:-16px; padding-top:30px;">
         <v-list subheader absolute avatar v-show="hasResult" style="background-color:#f5f5f5; border-radius:0px 0px 10px 10px;">
           <v-subheader>候補...</v-subheader>
@@ -82,6 +52,29 @@
           </v-list-tile>
         </v-list>
       </v-card-text>
+        <v-btn
+          absolute
+          dark
+          fab
+          bottom
+          right
+          style="margin-bottom:75px;"
+          color="pink"
+        >
+          <v-icon>my_location</v-icon>
+        </v-btn>
+        <v-btn
+          absolute
+          dark
+          fab
+          bottom
+          right
+          style="margin-bottom:150px;"
+          color="blue"
+          @click="onClickMyLocationIcon"
+        >
+          <v-icon>search</v-icon>
+        </v-btn>
     </div>
   </div>
 </template>
@@ -151,12 +144,13 @@ export default {
             }
           }
         );
-
+        
         let markers = resp.data.map(elem => ({
           lat: elem.latitude,
           lng: elem.longitude,
           name: elem.name,
-          id: elem.id
+          id: elem.building_id,
+          lines: elem.lines
         }));
 
         return markers;
@@ -252,6 +246,7 @@ export default {
       this.getMarkersInCurrentRect()
         .then(markerList => {
           this.markerList = markerList;
+          console.log(this.markerList);
         })
         .catch(error => {
           console.error(error);

@@ -3,20 +3,20 @@
     ID:{{ this.data.id }}
     <br>
     <H1>{{ this.data.name }}</H1>
+    <!-- <H1>{{ this.data.lines[0].railway_name }}</H1> -->
     <!-- <H2> 🚊  {{ this.data.companyName }} : {{ this.data.railwayName }} </H2>  -->
-    <v-list>
+    <v-list dense>
       <v-list-tile
-        v-for="(c, idx) in this.data.companyName"
+        v-for="(l, idx) in this.data.lines"
         :key="idx"
         @click="companyNameClicked(idx)"
       >
         <v-list-tile-avatar>
-          <H1>{{icon}}</H1>
+          <H2>{{icon}}</H2>
           <!-- <v-icon :class="[item.iconClass]">{{ item.icon }}</v-icon> -->
         </v-list-tile-avatar>
         <v-list-tile-content>
-          <v-list-tile-title>{{ data.railwayName[idx] }}</v-list-tile-title>
-          <v-list-tile-sub-title>{{ data.companyName[idx] }}</v-list-tile-sub-title>
+          <v-list-tile-title>{{ data.lines[idx].railway_name }}</v-list-tile-title>
         </v-list-tile-content>
       </v-list-tile>
     </v-list>
@@ -48,14 +48,15 @@ export default {
   },
   mounted: function() {
     this.$nextTick(function() {
+      this.icon = "🚊";
       // アイコンの指定
-      if (this.data.railwayName[0].indexOf("新幹線") !== -1) {
-        // 新幹線
-        this.icon = "🚆";
-      } else {
-        // それ以外
-        this.icon = "🚊";
-      }
+      // if (this.data.railwayName[0].indexOf("新幹線") !== -1) {
+      //   // 新幹線
+      //   this.icon = "🚆";
+      // } else {
+      //   // それ以外
+      //   this.icon = "🚊";
+      // }
     });
   }
 };
