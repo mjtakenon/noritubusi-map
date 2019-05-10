@@ -73,7 +73,7 @@
             :key="stationInfo.stationId"
             @click="onClickStationList(stationInfo)" >
             <v-list-tile-avatar>
-              <v-icon>🚉</v-icon>
+              <v-icon large>train</v-icon>
             </v-list-tile-avatar>
             <v-list-tile-content>
               <v-list-tile-title v-text="stationInfo.stationName"></v-list-tile-title>
