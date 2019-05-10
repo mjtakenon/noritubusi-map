@@ -13,7 +13,7 @@
       <l-tile-layer :url="urlTileMap"></l-tile-layer>
       <TMarker v-for="marker in markerList" :key="m.id" :data="marker"/>
     </l-map>
-
+<!-- 元のやつ -->
     <!-- <v-layout align-start justify-start row/>
     <v-flex xs4 offset-xs1 sm3 offset-sm1 md2 offset-md1>
       <v-card>
@@ -46,34 +46,42 @@
         </v-list>
       </v-card>
     </v-flex> -->
+
     <div class="pa-3">
-      <v-toolbar dense floating>
-        <v-btn icon>
-          <v-icon>search</v-icon>
-        </v-btn>
-        <v-text-field
-          clearable
-          label="乗車駅を入力"
-          single-line
-          v-model="textField"
-          @keyup.enter="searchStation"
-        ></v-text-field>
-        <v-btn icon @click="onClickMyLocationIcon">
-          <v-icon>my_location</v-icon>
-        </v-btn>
-      </v-toolbar>
-      <v-list v-show="hasResult">
-        <v-list-tile
-          v-for="stationInfo in stationList.slice(0, 5)"
-          :key="stationInfo.stationId"
-          @click="onClickStationList(stationInfo)"
-        >
-          <v-list-tile-content>
-            <v-list-tile-title v-text="stationInfo.stationName"></v-list-tile-title>
-            <v-list-tile-sub-title v-text="stationInfo.railwayName"></v-list-tile-sub-title>
-          </v-list-tile-content>
-        </v-list-tile>
-      </v-list>
+      <v-card-text style="width: 320px; position: relative;">
+        <v-toolbar absolute flat height="50px" style="border-radius:10px 10px 0px 0px;">
+          <v-toolbar-side-icon></v-toolbar-side-icon>
+          <v-text-field
+            clearable
+            label="乗車駅を入力"
+            v-model="textField"
+            @keyup.enter="searchStation"
+          ></v-text-field>
+          <v-btn icon>
+            <v-icon>search</v-icon>
+          </v-btn>
+          <v-btn icon @click="onClickMyLocationIcon">
+            <v-icon>my_location</v-icon>
+          </v-btn>
+        </v-toolbar>
+      </v-card-text>
+      <v-card-text style="width: 352px; position: relative; top: -20px; left:-16px; padding-top:30px;">
+        <v-list subheader absolute avatar v-show="hasResult" style="background-color:#f5f5f5; border-radius:0px 0px 10px 10px;">
+          <v-subheader>候補...</v-subheader>
+          <v-list-tile
+            v-for="stationInfo in stationList.slice(0, 5)"
+            :key="stationInfo.stationId"
+            @click="onClickStationList(stationInfo)" >
+            <v-list-tile-avatar>
+              <v-icon>🚉</v-icon>
+            </v-list-tile-avatar>
+            <v-list-tile-content>
+              <v-list-tile-title v-text="stationInfo.stationName"></v-list-tile-title>
+              <v-list-tile-sub-title v-text="stationInfo.railwayName"></v-list-tile-sub-title>
+            </v-list-tile-content>
+          </v-list-tile>
+        </v-list>
+      </v-card-text>
     </div>
   </div>
 </template>
