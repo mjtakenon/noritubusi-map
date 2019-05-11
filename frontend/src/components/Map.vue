@@ -41,13 +41,14 @@
         <!-- 検索フィールド(乗車駅) -->
         <v-toolbar absolute height="50px" v-bind:style="rideStationToolbarStyle" v-bind:flat="flatToolbar">
           <v-toolbar-side-icon style="color:#FFFFFF"></v-toolbar-side-icon>
-          <v-text-field clearable single-line dark
+          <v-text-field clearable single-line dark　autofocus
             label="乗車駅を入力"
+            tabindex="1"
             v-model="rideStationTextFieldModel"
             @keyup.enter="searchStation"
             @click:clear="rideStationTextFieldCleared"
           ></v-text-field>
-          <v-btn icon style="color:#FFFFFF">
+          <v-btn icon style="color:#FFFFFF" @click="searchStation">
             <v-icon>search</v-icon>
           </v-btn>
         </v-toolbar>
@@ -56,11 +57,12 @@
         <!-- 検索フィールド(降車駅) -->
         <v-toolbar v-show="showDropStationTextField" absolute height="50px" v-bind:style="dropStationToolbarStyle" v-bind:flat="flatToolbar">
           <!-- <v-toolbar-side-icon></v-toolbar-side-icon> -->
-          <v-btn icon style="color:#FFFFFF">
+          <v-btn icon style="color:#FFFFFF" @click="swapTextField">
             <v-icon>swap_vert</v-icon>
           </v-btn>
           <v-text-field clearable single-line dark
             label="降車駅を入力"
+            tabindex="2"
             v-model="dropStationTextFieldModel"
             @keyup.enter="searchStation"
             @click:clear="dropStationTextFieldCleared"
@@ -320,7 +322,12 @@ export default {
 
     // キーワードに基づく駅検索
     searchStation() {
-      let keyword = this.rideStationTextFieldModel;
+      let keyword = "";
+      if (!this.isRideStationFixed) {
+        keyword = this.rideStationTextFieldModel;
+      } else {
+        keyword = this.dropStationTextFieldModel;
+      }
 
       this.getStationListByKeyword(keyword)
         .then(stationList => {
@@ -354,7 +361,7 @@ export default {
     },
     rideStationUnfix() {
       this.isRideStationFixed = false;
-      if (!this.isDropStationFixed) {
+      if (isEmpty(this.dropStationTextFieldModel)) {
         this.showDropStationTextField = false;
         this.suggestListStyle.position = 'relative'
         this.suggestListStyle.top = '-50px'
@@ -420,6 +427,12 @@ export default {
       this.dropStationUnfix();
     },
 
+    // swapボタンを押したとき
+    swapTextField() {
+      // フィールドの内容を交換
+      this.dropStationTextFieldModel = [this.rideStationTextFieldModel, this.rideStationTextFieldModel = this.dropStationTextFieldModel][0];
+      this.isDropStationFixed = [this.isRideStationFixed, this.isRideStationFixed = this.isDropStationFixed][0];
+    },
 
     /**********************************/
     /*******  Map (Leaflet.js)  *******/
