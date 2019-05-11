@@ -17,13 +17,32 @@
     <div class="pa-3">
       <!-- 検索フィールドの幅を指定 -->
       <v-card-text style="width: 320px; position: relative;">
-        <!-- 検索フィールド -->
-        <v-toolbar absolute flat height="50px" style="border-radius:10px 10px 0px 0px;">
+        <!-- 検索フィールド(乗車駅) -->
+        <v-toolbar absolute flat height="50px" v-bind:style="rideStationTextFieldStyle">
           <v-toolbar-side-icon></v-toolbar-side-icon>
           <v-text-field
             clearable
+            single-line
             label="乗車駅を入力"
-            v-model="textField"
+            v-model="rideStationTextField"
+            ref="rideStationTextFieldRef"
+            @keyup.enter="searchStation"
+          ></v-text-field>
+          <v-btn icon>
+            <v-icon>search</v-icon>
+          </v-btn>
+        </v-toolbar>
+      </v-card-text>
+      <v-card-text style="width: 320px; position: relative;">
+        <!-- 検索フィールド(降車駅) -->
+        <v-toolbar v-show="showDropStationTextField" absolute flat height="50px" v-bind:style="dropStationTextFieldStyle">
+          <v-toolbar-side-icon></v-toolbar-side-icon>
+          <v-text-field
+            clearable
+            single-line
+            label="降車駅を入力"
+            v-model="dropStationTextField"
+            ref="dropStationTextFieldRef"
             @keyup.enter="searchStation"
           ></v-text-field>
           <v-btn icon>
@@ -32,37 +51,33 @@
         </v-toolbar>
       </v-card-text>
       <!-- サジェストのリスト -->
-      <v-card-text style="width: 352px; position: relative; top: -20px; left:-16px; padding-top:30px;">
-        <v-list subheader absolute avatar v-show="hasResult" style="background-color:#f5f5f5; border-radius:0px 0px 10px 10px;">
+      <v-card-text v-bind:style="suggestListStyle">
+        <v-list subheader absolute avatar v-show="showSuggestList" style="background-color:#f5f5f5; border-radius:0px 0px 10px 10px;">
           <v-subheader>候補...</v-subheader>
           <v-list-tile
-            v-for="buildingInfo in buildingList.slice(0, 5)"
-            :key="buildingInfo.stationId"
-            @click="onClickStationList(buildingInfo)" >
+            v-for="stationInfo in stationList.slice(0, 5)"
+            :key="stationInfo.stationId"
+            @click="onClickStationList(stationInfo)" >
             <v-list-tile-avatar>
               <v-icon large>train</v-icon>
             </v-list-tile-avatar>
             <v-list-tile-content>
-              <v-list-tile-title v-text="buildingInfo.name"></v-list-tile-title>
-              <!-- <v-list-tile-sub-title 
-                v-text="lines.railway_name" 
-                v-for="lines in buildingInfo.lines.slice(0, 3)" 
-                :key="lines.station_id">
-              </v-list-tile-sub-title> -->
+              <v-list-tile-title v-text="stationInfo.name"></v-list-tile-title>
               <v-list-tile-sub-title>
-                <div v-if="buildingInfo.lines.length>=2">
-                  <v-text
-                  v-for="lines in buildingInfo.lines.slice(0, 3)"
+                <!-- 2路線以上だと最後の路線の後に，が入って少し見づらい -->
+                <div v-if="stationInfo.lines.length>=2">
+                  <span
+                  v-for="lines in stationInfo.lines.slice(0, 3)"
                   :key="lines.station_id"
                   v-text="lines.railway_name + '，' "
-                  ></v-text>
+                  ></span>
                 </div>
                 <div v-else>
-                  <v-text
-                  v-for="lines in buildingInfo.lines.slice(0, 3)"
+                  <span
+                  v-for="lines in stationInfo.lines"
                   :key="lines.station_id"
                   v-text="lines.railway_name"
-                  ></v-text>
+                  ></span>
                 </div>
               </v-list-tile-sub-title>
             </v-list-tile-content>
@@ -137,13 +152,37 @@ export default {
       },
       // markerList: 地図上にプロットされるマーカーのリスト
       markerList: [],
-      // stationList,buildingList: キーワード検索結果のリスト
+      // stationList: キーワード検索結果のリスト
       stationList: [],
-      buildingList: [],
-      // textField: キーワード検索欄の文字列
-      textField: "",
+      // rideStationTextField,dropStationTextField: キーワード検索欄の文字列
+      rideStationTextField: "",
+      dropStationTextField: "",
       // hasResult: キーワード検索の結果があるかどうかのフラグ
-      hasResult: false
+      hasResult: false,
+      // showDropStationTextField: 降車駅を入力するフィールドを表示するかのフラグ
+      showDropStationTextField: false,
+      // showSuggestList: キーワード検索の結果リストを表示するかのフラグ
+      showSuggestList: false,
+      rideStationFixed: false,
+      dropStationFixed: false,
+      // 表示によってテキストフィールドの角を丸めるためのスタイル指定
+      rideStationTextFieldStyle: {
+        borderRadius: '10px'
+      },
+      dropStationTextFieldStyle: {
+        marginTop: '18px',
+        borderRadius: '10px'
+      },
+      // suggestリストをフィールドに合わせて移動するためのスタイル指定
+      suggestListStyle: {
+        width: '352px',
+        position: 'relative',
+        top: '-50px',
+        left: '-16px',
+        paddingTop: '30px'
+      }
+
+      
     };
   },
   methods: {
@@ -184,9 +223,9 @@ export default {
 
       try {
         let resp = await axios.get(`http://${window.location.hostname}:1323/buildings/suggest?keyword=${keyword}`);
-        let buildingList = Array();
+        let stationList = Array();
 
-        buildingList = resp.data.map(elem => ({
+        stationList = resp.data.map(elem => ({
           lat: elem.latitude,
           lng: elem.longitude,
           name: elem.name,
@@ -194,7 +233,7 @@ export default {
           lines: elem.lines
         }));
 
-        return buildingList;
+        return stationList;
       } catch (error) {
         console.error(`ERROR @ getBuildingListByKeyword (${keyword})`);
         throw error;
@@ -263,7 +302,7 @@ export default {
 
     // キーワードに基づく駅検索
     searchStation() {
-      let keyword = this.textField;
+      let keyword = this.rideStationTextField;
 
       this.getStationListByKeyword(keyword)
         .then(stationList => {
@@ -297,6 +336,21 @@ export default {
     // キーワード検索結果の候補をクリックしたとき
     onClickStationList(stationInfo) {
       this.forcusToStation(stationInfo);
+      this.markerList = [stationInfo];
+      this.showSuggestList = false;
+      // 乗車駅の入力
+      if (!this.showDropStationTextField) { 
+        this.showDropStationTextField = true;
+        this.rideStationTextField = stationInfo.name;
+        this.suggestListStyle.top = '0px'
+        this.dropStationTextFieldStyle.borderRadius = "0px 0px 10px 10px";
+        this.rideStationFixed = true;
+      } // 降車駅の入力
+      else {
+        this.dropStationTextField = stationInfo.name;
+        this.dropStationFixed = true;
+        this.dropStationTextFieldStyle.borderRadius = "0px 0px 10px 10px";
+      }
     },
 
     /**********************************/
@@ -329,24 +383,86 @@ export default {
 
   // 変数の監視処理
   watch: {
-    // textField: キーワード検索文字列
-    textField(str) {
-      // 何も入力されてなければリストを非表示
+    // rideStationTextField: キーワード検索文字列
+    rideStationTextField(str) {
+      if(this.showDropStationTextField) {
+        return;
+      }
+      if(this.rideStationFixed) {
+        this.rideStationFixed = false;
+      }
+      // 何も入力されてなければリストを非表示にする
       if (isEmpty(str)) {
         this.hasResult = false;
+        this.showSuggestList = false;
       } else {
-        this.getBuildingListByKeyword(this.textField)
-          .then(buildingList => {
-            if (buildingList.length >= 1) {
-              this.buildingList = buildingList;
+        this.getBuildingListByKeyword(this.rideStationTextField)
+          .then(stationList => {
+            if (stationList.length >= 1) {
+              this.stationList = stationList;
               this.hasResult = true;
+                if(this.rideStationFixed) {
+                  this.showSuggestList = false;
+              } else {
+                this.showSuggestList = true;
+              }
             }
           })
           .catch(error => {
             console.log(error);
           });
       }
+    },
+    dropStationTextField(str) {
+      // テキストフィールドが編集されたときのFixed解除
+      // if (this.dropStationFixed && this.stationList[0].name == str) {
+      //   this.dropStationFixed = false;
+      // }
+      if(!this.showDropStationTextField) {
+        return;
+      }
+      // 何も入力されてなければリストを非表示
+      if (isEmpty(str)) {
+        this.hasResult = false;
+        this.showSuggestList = false;
+      } else {
+        this.getBuildingListByKeyword(this.dropStationTextField)
+          .then(stationList => {
+            if (stationList.length >= 1) {
+              this.stationList = stationList;
+              this.hasResult = true;
+              if (this.dropStationFixed) {
+                this.showSuggestList = false;
+              } else {
+                this.showSuggestList = true;
+              }
+            }
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      }
+    },
+    hasResult() {
+      // リザルトに変更があった場合のデザイン
+      if (this.hasResult | this.showDropStationTextField) { 
+        this.rideStationTextFieldStyle.borderRadius = "10px 10px 0px 0px";
+      } else {
+        this.rideStationTextFieldStyle.borderRadius = "10px";
+      }
+      // 下にサジェストが表示されている
+      if (this.showSuggestList) {
+        this.dropStationTextFieldStyle.borderRadius = "0px";
+      }
+    },
+    showDropStationTextField() {
+      if (this.hasResult | this.showDropStationTextField) { 
+        this.rideStationTextFieldStyle.borderRadius = "10px 10px 0px 0px";
+      } else {
+        this.rideStationTextFieldStyle.borderRadius = "10px";
+      }
     }
+  
   }
 };
 
@@ -354,4 +470,4 @@ export default {
 function isEmpty(str) {
   return !str || /^\s*$/.test(str);
 }
-</script>
+</script> 
