@@ -306,13 +306,16 @@ export default {
     },
 
     // キーワードに完全一致した駅にフォーカスする
+    // 戻り値: true=1つ以上の駅が見つかった場合, false=見つからなかった場合
     checkCompleteMatchAndForcus(keyword) {
       const matchedToKeywordCompletely = this.stationList.filter(elem => elem.name == keyword);
       if (matchedToKeywordCompletely.length > 0) {
         // マッチした中で1番目の駅にフォーカス
         this.forcusToStation(matchedToKeywordCompletely[0]);
         this.markerList = [matchedToKeywordCompletely[0]];
+        return true;
       }
+      return false;
     },
 
     // キーワードに基づく駅検索
@@ -328,7 +331,14 @@ export default {
         });
       // もし完全一致する駅が存在すれば検索結果の
       // 1つ目の駅にフォーカス
-      this.checkCompleteMatchAndForcus(keyword);
+      if (this.checkCompleteMatchAndForcus(keyword)) {
+        // 乗車駅の編集
+        if(!this.isRideStationFixed) { 
+          this.rideStationFix();
+        } else { // 降車駅 
+          this.dropStationFix();
+        }
+      }
     },
     rideStationFix() {
         this.showDropStationTextField = true;
@@ -341,10 +351,12 @@ export default {
         this.isRideStationFixed = true;
         this.showInputDetailsModal = true;
         this.flatToolbar = true;
+        this.showSuggestList = false;
     },
     dropStationFix() {
       this.isDropStationFixed = true;
       this.dropStationToolbarStyle.borderRadius = "0px 0px 10px 10px";
+      this.showSuggestList = false;
     },
 
     /*****************************************************************/
@@ -367,10 +379,9 @@ export default {
     onClickStationList(stationInfo) {
       this.forcusToStation(stationInfo);
       this.markerList = [stationInfo];
-      this.showSuggestList = false;
       // 乗車駅の入力
-      // TODO:あとでなおす
-      if (!this.showDropStationTextField) { 
+      // TODO:両方確定した後に両方消して降車駅を編集するとバグがあると思う。フィールドを消すかフォーカスが当たっているフィールドを検出するなどして対処が必要
+      if (!this.isRideStationFixed) { 
         this.rideStationTextFieldModel = stationInfo.name;
         this.rideStationFix();
       } // 降車駅の入力
