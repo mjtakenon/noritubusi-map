@@ -22,7 +22,35 @@
         style="position: absolute; top:120px;"
         transition="slide-x-transition"
         v-show="showInputDetailsModal"
-      ></v-card>
+      >
+      <v-list subheader v-navigation-drawer v-show="isRideStationFixed" >
+        <v-subheader v-text="rideStationTextFieldModel"></v-subheader>
+          <v-list-group
+            v-for="l in rideStation.lines"
+            :key="l.railway_name" 
+            @click="onClickRailwayList(l)"
+            no-action>
+            <template v-slot:activator>
+              <v-list-tile-avatar>
+                <v-icon>train</v-icon>
+              </v-list-tile-avatar>
+              <v-list-tile>
+                <v-list-tile-content>
+                  <v-list-tile-title> {{ l.railway_name }} </v-list-tile-title>
+                </v-list-tile-content>
+              </v-list-tile>
+            </template>
+            <v-list-tile>
+              <!-- v-for="subItem in item.items"
+              :key="subItem.title"
+            > -->
+              <v-list-tile-content>
+                <v-list-tile-title> hoge </v-list-tile-title>
+              </v-list-tile-content>
+            </v-list-tile>
+        </v-list-group>
+      </v-list>
+    </v-card>
     </v-slide-x-transition>
     <v-slide-x-transition>
       <v-card
@@ -41,7 +69,7 @@
         <!-- 検索フィールド(乗車駅) -->
         <v-toolbar absolute height="50px" v-bind:style="rideStationToolbarStyle" v-bind:flat="flatToolbar">
           <v-toolbar-side-icon style="color:#FFFFFF"></v-toolbar-side-icon>
-          <v-text-field clearable single-line dark　autofocus
+          <v-text-field clearable single-line dark autofocus
             label="乗車駅を入力"
             tabindex="1"
             v-model="rideStationTextFieldModel"
@@ -56,7 +84,6 @@
       <v-card-text style="width: 320px; position: relative;">
         <!-- 検索フィールド(降車駅) -->
         <v-toolbar v-show="showDropStationTextField" absolute height="50px" v-bind:style="dropStationToolbarStyle" v-bind:flat="flatToolbar">
-          <!-- <v-toolbar-side-icon></v-toolbar-side-icon> -->
           <v-btn icon style="color:#FFFFFF" @click="swapTextField">
             <v-icon>swap_vert</v-icon>
           </v-btn>
@@ -167,6 +194,8 @@ export default {
       markerList: [],
       // stationList: キーワード検索結果のリスト
       stationList: [],
+      // rideStation: 乗車駅に接続している駅のリスト
+      rideStation: [],
       // rideStationTextFieldModel, dropStationTextFieldModel: キーワード検索欄の文字列
       rideStationTextFieldModel: "",
       dropStationTextFieldModel: "",
@@ -315,7 +344,7 @@ export default {
         // マッチした中で1番目の駅にフォーカス
         this.forcusToStation(matchedToKeywordCompletely[0]);
         this.markerList = [matchedToKeywordCompletely[0]];
-        return true;
+        return matchedToKeywordCompletely[0];
       }
       return false;
     },
@@ -338,16 +367,17 @@ export default {
         });
       // もし完全一致する駅が存在すれば検索結果の
       // 1つ目の駅にフォーカス
-      if (this.checkCompleteMatchAndForcus(keyword)) {
+      var result = this.checkCompleteMatchAndForcus(keyword);
+      if (!result=== false) {
         // 乗車駅の編集
         if(!this.isRideStationFixed) { 
-          this.rideStationFix();
+          this.rideStationFix(result);
         } else { // 降車駅 
-          this.dropStationFix();
+          this.dropStationFix(result);
         }
       }
     },
-    rideStationFix() {
+    rideStationFix(stationInfo) {
         this.showDropStationTextField = true;
         this.suggestListStyle.position = 'absolute'
         this.suggestListStyle.top = '120px'
@@ -358,6 +388,7 @@ export default {
         this.showInputDetailsModal = true;
         this.flatToolbar = true;
         this.showSuggestList = false;
+        this.rideStation = stationInfo;
     },
     rideStationUnfix() {
       this.isRideStationFixed = false;
@@ -371,12 +402,14 @@ export default {
         this.showInputDetailsModal = false;
         this.flatToolbar = false;
         this.showSuggestList = false;
+        this.rideStation = [];
       }
     },
-    dropStationFix() {
+    dropStationFix(stationInfo) {
       this.isDropStationFixed = true;
       this.dropStationToolbarStyle.borderRadius = "0px 0px 10px 10px";
       this.showSuggestList = false;
+      this.dropStation = stationInfo;
     },
     dropStationUnfix() {
       this.isDropStationFixed = false;
@@ -411,12 +444,17 @@ export default {
       // 乗車駅の入力
       if (!this.isRideStationFixed) { 
         this.rideStationTextFieldModel = stationInfo.name;
-        this.rideStationFix();
+        this.rideStationFix(stationInfo);
       } // 降車駅の入力
       else {
         this.dropStationTextFieldModel = stationInfo.name;
-        this.dropStationFix();
+        this.dropStationFix(stationInfo);
       }
+    },
+
+    // 路線名をクリックしたとき
+    onClickRailwayList(railwayInfo) {
+      console.log(railwayInfo);
     },
 
     // テキストフィールドのクリアボタンを押したとき
