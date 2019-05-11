@@ -13,13 +13,34 @@
       <l-tile-layer :url="urlTileMap"></l-tile-layer>
       <TMarker v-for="marker in markerList" :key="marker.id" :data="marker"/>
     </l-map>
+    <!-- 路線登録時に左から出てくるメニュー -->
+    <v-slide-x-transition>
+      <v-card
+        light
+        height="100%"
+        width="340px"
+        style="position: absolute; top:120px;"
+        transition="slide-x-transition"
+        v-show="showInputDetailsModal"
+      ></v-card>
+    </v-slide-x-transition>
+    <v-slide-x-transition>
+      <v-card
+        light
+        height="120px"
+        width="340px"
+        style="position: absolute; top:0px; background-color:#2196f3"
+        transition="slide-x-transition"
+        v-show="showInputDetailsModal"
+      ></v-card>
+    </v-slide-x-transition>
     <!-- floatingっぽく見せるためのpadding -->
-    <div class="pa-3">
+    <div class="pa-2">
       <!-- 検索フィールドの幅を指定 -->
       <v-card-text style="width: 320px; position: relative;">
         <!-- 検索フィールド(乗車駅) -->
         <v-toolbar absolute flat height="50px" v-bind:style="rideStationTextFieldStyle">
-          <v-toolbar-side-icon style="color:#EEEEEE"></v-toolbar-side-icon>
+          <v-toolbar-side-icon style="color:#FFFFFF"></v-toolbar-side-icon>
           <v-text-field
             clearable
             single-line
@@ -29,7 +50,7 @@
             ref="rideStationTextFieldRef"
             @keyup.enter="searchStation"
           ></v-text-field>
-          <v-btn icon style="color:#EEEEEE">
+          <v-btn icon style="color:#FFFFFF">
             <v-icon>search</v-icon>
           </v-btn>
         </v-toolbar>
@@ -38,7 +59,7 @@
         <!-- 検索フィールド(降車駅) -->
         <v-toolbar v-show="showDropStationTextField" absolute flat height="50px" v-bind:style="dropStationTextFieldStyle">
           <!-- <v-toolbar-side-icon></v-toolbar-side-icon> -->
-          <v-btn icon style="color:#EEEEEE">
+          <v-btn icon style="color:#FFFFFF">
             <v-icon>swap_vert</v-icon>
           </v-btn>
           <v-text-field
@@ -50,44 +71,46 @@
             ref="dropStationTextFieldRef"
             @keyup.enter="searchStation"
           ></v-text-field>
-          <v-btn icon style="color:#EEEEEE">
+          <v-btn icon style="color:#FFFFFF">
             <v-icon>search</v-icon>
           </v-btn>
         </v-toolbar>
       </v-card-text>
       <!-- サジェストのリスト -->
       <v-card-text v-bind:style="suggestListStyle">
-        <v-list subheader absolute avatar v-show="showSuggestList" style="background-color:#f5f5f5; border-radius:0px 0px 10px 10px;">
-          <v-subheader>候補...</v-subheader>
-          <v-list-tile
-            v-for="stationInfo in stationList.slice(0, 5)"
-            :key="stationInfo.stationId"
-            @click="onClickStationList(stationInfo)" >
-            <v-list-tile-avatar>
-              <v-icon large>train</v-icon>
-            </v-list-tile-avatar>
-            <v-list-tile-content>
-              <v-list-tile-title v-text="stationInfo.name"></v-list-tile-title>
-              <v-list-tile-sub-title>
-                <!-- 2路線以上だと最後の路線の後に，が入って少し見づらい -->
-                <div v-if="stationInfo.lines.length>=2">
-                  <span
-                  v-for="lines in stationInfo.lines.slice(0, 3)"
-                  :key="lines.station_id"
-                  v-text="lines.railway_name + '，' "
-                  ></span>
-                </div>
-                <div v-else>
-                  <span
-                  v-for="lines in stationInfo.lines"
-                  :key="lines.station_id"
-                  v-text="lines.railway_name"
-                  ></span>
-                </div>
-              </v-list-tile-sub-title>
-            </v-list-tile-content>
-          </v-list-tile>
-        </v-list>
+        <v-slide-y-transition>
+          <v-list subheader absolute avatar v-show="showSuggestList" style="background-color:#f5f5f5; border-radius:0px 0px 10px 10px;">
+            <v-subheader>候補...</v-subheader>
+            <v-list-tile
+              v-for="stationInfo in stationList.slice(0, 5)"
+              :key="stationInfo.stationId"
+              @click="onClickStationList(stationInfo)" >
+              <v-list-tile-avatar>
+                <v-icon large>train</v-icon>
+              </v-list-tile-avatar>
+              <v-list-tile-content>
+                <v-list-tile-title v-text="stationInfo.name"></v-list-tile-title>
+                <v-list-tile-sub-title>
+                  <!-- 2路線以上だと最後の路線の後に，が入って少し見づらい -->
+                  <div v-if="stationInfo.lines.length>=2">
+                    <span
+                    v-for="lines in stationInfo.lines.slice(0, 3)"
+                    :key="lines.station_id"
+                    v-text="lines.railway_name + '，' "
+                    ></span>
+                  </div>
+                  <div v-else>
+                    <span
+                    v-for="lines in stationInfo.lines"
+                    :key="lines.station_id"
+                    v-text="lines.railway_name"
+                    ></span>
+                  </div>
+                </v-list-tile-sub-title>
+              </v-list-tile-content>
+            </v-list-tile>
+          </v-list>
+        </v-slide-y-transition>
       </v-card-text>
         <v-btn
           absolute
@@ -168,6 +191,9 @@ export default {
       showDropStationTextField: false,
       // showSuggestList: キーワード検索の結果リストを表示するかのフラグ
       showSuggestList: false,
+      // showInputDetailsModal: 駅登録の詳細を入力できるよう左から出てくるモーダル
+      showInputDetailsModal: false,
+      // rideStationFixed, dropStationFixed: それぞれのテキストフィールドが確定しているか
       rideStationFixed: false,
       dropStationFixed: false,
       // 表示によってテキストフィールドの角を丸めるためのスタイル指定
@@ -352,6 +378,8 @@ export default {
         this.suggestListStyle.top = '0px'
         this.dropStationTextFieldStyle.borderRadius = "0px 0px 10px 10px";
         this.rideStationFixed = true;
+        this.showInputDetailsModal = true;
+
       } // 降車駅の入力
       else {
         this.dropStationTextField = stationInfo.name;
