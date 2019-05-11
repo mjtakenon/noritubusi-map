@@ -39,15 +39,11 @@
       <!-- 検索フィールドの幅を指定 -->
       <v-card-text style="width: 320px; position: relative;">
         <!-- 検索フィールド(乗車駅) -->
-        <v-toolbar absolute flat height="50px" v-bind:style="rideStationTextFieldStyle">
+        <v-toolbar absolute height="50px" v-bind:style="rideStationToolbarStyle" v-bind:flat="flatToolbar">
           <v-toolbar-side-icon style="color:#FFFFFF"></v-toolbar-side-icon>
-          <v-text-field
-            clearable
-            single-line
+          <v-text-field clearable single-line dark
             label="乗車駅を入力"
-            v-model="rideStationTextField"
-            dark
-            ref="rideStationTextFieldRef"
+            v-model="rideStationTextFieldModel"
             @keyup.enter="searchStation"
           ></v-text-field>
           <v-btn icon style="color:#FFFFFF">
@@ -57,18 +53,14 @@
       </v-card-text>
       <v-card-text style="width: 320px; position: relative;">
         <!-- 検索フィールド(降車駅) -->
-        <v-toolbar v-show="showDropStationTextField" absolute flat height="50px" v-bind:style="dropStationTextFieldStyle">
+        <v-toolbar v-show="showDropStationTextField" absolute height="50px" v-bind:style="dropStationToolbarStyle" v-bind:flat="flatToolbar">
           <!-- <v-toolbar-side-icon></v-toolbar-side-icon> -->
           <v-btn icon style="color:#FFFFFF">
             <v-icon>swap_vert</v-icon>
           </v-btn>
-          <v-text-field
-            clearable
-            single-line
+          <v-text-field clearable single-line dark
             label="降車駅を入力"
-            v-model="dropStationTextField"
-            dark
-            ref="dropStationTextFieldRef"
+            v-model="dropStationTextFieldModel"
             @keyup.enter="searchStation"
           ></v-text-field>
           <v-btn icon style="color:#FFFFFF">
@@ -112,29 +104,18 @@
           </v-list>
         </v-slide-y-transition>
       </v-card-text>
-        <v-btn
-          absolute
-          dark
-          fab
-          bottom
-          right
-          style="margin-bottom:75px; color:gray; background-color:gray;"
-          color="gray"
-        >
-          <v-icon>my_location</v-icon>
-        </v-btn>
-        <v-btn
-          absolute
-          dark
-          fab
-          bottom
-          right
-          style="margin-bottom:150px;"
-          color="blue"
-          @click="onClickMyLocationIcon"
-        >
-          <v-icon>search</v-icon>
-        </v-btn>
+      <!-- 左下のFloatingActionButton -->
+      <v-btn absolute dark fab bottom right color="gray"
+        style="margin-bottom:75px; color:gray; background-color:gray;"
+      >
+        <v-icon>my_location</v-icon>
+      </v-btn>
+      <v-btn absolute dark fab bottom right color="blue"
+        style="margin-bottom:150px;"
+        @click="onClickMyLocationIcon"
+      >
+        <v-icon>search</v-icon>
+      </v-btn>
     </div>
   </div>
 </template>
@@ -182,9 +163,11 @@ export default {
       markerList: [],
       // stationList: キーワード検索結果のリスト
       stationList: [],
-      // rideStationTextField,dropStationTextField: キーワード検索欄の文字列
-      rideStationTextField: "",
-      dropStationTextField: "",
+      // rideStationTextFieldModel, dropStationTextFieldModel: キーワード検索欄の文字列
+      rideStationTextFieldModel: "",
+      dropStationTextFieldModel: "",
+      // flatToolbar: 検索バーのデザインをflatにするか
+      flatToolbar: false,
       // hasResult: キーワード検索の結果があるかどうかのフラグ
       hasResult: false,
       // showDropStationTextField: 降車駅を入力するフィールドを表示するかのフラグ
@@ -193,15 +176,15 @@ export default {
       showSuggestList: false,
       // showInputDetailsModal: 駅登録の詳細を入力できるよう左から出てくるモーダル
       showInputDetailsModal: false,
-      // rideStationFixed, dropStationFixed: それぞれのテキストフィールドが確定しているか
-      rideStationFixed: false,
-      dropStationFixed: false,
+      // isRideStationFixed, isDropStationFixed: それぞれのテキストフィールドが確定しているか
+      isRideStationFixed: false,
+      isDropStationFixed: false,
       // 表示によってテキストフィールドの角を丸めるためのスタイル指定
-      rideStationTextFieldStyle: {
+      rideStationToolbarStyle: {
         borderRadius: '10px',
         backgroundColor: '#2196f3'
       },
-      dropStationTextFieldStyle: {
+      dropStationToolbarStyle: {
         marginTop: '18px',
         borderRadius: '10px',
         backgroundColor: '#2196f3'
@@ -335,7 +318,7 @@ export default {
 
     // キーワードに基づく駅検索
     searchStation() {
-      let keyword = this.rideStationTextField;
+      let keyword = this.rideStationTextFieldModel;
 
       this.getStationListByKeyword(keyword)
         .then(stationList => {
@@ -373,18 +356,23 @@ export default {
       this.showSuggestList = false;
       // 乗車駅の入力
       if (!this.showDropStationTextField) { 
+        // RideStationFixed()
         this.showDropStationTextField = true;
-        this.rideStationTextField = stationInfo.name;
-        this.suggestListStyle.top = '0px'
-        this.dropStationTextFieldStyle.borderRadius = "0px 0px 10px 10px";
-        this.rideStationFixed = true;
+        this.rideStationTextFieldModel = stationInfo.name;
+        this.suggestListStyle.position = 'absolute'
+        this.suggestListStyle.top = '120px'
+        this.suggestListStyle.width = '372px'
+        this.suggestListStyle.paddingTop = '0px'
+        this.suggestListStyle.borderRadius = '0px'
+        this.dropStationToolbarStyle.borderRadius = "0px 0px 10px 10px";
+        this.isRideStationFixed = true;
         this.showInputDetailsModal = true;
-
+        this.flatToolbar = true;
       } // 降車駅の入力
       else {
-        this.dropStationTextField = stationInfo.name;
-        this.dropStationFixed = true;
-        this.dropStationTextFieldStyle.borderRadius = "0px 0px 10px 10px";
+        this.dropStationTextFieldModel = stationInfo.name;
+        this.isDropStationFixed = true;
+        this.dropStationToolbarStyle.borderRadius = "0px 0px 10px 10px";
       }
     },
 
@@ -418,25 +406,25 @@ export default {
 
   // 変数の監視処理
   watch: {
-    // rideStationTextField: キーワード検索文字列
-    rideStationTextField(str) {
+    // rideStationTextFieldModel: キーワード検索文字列
+    rideStationTextFieldModel(str) {
       if(this.showDropStationTextField) {
         return;
       }
-      if(this.rideStationFixed) {
-        this.rideStationFixed = false;
+      if(this.isRideStationFixed) {
+        this.isRideStationFixed = false;
       }
       // 何も入力されてなければリストを非表示にする
       if (isEmpty(str)) {
         this.hasResult = false;
         this.showSuggestList = false;
       } else {
-        this.getBuildingListByKeyword(this.rideStationTextField)
+        this.getBuildingListByKeyword(this.rideStationTextFieldModel)
           .then(stationList => {
             if (stationList.length >= 1) {
               this.stationList = stationList;
               this.hasResult = true;
-                if(this.rideStationFixed) {
+                if(this.isRideStationFixed) {
                   this.showSuggestList = false;
               } else {
                 this.showSuggestList = true;
@@ -448,10 +436,10 @@ export default {
           });
       }
     },
-    dropStationTextField(str) {
+    dropStationTextFieldModel(str) {
       // テキストフィールドが編集されたときのFixed解除
-      // if (this.dropStationFixed && this.stationList[0].name == str) {
-      //   this.dropStationFixed = false;
+      // if (this.isDropStationFixed && this.stationList[0].name == str) {
+      //   this.isDropStationFixed = false;
       // }
       if(!this.showDropStationTextField) {
         return;
@@ -461,12 +449,12 @@ export default {
         this.hasResult = false;
         this.showSuggestList = false;
       } else {
-        this.getBuildingListByKeyword(this.dropStationTextField)
+        this.getBuildingListByKeyword(this.dropStationTextFieldModel)
           .then(stationList => {
             if (stationList.length >= 1) {
               this.stationList = stationList;
               this.hasResult = true;
-              if (this.dropStationFixed) {
+              if (this.isDropStationFixed) {
                 this.showSuggestList = false;
               } else {
                 this.showSuggestList = true;
@@ -481,20 +469,20 @@ export default {
     hasResult() {
       // リザルトに変更があった場合のデザイン
       if (this.hasResult | this.showDropStationTextField) { 
-        this.rideStationTextFieldStyle.borderRadius = "10px 10px 0px 0px";
+        this.rideStationToolbarStyle.borderRadius = "10px 10px 0px 0px";
       } else {
-        this.rideStationTextFieldStyle.borderRadius = "10px";
+        this.rideStationToolbarStyle.borderRadius = "10px";
       }
       // 下にサジェストが表示されている
       if (this.showSuggestList) {
-        this.dropStationTextFieldStyle.borderRadius = "0px";
+        this.dropStationToolbarStyle.borderRadius = "0px";
       }
     },
     showDropStationTextField() {
       if (this.hasResult | this.showDropStationTextField) { 
-        this.rideStationTextFieldStyle.borderRadius = "10px 10px 0px 0px";
+        this.rideStationToolbarStyle.borderRadius = "10px 10px 0px 0px";
       } else {
-        this.rideStationTextFieldStyle.borderRadius = "10px";
+        this.rideStationToolbarStyle.borderRadius = "10px";
       }
     }
   
