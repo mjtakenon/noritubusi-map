@@ -45,6 +45,7 @@
             label="乗車駅を入力"
             v-model="rideStationTextFieldModel"
             @keyup.enter="searchStation"
+            @click:clear="rideStationTextFieldCleared"
           ></v-text-field>
           <v-btn icon style="color:#FFFFFF">
             <v-icon>search</v-icon>
@@ -62,6 +63,7 @@
             label="降車駅を入力"
             v-model="dropStationTextFieldModel"
             @keyup.enter="searchStation"
+            @click:clear="dropStationTextFieldCleared"
           ></v-text-field>
           <v-btn icon style="color:#FFFFFF">
             <v-icon>search</v-icon>
@@ -197,8 +199,6 @@ export default {
         left: '-16px',
         paddingTop: '30px'
       }
-
-      
     };
   },
   methods: {
@@ -346,17 +346,38 @@ export default {
         this.suggestListStyle.top = '120px'
         this.suggestListStyle.width = '372px'
         this.suggestListStyle.paddingTop = '0px'
-        this.suggestListStyle.borderRadius = '0px'
         this.dropStationToolbarStyle.borderRadius = "0px 0px 10px 10px";
         this.isRideStationFixed = true;
         this.showInputDetailsModal = true;
         this.flatToolbar = true;
         this.showSuggestList = false;
     },
+    rideStationUnfix() {
+      this.isRideStationFixed = false;
+      if (!this.isDropStationFixed) {
+        this.showDropStationTextField = false;
+        this.suggestListStyle.position = 'relative'
+        this.suggestListStyle.top = '-50px'
+        this.suggestListStyle.width = '352px'
+        this.suggestListStyle.paddingTop = '30px'
+        this.dropStationToolbarStyle.borderRadius = "0px";
+        this.showInputDetailsModal = false;
+        this.flatToolbar = false;
+        this.showSuggestList = false;
+      }
+    },
     dropStationFix() {
       this.isDropStationFixed = true;
       this.dropStationToolbarStyle.borderRadius = "0px 0px 10px 10px";
       this.showSuggestList = false;
+    },
+    dropStationUnfix() {
+      this.isDropStationFixed = false;
+      this.dropStationToolbarStyle.borderRadius = "0px";
+      this.showSuggestList = false;
+      if (!this.isRideStationFixed) {
+        this.rideStationUnfix();
+      }
     },
 
     /*****************************************************************/
@@ -379,8 +400,8 @@ export default {
     onClickStationList(stationInfo) {
       this.forcusToStation(stationInfo);
       this.markerList = [stationInfo];
+      this.stationList = [stationInfo];
       // 乗車駅の入力
-      // TODO:両方確定した後に両方消して降車駅を編集するとバグがあると思う。フィールドを消すかフォーカスが当たっているフィールドを検出するなどして対処が必要
       if (!this.isRideStationFixed) { 
         this.rideStationTextFieldModel = stationInfo.name;
         this.rideStationFix();
@@ -390,6 +411,15 @@ export default {
         this.dropStationFix();
       }
     },
+
+    // テキストフィールドのクリアボタンを押したとき
+    rideStationTextFieldCleared() {
+      this.rideStationUnfix();
+    },
+    dropStationTextFieldCleared() {
+      this.dropStationUnfix();
+    },
+
 
     /**********************************/
     /*******  Map (Leaflet.js)  *******/
@@ -423,11 +453,13 @@ export default {
   watch: {
     // rideStationTextFieldModel: キーワード検索文字列
     rideStationTextFieldModel(str) {
-      if(this.showDropStationTextField) {
-        return;
-      }
-      if(this.isRideStationFixed) {
-        this.isRideStationFixed = false;
+      // 入力確定後に変更があり、それが候補と違えば確定を解除
+      if (this.isRideStationFixed) {
+        if (str != this.stationList[0].name) {
+          this.rideStationUnfix();
+        } else {
+          this.showSuggestList = true;
+        }
       }
       // 何も入力されてなければリストを非表示にする
       if (isEmpty(str)) {
@@ -439,8 +471,8 @@ export default {
             if (stationList.length >= 1) {
               this.stationList = stationList;
               this.hasResult = true;
-                if(this.isRideStationFixed) {
-                  this.showSuggestList = false;
+              if(this.isRideStationFixed) {
+                this.showSuggestList = false;
               } else {
                 this.showSuggestList = true;
               }
@@ -452,12 +484,9 @@ export default {
       }
     },
     dropStationTextFieldModel(str) {
-      // テキストフィールドが編集されたときのFixed解除
-      // if (this.isDropStationFixed && this.stationList[0].name == str) {
-      //   this.isDropStationFixed = false;
-      // }
-      if(!this.showDropStationTextField) {
-        return;
+      // 入力確定後に変更があり、それが候補と違えば確定を解除
+      if(this.isDropStationFixed && str != this.stationList[0].name) {
+        this.dropStationUnfix();
       }
       // 何も入力されてなければリストを非表示
       if (isEmpty(str)) {
