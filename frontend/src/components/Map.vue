@@ -19,16 +19,17 @@
       <v-card-text style="width: 320px; position: relative;">
         <!-- 検索フィールド(乗車駅) -->
         <v-toolbar absolute flat height="50px" v-bind:style="rideStationTextFieldStyle">
-          <v-toolbar-side-icon></v-toolbar-side-icon>
+          <v-toolbar-side-icon style="color:#EEEEEE"></v-toolbar-side-icon>
           <v-text-field
             clearable
             single-line
             label="乗車駅を入力"
             v-model="rideStationTextField"
+            dark
             ref="rideStationTextFieldRef"
             @keyup.enter="searchStation"
           ></v-text-field>
-          <v-btn icon>
+          <v-btn icon style="color:#EEEEEE">
             <v-icon>search</v-icon>
           </v-btn>
         </v-toolbar>
@@ -36,16 +37,20 @@
       <v-card-text style="width: 320px; position: relative;">
         <!-- 検索フィールド(降車駅) -->
         <v-toolbar v-show="showDropStationTextField" absolute flat height="50px" v-bind:style="dropStationTextFieldStyle">
-          <v-toolbar-side-icon></v-toolbar-side-icon>
+          <!-- <v-toolbar-side-icon></v-toolbar-side-icon> -->
+          <v-btn icon style="color:#EEEEEE">
+            <v-icon>swap_vert</v-icon>
+          </v-btn>
           <v-text-field
             clearable
             single-line
             label="降車駅を入力"
             v-model="dropStationTextField"
+            dark
             ref="dropStationTextFieldRef"
             @keyup.enter="searchStation"
           ></v-text-field>
-          <v-btn icon>
+          <v-btn icon style="color:#EEEEEE">
             <v-icon>search</v-icon>
           </v-btn>
         </v-toolbar>
@@ -167,11 +172,13 @@ export default {
       dropStationFixed: false,
       // 表示によってテキストフィールドの角を丸めるためのスタイル指定
       rideStationTextFieldStyle: {
-        borderRadius: '10px'
+        borderRadius: '10px',
+        backgroundColor: '#2196f3'
       },
       dropStationTextFieldStyle: {
         marginTop: '18px',
-        borderRadius: '10px'
+        borderRadius: '10px',
+        backgroundColor: '#2196f3'
       },
       // suggestリストをフィールドに合わせて移動するためのスタイル指定
       suggestListStyle: {
