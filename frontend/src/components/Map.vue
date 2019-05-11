@@ -261,17 +261,16 @@ export default {
       console.log(`Keyword: ${keyword}`);
 
       try {
-        let resp = await axios.get(`http://${window.location.hostname}:1323/stations/suggest?keyword=${keyword}`);
+        // let resp = await axios.get(`http://${window.location.hostname}:1323/stations/suggest?keyword=${keyword}`);
+        let resp = await axios.get(`http://${window.location.hostname}:1323/buildings/suggest?keyword=${keyword}`);
         let stationList = Array();
 
         stationList = resp.data.map(elem => ({
           lat: elem.latitude,
           lng: elem.longitude,
-          stationName: elem.name,
-          railwayName: elem.railway_line_name,
-          orderInRailway: elem.order_in_railway,
-          stationId: elem.station_id,
-          buildingId: elem.building_id
+          name: elem.name,
+          id: elem.building_id,
+          lines: elem.lines
         }));
 
         return stationList;
@@ -308,11 +307,11 @@ export default {
 
     // キーワードに完全一致した駅にフォーカスする
     checkCompleteMatchAndForcus(keyword) {
-      const matchedToKeywordCompletely = this.stationList.filter(elem => elem.stationName == keyword);
-
+      const matchedToKeywordCompletely = this.stationList.filter(elem => elem.name == keyword);
       if (matchedToKeywordCompletely.length > 0) {
         // マッチした中で1番目の駅にフォーカス
         this.forcusToStation(matchedToKeywordCompletely[0]);
+        this.markerList = [matchedToKeywordCompletely[0]];
       }
     },
 
@@ -327,10 +326,25 @@ export default {
         .catch(error => {
           console.error(error);
         });
-
       // もし完全一致する駅が存在すれば検索結果の
       // 1つ目の駅にフォーカス
       this.checkCompleteMatchAndForcus(keyword);
+    },
+    rideStationFix() {
+        this.showDropStationTextField = true;
+        this.suggestListStyle.position = 'absolute'
+        this.suggestListStyle.top = '120px'
+        this.suggestListStyle.width = '372px'
+        this.suggestListStyle.paddingTop = '0px'
+        this.suggestListStyle.borderRadius = '0px'
+        this.dropStationToolbarStyle.borderRadius = "0px 0px 10px 10px";
+        this.isRideStationFixed = true;
+        this.showInputDetailsModal = true;
+        this.flatToolbar = true;
+    },
+    dropStationFix() {
+      this.isDropStationFixed = true;
+      this.dropStationToolbarStyle.borderRadius = "0px 0px 10px 10px";
     },
 
     /*****************************************************************/
@@ -355,24 +369,14 @@ export default {
       this.markerList = [stationInfo];
       this.showSuggestList = false;
       // 乗車駅の入力
+      // TODO:あとでなおす
       if (!this.showDropStationTextField) { 
-        // RideStationFixed()
-        this.showDropStationTextField = true;
         this.rideStationTextFieldModel = stationInfo.name;
-        this.suggestListStyle.position = 'absolute'
-        this.suggestListStyle.top = '120px'
-        this.suggestListStyle.width = '372px'
-        this.suggestListStyle.paddingTop = '0px'
-        this.suggestListStyle.borderRadius = '0px'
-        this.dropStationToolbarStyle.borderRadius = "0px 0px 10px 10px";
-        this.isRideStationFixed = true;
-        this.showInputDetailsModal = true;
-        this.flatToolbar = true;
+        this.rideStationFix();
       } // 降車駅の入力
       else {
         this.dropStationTextFieldModel = stationInfo.name;
-        this.isDropStationFixed = true;
-        this.dropStationToolbarStyle.borderRadius = "0px 0px 10px 10px";
+        this.dropStationFix();
       }
     },
 
@@ -485,7 +489,6 @@ export default {
         this.rideStationToolbarStyle.borderRadius = "10px";
       }
     }
-  
   }
 };
 
