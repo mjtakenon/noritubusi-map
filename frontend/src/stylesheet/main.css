@@ -5,3 +5,13 @@
 .float-toolbar {
   margin: 16px !important;
 }
+
+h1.popup {
+  border-left: 12px solid yellowgreen;
+  padding-left: 6px;
+}
+
+.circle-icon {
+  margin-left: -12px;
+  margin-top: -5px;
+}
