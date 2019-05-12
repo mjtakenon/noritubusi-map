@@ -1,18 +1,17 @@
 <template>
   <l-popup>
-    <!-- ID:{{ this.data.id }} -->
-    <H1>{{ this.data.name }}</H1>
+    <H1 class="popup">{{ this.popupInfo.name }}</H1>
     <v-list dense>
       <v-list-tile
-        v-for="(l, idx) in this.data.lines"
+        v-for="(line, idx) in this.popupInfo.lines"
         :key="idx"
         @click="companyNameClicked(idx)"
       >
         <v-list-tile-avatar>
-          <H2>{{icon}}</H2>
+          <H2>{{listIcon}}</H2>
         </v-list-tile-avatar>
         <v-list-tile-content>
-          <v-list-tile-title>{{ data.lines[idx].railway_name }}</v-list-tile-title>
+          <v-list-tile-title>{{ line.railway_name }}</v-list-tile-title>
         </v-list-tile-content>
       </v-list-tile>
     </v-list>
@@ -27,14 +26,14 @@ export default {
     LPopup
   },
   props: {
-    data: {
+    popupInfo: {
       type: Object,
       required: true
     }
   },
   data() {
     return {
-      icon: ""
+      listIcon: ""
     };
   },
   methods: {
@@ -44,15 +43,7 @@ export default {
   },
   mounted: function() {
     this.$nextTick(function() {
-      this.icon = "🚊";
-      // アイコンの指定
-      // if (this.data.railwayName[0].indexOf("新幹線") !== -1) {
-      //   // 新幹線
-      //   this.icon = "🚆";
-      // } else {
-      //   // それ以外
-      //   this.icon = "🚊";
-      // }
+      this.listIcon = "🚊";
     });
   }
 };
