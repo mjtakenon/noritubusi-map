@@ -23,6 +23,7 @@
         transition="slide-x-transition"
         v-show="showInputDetailsModal"
       >
+      <!-- 路線から駅を選択するリスト -->
       <v-list subheader v-show="isRideStationFixed" >
         <v-subheader v-text="rideStationTextFieldModel"></v-subheader>
         <v-list-group
@@ -38,9 +39,12 @@
                 </v-list-tile-content>
               </v-list-tile>
           </template>
-          <v-list-tile>
+          <v-list-tile 
+          v-for="(ll, idx) in suggestedDropStationList"
+          :key="idx"
+          @click="onClickSuggestedDropStation(ll)">
             <v-list-tile-content>
-              <v-list-tile-title> hoge </v-list-tile-title>
+              <v-list-tile-title> {{ ll }} </v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
         </v-list-group>
@@ -131,8 +135,9 @@
         </v-slide-y-transition>
       </v-card-text>
       <!-- 左下のFloatingActionButton -->
-      <v-btn absolute dark fab bottom right color="gray"
-        style="margin-bottom:75px; color:gray; background-color:gray;"
+      <v-btn absolute dark fab bottom right color="pink"
+        style="margin-bottom:75px;"
+        @click="onClickGetCurrentPosition"
       >
         <v-icon>my_location</v-icon>
       </v-btn>
@@ -189,8 +194,12 @@ export default {
       markerList: [],
       // stationList: キーワード検索結果のリスト
       stationList: [],
-      // rideStation: 乗車駅に接続している駅のリスト
+      // rideStation: 乗車駅
       rideStation: [],
+      // drioStation: 降車駅
+      dropStation: [],
+      // suggestedDropStationList: 乗車駅に接続している駅のリスト
+      suggestedDropStationList: [],
       // rideStationTextFieldModel, dropStationTextFieldModel: キーワード検索欄の文字列
       rideStationTextFieldModel: "",
       dropStationTextFieldModel: "",
@@ -449,7 +458,29 @@ export default {
 
     // 路線名をクリックしたとき
     onClickRailwayList(railwayInfo) {
+      // 実装?
+      // this.getStationListByRailwayName(railwayInfo.railway_name)
+      this.suggestedDropStationList = [ "駅1", "駅2", "駅3" ];
       console.log(railwayInfo);
+    },
+
+    // サジェストされた降車駅をクリックしたとき
+    onClickSuggestedDropStation(stationInfo) {
+      console.log(stationInfo)
+    },
+
+    // 現在地ボタンをクリックしたとき
+    onClickGetCurrentPosition() {
+      navigator.geolocation.getCurrentPosition(this.getCurrentPositionCompleted);
+    },
+
+    // 位置情報の取得が完了したとき
+    getCurrentPositionCompleted(pos) {
+
+      this.$refs.mainMap.mapObject.panTo([pos.coords.latitude, pos.coords.longitude]);
+      // this.$refs.mainMap.mapObject.setView(new L.LatLng(pos.coords.latitude,  pos.coords.longitude), this.zoom);
+      // 移動後の場所にピンを立てようとしても移動前の場所になってしまう
+      // this.onClickMyLocationIcon();
     },
 
     // テキストフィールドのクリアボタンを押したとき
@@ -484,7 +515,7 @@ export default {
     // 表示範囲が変更されたとき
     onUpdateBounds(bounds) {
       this.bounds = bounds;
-    }
+    },
   },
 
   // このコンポーネントがマウントされたときに実行される処理
