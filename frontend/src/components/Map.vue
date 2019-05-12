@@ -23,31 +23,26 @@
         transition="slide-x-transition"
         v-show="showInputDetailsModal"
       >
-      <v-list subheader v-navigation-drawer v-show="isRideStationFixed" >
+      <v-list subheader v-show="isRideStationFixed" >
         <v-subheader v-text="rideStationTextFieldModel"></v-subheader>
-          <v-list-group
-            v-for="l in rideStation.lines"
-            :key="l.railway_name" 
-            @click="onClickRailwayList(l)"
-            no-action>
-            <template v-slot:activator>
-              <v-list-tile-avatar>
-                <v-icon>train</v-icon>
-              </v-list-tile-avatar>
+        <v-list-group
+          v-for="l in rideStation.lines"
+          :key="l.railway_name" 
+          @click="onClickRailwayList(l)"
+          no-action
+          :prepend-icon="'train'">
+          <template v-slot:activator>
               <v-list-tile>
                 <v-list-tile-content>
                   <v-list-tile-title> {{ l.railway_name }} </v-list-tile-title>
                 </v-list-tile-content>
               </v-list-tile>
-            </template>
-            <v-list-tile>
-              <!-- v-for="subItem in item.items"
-              :key="subItem.title"
-            > -->
-              <v-list-tile-content>
-                <v-list-tile-title> hoge </v-list-tile-title>
-              </v-list-tile-content>
-            </v-list-tile>
+          </template>
+          <v-list-tile>
+            <v-list-tile-content>
+              <v-list-tile-title> hoge </v-list-tile-title>
+            </v-list-tile-content>
+          </v-list-tile>
         </v-list-group>
       </v-list>
     </v-card>
