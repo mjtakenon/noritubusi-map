@@ -111,12 +111,14 @@
       ></v-card>
     </v-slide-x-transition>
     <!-- floatingっぽく見せるためのpadding -->
-    <div class="pa-2">
+    <div class="pa-2" style="z-index:0">
       <!-- 検索フィールドの幅を指定 -->
       <v-card-text style="width: 320px; position: relative;">
         <!-- 検索フィールド(乗車駅) -->
         <v-toolbar absolute height="50px" v-bind:style="rideStationToolbarStyle" v-bind:flat="flatToolbar">
-          <v-toolbar-side-icon style="color:#FFFFFF"></v-toolbar-side-icon>
+          <v-toolbar-side-icon style="color:#FFFFFF"
+          @click="onClickSideIcon()"
+          ></v-toolbar-side-icon>
           <v-text-field clearable single-line dark autofocus
             label="乗車駅を入力"
             tabindex="1"
@@ -197,6 +199,64 @@
         <v-icon>search</v-icon>
       </v-btn>
     </div>
+    <v-slide-x-transition>
+      <v-card
+        height="100%"
+        width="300px"
+        style="position: absolute; top:0px; z-index:10; padding:10px;"
+        transition="slide-x-transition"
+        v-show="showSideMenu"
+      >
+        <v-list>
+          <v-list-tile>
+            <v-list-tile-avatar>
+              <v-icon x-large>portrait</v-icon>
+            </v-list-tile-avatar>
+            <v-list-tile-content>
+              <v-list-tile-title> 未ログイン </v-list-tile-title>
+            </v-list-tile-content>
+          </v-list-tile>
+        </v-list>
+        <div class="text-xs-center">
+          <v-btn> アカウント登録 </v-btn>
+          <v-btn> ログイン </v-btn>
+        </div>
+        <v-list>
+          <v-list-tile @click="showSideMenu=!showSideMenu">
+            <v-list-tile-avatar>
+              <v-icon>train</v-icon>
+            </v-list-tile-avatar>
+            <v-list-tile-content>
+              <v-list-tile-title> 乗車記録をつける </v-list-tile-title>
+            </v-list-tile-content>
+          </v-list-tile>
+          <v-list-tile @click="showSideMenu=!showSideMenu">
+            <v-list-tile-avatar>
+              <v-icon>search</v-icon>
+            </v-list-tile-avatar>
+            <v-list-tile-content>
+              <v-list-tile-title> 乗車記録を見る </v-list-tile-title>
+            </v-list-tile-content>
+          </v-list-tile>
+          <v-list-tile @click="showSideMenu=!showSideMenu">
+            <v-list-tile-avatar>
+              <v-icon>edit</v-icon>
+            </v-list-tile-avatar>
+            <v-list-tile-content>
+              <v-list-tile-title> 乗車記録を編集する </v-list-tile-title>
+            </v-list-tile-content>
+          </v-list-tile>
+        </v-list>
+      </v-card>
+    </v-slide-x-transition>
+    <v-card
+      height="100%"
+      width="100%"
+      style="position: absolute; top:0px; z-index:9; background-color:black; opacity:0.2;"
+      v-show="showSideMenu"
+      @click="showSideMenu=!showSideMenu"
+    >
+    </v-card>
   </div>
 </template>
 <script>
@@ -258,6 +318,8 @@ export default {
       flatToolbar: false,
       // hasResult: キーワード検索の結果があるかどうかのフラグ
       hasResult: false,
+      // showSideMenu: ログイン処理などのメニューを表示するかのフラグ
+      showSideMenu: false,
       // showDropStationTextField: 降車駅を入力するフィールドを表示するかのフラグ
       showDropStationTextField: false,
       // showSuggestList: キーワード検索の結果リストを表示するかのフラグ
@@ -498,16 +560,10 @@ export default {
     /************************** Event Handlers ***********************/
     /*****************************************************************/
 
-    // ツールバーの「現在地」アイコンを押したとき
-    onClickMyLocationIcon() {
-      this.getMarkersInCurrentRect()
-        .then(markerList => {
-          this.markerList = markerList;
-          console.log(this.markerList);
-        })
-        .catch(error => {
-          console.error(error);
-        });
+
+    // ツールバーのメニューを開くアイコン(サイドアイコン)を押したとき
+    onClickSideIcon() {
+      this.showSideMenu = true;
     },
 
     // キーワード検索結果の候補をクリックしたとき
@@ -573,10 +629,23 @@ export default {
       console.log("register")
     },
 
-    // 現在地ボタンをクリックしたとき
+    // 現在地に移動するフローティングアクションボタンをクリックしたとき
     onClickGetCurrentPosition() {
       navigator.geolocation.getCurrentPosition(this.getCurrentPositionCompleted);
     },
+
+    // 現在地付近の駅を表示するフローティングアクションボタンをクリックしたとき
+    onClickMyLocationIcon() {
+      this.getMarkersInCurrentRect()
+        .then(markerList => {
+          this.markerList = markerList;
+          console.log(this.markerList);
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    },
+
 
     // 位置情報の取得が完了したとき
     getCurrentPositionCompleted(pos) {
