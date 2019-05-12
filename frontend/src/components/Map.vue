@@ -11,7 +11,8 @@
       @update:bounds="onUpdateBounds"
     >
       <l-tile-layer :url="urlTileMap"></l-tile-layer>
-      <TMarker v-for="marker in markerList" :key="marker.id" :data="marker"/>
+      <TMarker v-for="marker in markerList" :key="marker.id" :markerInfo="marker"/>
+      <l-marker :lat-lng="myLocation" v-if="myLocation"></l-marker>
     </l-map>
     <!-- 路線登録時に左から出てくるメニュー -->
     <v-slide-x-transition>
@@ -30,22 +31,24 @@
           <div v-if="!isDropStationFixed">
             <v-list-group
               v-for="l in rideStation.lines"
-              :key="l.railway_name" 
+              :key="l.railway_name"
               @click="onClickRideRailwayList(l)"
-              :prepend-icon="'train'">
+              :prepend-icon="'train'"
+            >
               <template v-slot:activator>
                 <v-list-tile>
                   <v-list-tile-content>
-                    <v-list-tile-title> {{ l.railway_name }} </v-list-tile-title>
+                    <v-list-tile-title>{{ l.railway_name }}</v-list-tile-title>
                   </v-list-tile-content>
                 </v-list-tile>
               </template>
-              <v-list-tile 
-              v-for="(s, idx) in suggestedDropStationList"
-              :key="idx"
-              @click="onClickSuggestedDropStation(s,l)">
+              <v-list-tile
+                v-for="(s, idx) in suggestedDropStationList"
+                :key="idx"
+                @click="onClickSuggestedDropStation(s,l)"
+              >
                 <v-list-tile-content>
-                  <v-list-tile-title> {{ s }} </v-list-tile-title>
+                  <v-list-tile-title>{{ s }}</v-list-tile-title>
                 </v-list-tile-content>
               </v-list-tile>
             </v-list-group>
@@ -55,27 +58,26 @@
             <!-- 路線数が1の場合 -->
             <v-list-group :prepend-icon="'train'" v-if="rideRailway.length==1">
               <template v-slot:activator>
-                <div>
-                  {{ rideRailway[0].railway_name }}
-                </div>
+                <div>{{ rideRailway[0].railway_name }}</div>
               </template>
               <v-list-tile>
                 <v-list-tile-content>
-                  <v-list-tile-title> hoge </v-list-tile-title>
+                  <v-list-tile-title>hoge</v-list-tile-title>
                 </v-list-tile-content>
               </v-list-tile>
             </v-list-group>
             <!-- 路線数が複数 -->
             <v-list v-else-if="rideRailway.length>=2">
-              <v-list-tile 
+              <v-list-tile
                 v-for="(r, idx) in rideRailway"
                 :key="idx"
-                @click="onClickUseRailwayList(r)">
+                @click="onClickUseRailwayList(r)"
+              >
                 <v-list-tile-avatar>
                   <v-icon>train</v-icon>
                 </v-list-tile-avatar>
                 <v-list-tile-content>
-                  <v-list-tile-title> {{ r.railway_name }} </v-list-tile-title>
+                  <v-list-tile-title>{{ r.railway_name }}</v-list-tile-title>
                 </v-list-tile-content>
               </v-list-tile>
             </v-list>
@@ -86,18 +88,22 @@
                   <v-icon>warning</v-icon>
                 </v-list-tile-avatar>
                 <v-list-tile-content>
-                  <v-list-tile-title> 共通の路線がありません </v-list-tile-title>
+                  <v-list-tile-title>共通の路線がありません</v-list-tile-title>
                 </v-list-tile-content>
               </v-list-tile>
             </v-list>
           </div>
           <v-subheader v-if="isDropStationFixed" v-text="dropStationTextFieldModel"></v-subheader>
         </v-list>
-        <v-btn absolute right color="#2196f3"
-          v-show="isDropStationFixed && isRideStationFixed" 
-          v-bind:disabled="!(isDropStationFixed && isRideStationFixed)" 
-          v-bind:dark="isDropStationFixed && isRideStationFixed" 
-          @click="onClickRegisterButton()"> 登録 </v-btn>
+        <v-btn
+          absolute
+          right
+          color="#2196f3"
+          v-show="isDropStationFixed && isRideStationFixed"
+          v-bind:disabled="!(isDropStationFixed && isRideStationFixed)"
+          v-bind:dark="isDropStationFixed && isRideStationFixed"
+          @click="onClickRegisterButton()"
+        >登録</v-btn>
       </v-card>
     </v-slide-x-transition>
     <v-slide-x-transition>
@@ -115,9 +121,18 @@
       <!-- 検索フィールドの幅を指定 -->
       <v-card-text style="width: 320px; position: relative;">
         <!-- 検索フィールド(乗車駅) -->
-        <v-toolbar absolute height="50px" v-bind:style="rideStationToolbarStyle" v-bind:flat="flatToolbar">
+        <v-toolbar
+          absolute
+          height="50px"
+          v-bind:style="rideStationToolbarStyle"
+          v-bind:flat="flatToolbar"
+        >
           <v-toolbar-side-icon style="color:#FFFFFF"></v-toolbar-side-icon>
-          <v-text-field clearable single-line dark autofocus
+          <v-text-field
+            clearable
+            single-line
+            dark
+            autofocus
             label="乗車駅を入力"
             tabindex="1"
             v-model="rideStationTextFieldModel"
@@ -131,11 +146,20 @@
       </v-card-text>
       <v-card-text style="width: 320px; position: relative;">
         <!-- 検索フィールド(降車駅) -->
-        <v-toolbar v-show="showDropStationTextField" absolute height="50px" v-bind:style="dropStationToolbarStyle" v-bind:flat="flatToolbar">
+        <v-toolbar
+          v-show="showDropStationTextField"
+          absolute
+          height="50px"
+          v-bind:style="dropStationToolbarStyle"
+          v-bind:flat="flatToolbar"
+        >
           <v-btn icon style="color:#FFFFFF" @click="swapTextField">
             <v-icon>swap_vert</v-icon>
           </v-btn>
-          <v-text-field clearable single-line dark
+          <v-text-field
+            clearable
+            single-line
+            dark
             label="降車駅を入力"
             tabindex="2"
             v-model="dropStationTextFieldModel"
@@ -150,12 +174,19 @@
       <!-- サジェストのリスト -->
       <v-card-text v-bind:style="suggestListStyle">
         <v-slide-y-transition>
-          <v-list subheader absolute avatar v-show="showSuggestList" style="background-color:#f5f5f5; border-radius:0px 0px 10px 10px;">
+          <v-list
+            subheader
+            absolute
+            avatar
+            v-show="showSuggestList"
+            style="background-color:#f5f5f5; border-radius:0px 0px 10px 10px;"
+          >
             <v-subheader>候補...</v-subheader>
             <v-list-tile
               v-for="stationInfo in stationList.slice(0, 5)"
               :key="stationInfo.stationId"
-              @click="onClickStationList(stationInfo)" >
+              @click="onClickStationList(stationInfo)"
+            >
               <v-list-tile-avatar>
                 <v-icon large>train</v-icon>
               </v-list-tile-avatar>
@@ -165,16 +196,16 @@
                   <!-- 2路線以上だと最後の路線の後に，が入って少し見づらい -->
                   <div v-if="stationInfo.lines.length>=2">
                     <span
-                    v-for="lines in stationInfo.lines.slice(0, 3)"
-                    :key="lines.station_id"
-                    v-text="lines.railway_name + '，' "
+                      v-for="lines in stationInfo.lines.slice(0, 3)"
+                      :key="lines.station_id"
+                      v-text="lines.railway_name + '，' "
                     ></span>
                   </div>
                   <div v-else>
                     <span
-                    v-for="lines in stationInfo.lines"
-                    :key="lines.station_id"
-                    v-text="lines.railway_name"
+                      v-for="lines in stationInfo.lines"
+                      :key="lines.station_id"
+                      v-text="lines.railway_name"
                     ></span>
                   </div>
                 </v-list-tile-sub-title>
@@ -184,15 +215,27 @@
         </v-slide-y-transition>
       </v-card-text>
       <!-- 左下のFloatingActionButton -->
-      <v-btn absolute dark fab bottom right color="pink"
+      <v-btn
+        absolute
+        dark
+        fab
+        bottom
+        right
+        color="pink"
         style="margin-bottom:75px;"
         @click="onClickGetCurrentPosition()"
       >
         <v-icon>my_location</v-icon>
       </v-btn>
-      <v-btn absolute dark fab bottom right color="blue"
+      <v-btn
+        absolute
+        dark
+        bottom
+        fab
+        right
+        color="blue"
         style="margin-bottom:150px;"
-        @click="onClickMyLocationIcon()"
+        @click="onClickSearchIcon()"
       >
         <v-icon>search</v-icon>
       </v-btn>
@@ -201,7 +244,7 @@
 </template>
 <script>
 // Module: vue2-leaflet
-import { LMap, LTileLayer } from "vue2-leaflet";
+import { LMap, LTileLayer, LMarker, LIcon } from "vue2-leaflet";
 import TMarker from "./Marker";
 import "leaflet/dist/leaflet.css";
 
@@ -210,8 +253,10 @@ import axios from "axios";
 export default {
   components: {
     LMap,
+    LIcon,
     LTileLayer,
-    TMarker
+    TMarker,
+    LMarker
   },
   data() {
     return {
@@ -269,41 +314,38 @@ export default {
       isDropStationFixed: false,
       // 表示によってテキストフィールドの角を丸めるためのスタイル指定
       rideStationToolbarStyle: {
-        borderRadius: '10px',
-        backgroundColor: '#2196f3'
+        borderRadius: "10px",
+        backgroundColor: "#2196f3"
       },
       dropStationToolbarStyle: {
-        marginTop: '18px',
-        borderRadius: '10px',
-        backgroundColor: '#2196f3'
+        marginTop: "18px",
+        borderRadius: "10px",
+        backgroundColor: "#2196f3"
       },
       // suggestリストをフィールドに合わせて移動するためのスタイル指定
       suggestListStyle: {
-        width: '352px',
-        position: 'relative',
-        top: '-50px',
-        left: '-16px',
-        paddingTop: '30px'
-      }
+        width: "352px",
+        position: "relative",
+        top: "-50px",
+        left: "-16px",
+        paddingTop: "30px"
+      },
+      myLocation: null
     };
   },
   methods: {
     // 現在位置にある駅舎一覧を取得する
     async getMarkersInCurrentRect() {
       try {
-        let resp = await axios.get(
-          `
-          http://${window.location.hostname}:1323/buildings`,
-          {
-            params: {
-              begin_latitude: this.bounds._northEast.lat,
-              begin_longitude: this.bounds._northEast.lng,
-              end_latitude: this.bounds._southWest.lat,
-              end_longitude: this.bounds._southWest.lng
-            }
+        let resp = await axios.get(`http://${window.location.hostname}:1323/buildings`, {
+          params: {
+            begin_latitude: this.bounds._northEast.lat,
+            begin_longitude: this.bounds._northEast.lng,
+            end_latitude: this.bounds._southWest.lat,
+            end_longitude: this.bounds._southWest.lng
           }
-        );
-        
+        });
+
         let markers = resp.data.map(elem => ({
           lat: elem.latitude,
           lng: elem.longitude,
@@ -318,7 +360,7 @@ export default {
         throw error;
       }
     },
-    
+
     // キーワードから駅を検索して、駅一覧リストを取得する(建物単位)
     async getBuildingListByKeyword(keyword) {
       console.log(`Keyword: ${keyword}`);
@@ -423,32 +465,33 @@ export default {
       // もし完全一致する駅が存在すれば検索結果の
       // 1つ目の駅にフォーカス
       var result = this.checkCompleteMatchAndForcus(keyword);
-      if (!result=== false) {
+      if (!result === false) {
         // 乗車駅の編集
-        if(!this.isRideStationFixed) { 
+        if (!this.isRideStationFixed) {
           this.rideStationFix(result);
-          if(this.isDropStationFixed) {
-            this.checkRoute();      
+          if (this.isDropStationFixed) {
+            this.checkRoute();
           }
-        } else { // 降車駅 
+        } else {
+          // 降車駅
           this.dropStationFix(result);
-          this.checkRoute();      
+          this.checkRoute();
         }
       }
     },
     // 乗車駅の確定処理
     rideStationFix(stationInfo) {
-        this.showDropStationTextField = true;
-        this.suggestListStyle.position = 'absolute'
-        this.suggestListStyle.top = '120px'
-        this.suggestListStyle.width = '372px'
-        this.suggestListStyle.paddingTop = '0px'
-        this.dropStationToolbarStyle.borderRadius = "0px 0px 10px 10px";
-        this.isRideStationFixed = true;
-        this.showInputDetailsModal = true;
-        this.flatToolbar = true;
-        this.showSuggestList = false;
-        this.rideStation = stationInfo;
+      this.showDropStationTextField = true;
+      this.suggestListStyle.position = "absolute";
+      this.suggestListStyle.top = "120px";
+      this.suggestListStyle.width = "372px";
+      this.suggestListStyle.paddingTop = "0px";
+      this.dropStationToolbarStyle.borderRadius = "0px 0px 10px 10px";
+      this.isRideStationFixed = true;
+      this.showInputDetailsModal = true;
+      this.flatToolbar = true;
+      this.showSuggestList = false;
+      this.rideStation = stationInfo;
     },
     // 乗車駅の確定解除
     rideStationUnfix() {
@@ -457,10 +500,10 @@ export default {
 
       if (isEmpty(this.dropStationTextFieldModel)) {
         this.showDropStationTextField = false;
-        this.suggestListStyle.position = 'relative'
-        this.suggestListStyle.top = '-50px'
-        this.suggestListStyle.width = '352px'
-        this.suggestListStyle.paddingTop = '30px'
+        this.suggestListStyle.position = "relative";
+        this.suggestListStyle.top = "-50px";
+        this.suggestListStyle.width = "352px";
+        this.suggestListStyle.paddingTop = "30px";
         this.dropStationToolbarStyle.borderRadius = "0px";
         this.showInputDetailsModal = false;
         this.flatToolbar = false;
@@ -489,7 +532,7 @@ export default {
     /*****************************************************************/
 
     // ツールバーの「現在地」アイコンを押したとき
-    onClickMyLocationIcon() {
+    onClickSearchIcon() {
       this.getMarkersInCurrentRect()
         .then(markerList => {
           this.markerList = markerList;
@@ -506,7 +549,7 @@ export default {
       this.markerList = [stationInfo];
       this.stationList = [stationInfo];
       // 乗車駅の入力
-      if (!this.isRideStationFixed) { 
+      if (!this.isRideStationFixed) {
         this.rideStationTextFieldModel = stationInfo.name;
         this.rideStationFix(stationInfo);
         if (this.isDropStationFixed) {
@@ -516,7 +559,7 @@ export default {
       else {
         this.dropStationTextFieldModel = stationInfo.name;
         this.dropStationFix(stationInfo);
-        if(this.isRideStationFixed) {
+        if (this.isRideStationFixed) {
           this.checkRoute();
         }
         // TODO: rideRailwayの埋め
@@ -528,17 +571,26 @@ export default {
       console.log(railwayInfo);
       // 実装?
       // this.getStationListByRailwayName(railwayInfo.railway_name)
-      this.suggestedDropStationList = [ "駅1", "駅2", "駅3" ];
+      this.suggestedDropStationList = ["駅1", "駅2", "駅3"];
     },
-    
+
     // 後から使用した路線名をクリックしたとき
     onClickUseRailwayList(railwayInfo) {
       this.rideRailway = [railwayInfo];
     },
 
     // サジェストされた降車駅をクリックしたとき
-    onClickSuggestedDropStation(stationInfo,railwayInfo) {
-      stationInfo = {'id':1323, 'name': '浜松','lat': '34.703866','lng': '137.734759','lines': [{'railway_name': 'JR東海道本線(熱海～浜松)','station_id': 8517,'order_in_railway': 4},{'railway_name': 'JR東海道本線(浜松～岐阜)','station_id': 8819,'order_in_railway': 1}]};
+    onClickSuggestedDropStation(stationInfo, railwayInfo) {
+      stationInfo = {
+        id: 1323,
+        name: "浜松",
+        lat: "34.703866",
+        lng: "137.734759",
+        lines: [
+          { railway_name: "JR東海道本線(熱海～浜松)", station_id: 8517, order_in_railway: 4 },
+          { railway_name: "JR東海道本線(浜松～岐阜)", station_id: 8819, order_in_railway: 1 }
+        ]
+      };
       console.log(stationInfo);
       console.log(railwayInfo);
       // this.onClickStationList(stationInfo);
@@ -546,7 +598,7 @@ export default {
       this.markerList = [stationInfo];
       this.stationList = [stationInfo];
       // 乗車駅の入力
-      if (!this.isRideStationFixed) { 
+      if (!this.isRideStationFixed) {
         this.rideStationTextFieldModel = stationInfo.name;
         this.rideStationFix(stationInfo);
       } // 降車駅の入力
@@ -560,20 +612,21 @@ export default {
 
     // 登録ボタンをクリックしたとき
     onClickRegisterButton() {
-      console.log("register")
+      console.log("register");
     },
 
     // 現在地ボタンをクリックしたとき
     onClickGetCurrentPosition() {
-      navigator.geolocation.getCurrentPosition(this.getCurrentPositionCompleted);
-    },
-
-    // 位置情報の取得が完了したとき
-    getCurrentPositionCompleted(pos) {
-      this.$refs.mainMap.mapObject.panTo([pos.coords.latitude, pos.coords.longitude]);
-      // this.$refs.mainMap.mapObject.setView(new L.LatLng(pos.coords.latitude,  pos.coords.longitude), this.zoom);
-      // 移動後の場所にピンを立てようとしても移動前の場所になってしまう
-      // this.onClickMyLocationIcon();
+      navigator.geolocation.getCurrentPosition(pos => {
+        // 位置情報の取得が完了したとき
+        // this.$refs.mainMap.mapObject.setView(new L.LatLng(pos.coords.latitude,  pos.coords.longitude), this.zoom);
+        this.$refs.mainMap.mapObject.panTo([pos.coords.latitude, pos.coords.longitude]);
+        // 移動後の場所にピンを立てようとしても移動前の場所になってしまう
+        this.myLocation = {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude
+        };
+      });
     },
 
     // テキストフィールドのクリアボタンを押したとき
@@ -589,15 +642,18 @@ export default {
     // swapボタンを押したとき
     swapTextField() {
       // フィールドの内容を交換
-      this.dropStationTextFieldModel = [this.rideStationTextFieldModel, this.rideStationTextFieldModel = this.dropStationTextFieldModel][0];
-      this.isDropStationFixed = [this.isRideStationFixed, this.isRideStationFixed = this.isDropStationFixed][0];
+      this.dropStationTextFieldModel = [
+        this.rideStationTextFieldModel,
+        (this.rideStationTextFieldModel = this.dropStationTextFieldModel)
+      ][0];
+      this.isDropStationFixed = [this.isRideStationFixed, (this.isRideStationFixed = this.isDropStationFixed)][0];
     },
 
     // その区間の路線数を調べる
     checkRoute() {
-      var sameRailway = this.rideStation.lines.filter( function(d, index) {
+      var sameRailway = this.rideStation.lines.filter(function(d, index) {
         for (var r in this) {
-          if( this[r].railway_name === d.railway_name ) return d;
+          if (this[r].railway_name === d.railway_name) return d;
         }
       }, this.dropStation.lines);
       if (sameRailway.length == 0) {
@@ -624,7 +680,7 @@ export default {
     // 表示範囲が変更されたとき
     onUpdateBounds(bounds) {
       this.bounds = bounds;
-    },
+    }
   },
 
   // このコンポーネントがマウントされたときに実行される処理
@@ -657,7 +713,7 @@ export default {
             if (stationList.length >= 1) {
               this.stationList = stationList;
               this.hasResult = true;
-              if(this.isRideStationFixed) {
+              if (this.isRideStationFixed) {
                 this.showSuggestList = false;
               } else {
                 this.showSuggestList = true;
@@ -671,7 +727,7 @@ export default {
     },
     dropStationTextFieldModel(str) {
       // 入力確定後に変更があり、それが候補と違えば確定を解除
-      if(this.isDropStationFixed && str != this.stationList[0].name) {
+      if (this.isDropStationFixed && str != this.stationList[0].name) {
         this.dropStationUnfix();
       }
       // 何も入力されてなければリストを非表示
@@ -698,7 +754,7 @@ export default {
     },
     hasResult() {
       // リザルトに変更があった場合のデザイン
-      if (this.hasResult | this.showDropStationTextField) { 
+      if (this.hasResult | this.showDropStationTextField) {
         this.rideStationToolbarStyle.borderRadius = "10px 10px 0px 0px";
       } else {
         this.rideStationToolbarStyle.borderRadius = "10px";
@@ -709,7 +765,7 @@ export default {
       }
     },
     showDropStationTextField() {
-      if (this.hasResult | this.showDropStationTextField) { 
+      if (this.hasResult | this.showDropStationTextField) {
         this.rideStationToolbarStyle.borderRadius = "10px 10px 0px 0px";
       } else {
         this.rideStationToolbarStyle.borderRadius = "10px";
