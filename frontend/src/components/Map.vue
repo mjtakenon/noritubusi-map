@@ -391,8 +391,8 @@ export default {
       this.$refs.mainMap.mapObject.panTo([stationInfo.lat, stationInfo.lng]);
     },
 
-    // キーワードに完全一致した駅にフォーカスする
-    // 戻り値: true=1つ以上の駅が見つかった場合, false=見つからなかった場合
+    // キーワードに完全一致、または候補が1つしかない場合に駅にフォーカスする
+    // 戻り値: stationInfo=1つ以上の駅が見つかった場合, false=見つからなかった場合
     checkCompleteMatchAndForcus(keyword) {
       const matchedToKeywordCompletely = this.stationList.filter(elem => elem.name == keyword);
       if (matchedToKeywordCompletely.length > 0) {
@@ -400,6 +400,16 @@ export default {
         this.forcusToStation(matchedToKeywordCompletely[0]);
         this.markerList = [matchedToKeywordCompletely[0]];
         return matchedToKeywordCompletely[0];
+      }
+      if (this.stationList.length == 1) {
+        this.forcusToStation(this.stationList[0]);
+        this.markerList = this.stationList;
+        if(!this.isRideStationFixed) {
+          this.rideStationTextFieldModel = this.stationList[0].name;
+        } else {
+          this.dropStationTextFieldModel = this.stationList[0].name;
+        }
+        return this.stationList[0];
       }
       return false;
     },
@@ -519,7 +529,6 @@ export default {
         if(this.isRideStationFixed) {
           this.checkRoute();
         }
-        // TODO: rideRailwayの埋め
       }
     },
 
@@ -538,6 +547,7 @@ export default {
 
     // サジェストされた降車駅をクリックしたとき
     onClickSuggestedDropStation(stationInfo,railwayInfo) {
+      // TODO これはダミーデータなのでエンドポイントができ次第差し替える
       stationInfo = {'id':1323, 'name': '浜松','lat': '34.703866','lng': '137.734759','lines': [{'railway_name': 'JR東海道本線(熱海～浜松)','station_id': 8517,'order_in_railway': 4},{'railway_name': 'JR東海道本線(浜松～岐阜)','station_id': 8819,'order_in_railway': 1}]};
       console.log(stationInfo);
       console.log(railwayInfo);
@@ -595,6 +605,10 @@ export default {
 
     // その区間の路線数を調べる
     checkRoute() {
+      console.log("ride:");
+      console.log(this.rideStation);
+      console.log("drop:");
+      console.log(this.dropStation);
       var sameRailway = this.rideStation.lines.filter( function(d, index) {
         for (var r in this) {
           if( this[r].railway_name === d.railway_name ) return d;
