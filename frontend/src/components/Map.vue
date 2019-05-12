@@ -218,10 +218,10 @@
           </v-list-tile>
         </v-list>
         <div class="text-xs-center">
-          <v-btn> アカウント登録 </v-btn>
-          <v-btn> ログイン </v-btn>
+          <v-btn @click="showSignupMenu=true; showLoginMenu=false;"> アカウント登録 </v-btn>
+          <v-btn @click="showLoginMenu=true; showSignupMenu=false;"> ログイン </v-btn>
         </div>
-        <v-list>
+        <v-list v-if="!showSignupMenu && !showLoginMenu">
           <v-list-tile @click="showSideMenu=!showSideMenu">
             <v-list-tile-avatar>
               <v-icon>train</v-icon>
@@ -247,6 +247,61 @@
             </v-list-tile-content>
           </v-list-tile>
         </v-list>
+        <div v-else-if="showSignupMenu" class="pa-3">
+          <v-text-field
+            v-model="usernameModel"
+            label="ユーザー名"
+            :rules="[usernameRules.required]"
+            clearable
+          ></v-text-field>
+          <v-text-field
+            v-model="passwordModel"
+            :append-icon="showPassword ? 'visibility' : 'visibility_off'"
+            :rules="[passwordRules.required, passwordRules.min]"
+            :type="showPassword ? 'text' : 'password'"
+            label="パスワード"
+            hint="8文字以上で入力してください。"
+            counter
+            clearable
+            @click:append="showPassword = !showPassword"
+          ></v-text-field>
+          <v-text-field
+            v-model="passwordConfirmModel"
+            :append-icon="showPasswordConfirm ? 'visibility' : 'visibility_off'"
+            :rules="[passwordConfirmRules.required, passwordConfirmRules.passwordMatch]"
+            :type="showPasswordConfirm ? 'text' : 'password'"
+            label="パスワードの確認"
+            hint="8文字以上で入力してください。"
+            counter
+            clearable
+            @click:append="showPasswordConfirm = !showPasswordConfirm"
+          ></v-text-field>
+          <v-btn absolute right color="#2196f3"
+          v-bind:disabled="false" 
+          @click="onClickSignupButton()"> 登録 </v-btn>
+        </div>
+        <div v-else-if="showLoginMenu" class="pa-3">
+          <v-text-field
+            v-model="usernameModel"
+            label="ユーザー名"
+            :rules="[usernameRules.required]"
+            clearable
+          ></v-text-field>
+          <v-text-field
+            v-model="passwordModel"
+            :append-icon="showPassword ? 'visibility' : 'visibility_off'"
+            :rules="[passwordRules.required, passwordRules.min]"
+            :type="showPassword ? 'text' : 'password'"
+            label="パスワード"
+            hint="8文字以上で入力してください。"
+            counter
+            clearable
+            @click:append="showPassword = !showPassword"
+          ></v-text-field>
+          <v-btn absolute right color="#2196f3"
+          v-bind:disabled="false" 
+          @click="onClickSignupButton()"> ログイン </v-btn>
+        </div>
       </v-card>
     </v-slide-x-transition>
     <v-card
@@ -254,7 +309,7 @@
       width="100%"
       style="position: absolute; top:0px; z-index:9; background-color:black; opacity:0.2;"
       v-show="showSideMenu"
-      @click="showSideMenu=!showSideMenu"
+      @click="showSideMenu=false"
     >
     </v-card>
   </div>
@@ -314,12 +369,23 @@ export default {
       // rideStationTextFieldModel, dropStationTextFieldModel: キーワード検索欄の文字列
       rideStationTextFieldModel: "",
       dropStationTextFieldModel: "",
+      // usernameModel,passwordModel,passwordConfirmModel: ユーザー名,パスワード,確認のパスワードの文字列
+      usernameModel: "",
+      passwordModel: "",
+      passwordConfirmModel: "",
       // flatToolbar: 検索バーのデザインをflatにするか
       flatToolbar: false,
       // hasResult: キーワード検索の結果があるかどうかのフラグ
       hasResult: false,
       // showSideMenu: ログイン処理などのメニューを表示するかのフラグ
       showSideMenu: false,
+      // showSignupMenu: アカウント作成メニューを表示するかのフラグ
+      showSignupMenu: false,
+      // showLoginMenu: ログインメニューを表示するかのフラグ
+      showLoginMenu: false,
+      // showPassword, showPasswordConfirm: パスワードを表示するかどうかのフラグ
+      showPassword: false,
+      showPasswordConfirm: false,
       // showDropStationTextField: 降車駅を入力するフィールドを表示するかのフラグ
       showDropStationTextField: false,
       // showSuggestList: キーワード検索の結果リストを表示するかのフラグ
@@ -329,7 +395,7 @@ export default {
       // isRideStationFixed, isDropStationFixed: それぞれのテキストフィールドが確定しているか
       isRideStationFixed: false,
       isDropStationFixed: false,
-      // 表示によってテキストフィールドの角を丸めるためのスタイル指定
+      // rideStationToolbarStyle,dropStationToolbarStyle: 表示によってテキストフィールドの角を丸めるためのスタイル指定
       rideStationToolbarStyle: {
         borderRadius: '10px',
         backgroundColor: '#2196f3'
@@ -339,13 +405,27 @@ export default {
         borderRadius: '10px',
         backgroundColor: '#2196f3'
       },
-      // suggestリストをフィールドに合わせて移動するためのスタイル指定
+      // suggestListStyle: suggestリストをフィールドに合わせて移動するためのスタイル指定
       suggestListStyle: {
         width: '352px',
         position: 'relative',
         top: '-50px',
         left: '-16px',
         paddingTop: '30px'
+      },
+      // usernameRules: ユーザー名の制限
+      usernameRules: { 
+        required: value => !!value || 'このフィールドは必須です。'
+      },
+      // passwordRules: パスワードの制限
+      passwordRules: {
+        required: value => !!value || 'このフィールドは必須です。',
+        min: v => v.length >= 8 || '8文字以上で入力してください。',
+      },
+      // passwordConfirmRules: パスワードの制限
+      passwordConfirmRules: {
+        required: value => !!value || 'このフィールドは必須です。',
+        passwordMatch: value => (value === this.passwordModel) || 'メールアドレスまたはパスワードが一致していません。'
       }
     };
   },
