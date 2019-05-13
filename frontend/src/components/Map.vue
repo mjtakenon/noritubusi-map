@@ -218,18 +218,20 @@
             </v-list-tile-content>
           </v-list-tile>
         </v-list>
-        <v-alert
-          v-model="successAlertModel"
-          type="success"
-          dismissible
-        >
-          {{ successAlertMessage }}
-        </v-alert>
+          <v-alert
+            v-model="successAlertModel"
+            type="success"
+            dismissible
+            transition="slide-y-transition"
+          >
+            {{ successAlertMessage }}
+          </v-alert>
 
         <v-alert
           v-model="errorAlertModel"
           type="error"
           dismissible
+          transition="slide-y-transition"
         >
           {{ errorAlertMessage }}
         </v-alert>
@@ -708,19 +710,12 @@ export default {
     },
 
     // 登録ボタンを有効にできるかフォームの入力をチェックし更新
-    // TODO: バグあり、入力のたびにバリデーションを行うが前の入力に対して行っているようで、最後にユーザー名を入力しないと動かない
     signupFormUpdated() {
-      console.log(this.$refs.usernameRef.hasError);
-      console.log(this.$refs.passwordRef.hasError);
-      console.log(this.$refs.passwordConfirmRef.hasError);
-      this.signupFormHasError = this.$refs.usernameRef.hasError || this.$refs.passwordRef.hasError || this.$refs.passwordConfirmRef.hasError;
+      this.signupFormHasError = !this.usernameModel || !this.passwordModel || !(this.passwordModel.length>=8) || !(this.passwordModel==this.passwordConfirmModel);
     },
 
     loginFormUpdated() {
-      console.log(this.$refs.usernameRef.hasError);
-      console.log(this.$refs.passwordRef.hasError);
-      this.loginFormHasError = this.$refs.usernameRef.hasError || this.$refs.passwordRef.hasError;
-      console.log(this.loginFormHasError);
+      this.loginFormHasError = !this.usernameModel || !this.passwordModel || !(this.passwordModel.length>=8);
     },
 
 
@@ -781,7 +776,6 @@ export default {
           this.errorAlertMessage = "ログアウトに失敗しました。";
         });
     },
-
 
     // キーワード検索結果の候補をクリックしたとき
     onClickStationList(stationInfo, railwayInfo) {
@@ -928,7 +922,7 @@ export default {
 
   // このコンポーネントがマウントされたときに実行される処理
   mounted: function() {
-    this.$nextTick(function() {
+    this.$nextTick(() => {
       // 初期位置・ズームの設定
       this.bounds = this.$refs.mainMap.mapObject.getBounds();
     });
