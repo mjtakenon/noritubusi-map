@@ -213,13 +213,32 @@
               <v-icon x-large>portrait</v-icon>
             </v-list-tile-avatar>
             <v-list-tile-content>
-              <v-list-tile-title> 未ログイン </v-list-tile-title>
+              <v-list-tile-title v-if="isLoggedIn"> {{ username }} </v-list-tile-title>
+              <v-list-tile-title v-else> 未ログイン </v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
         </v-list>
-        <div class="text-xs-center">
+        <v-alert
+          v-model="successAlertModel"
+          type="success"
+          dismissible
+        >
+          {{ successAlertMessage }}
+        </v-alert>
+
+        <v-alert
+          v-model="errorAlertModel"
+          type="error"
+          dismissible
+        >
+          {{ errorAlertMessage }}
+        </v-alert>
+        <div class="text-xs-center" v-if="!isLoggedIn">
           <v-btn @click="showSignupMenu=true; showLoginMenu=false;"> アカウント登録 </v-btn>
           <v-btn @click="showLoginMenu=true; showSignupMenu=false;"> ログイン </v-btn>
+        </div>
+        <div class="text-xs-center" v-else>
+          <v-btn @click="onClickLogoutButton"> ログアウト </v-btn>
         </div>
         <v-list v-if="!showSignupMenu && !showLoginMenu">
           <v-list-tile @click="showSideMenu=!showSideMenu">
@@ -247,15 +266,17 @@
             </v-list-tile-content>
           </v-list-tile>
         </v-list>
-        <div v-else-if="showSignupMenu" class="pa-3">
+        <div v-else-if="showSignupMenu | showLoginMenu" class="pa-3">
           <v-text-field
             v-model="usernameModel"
+            ref="usernameRef"
             label="ユーザー名"
             :rules="[usernameRules.required]"
             clearable
           ></v-text-field>
           <v-text-field
             v-model="passwordModel"
+            ref="passwordRef"
             :append-icon="showPassword ? 'visibility' : 'visibility_off'"
             :rules="[passwordRules.required, passwordRules.min]"
             :type="showPassword ? 'text' : 'password'"
@@ -267,40 +288,26 @@
           ></v-text-field>
           <v-text-field
             v-model="passwordConfirmModel"
+            ref="passwordConfirmRef"
             :append-icon="showPasswordConfirm ? 'visibility' : 'visibility_off'"
             :rules="[passwordConfirmRules.required, passwordConfirmRules.passwordMatch]"
             :type="showPasswordConfirm ? 'text' : 'password'"
             label="パスワードの確認"
             hint="8文字以上で入力してください。"
-            counter
-            clearable
+            counter clearable
             @click:append="showPasswordConfirm = !showPasswordConfirm"
+            v-if="showSignupMenu"
           ></v-text-field>
           <v-btn absolute right color="#2196f3"
-          v-bind:disabled="false" 
+          v-bind:disabled="signupFormHasError"
+          v-bind:dark="!signupFormHasError"
+          v-if="showSignupMenu" 
           @click="onClickSignupButton()"> 登録 </v-btn>
-        </div>
-        <div v-else-if="showLoginMenu" class="pa-3">
-          <v-text-field
-            v-model="usernameModel"
-            label="ユーザー名"
-            :rules="[usernameRules.required]"
-            clearable
-          ></v-text-field>
-          <v-text-field
-            v-model="passwordModel"
-            :append-icon="showPassword ? 'visibility' : 'visibility_off'"
-            :rules="[passwordRules.required, passwordRules.min]"
-            :type="showPassword ? 'text' : 'password'"
-            label="パスワード"
-            hint="8文字以上で入力してください。"
-            counter
-            clearable
-            @click:append="showPassword = !showPassword"
-          ></v-text-field>
           <v-btn absolute right color="#2196f3"
-          v-bind:disabled="false" 
-          @click="onClickSignupButton()"> ログイン </v-btn>
+          v-bind:disabled="loginFormHasError" 
+          v-bind:dark="!loginFormHasError"
+          v-if="showLoginMenu"
+          @click="onClickLoginButton()"> ログイン </v-btn>
         </div>
       </v-card>
     </v-slide-x-transition>
@@ -373,6 +380,11 @@ export default {
       usernameModel: "",
       passwordModel: "",
       passwordConfirmModel: "",
+      // username: ユーザー名
+      username: "",
+      // successAlertMessage, errorAlertMessage: アラートに表示するメッセージ
+      successAlertMessage: "",
+      errorAlertMessage: "",
       // flatToolbar: 検索バーのデザインをflatにするか
       flatToolbar: false,
       // hasResult: キーワード検索の結果があるかどうかのフラグ
@@ -386,6 +398,14 @@ export default {
       // showPassword, showPasswordConfirm: パスワードを表示するかどうかのフラグ
       showPassword: false,
       showPasswordConfirm: false,
+      // signupFromHasError, loginFormHasError: それぞれのフォームにエラーがあるかのフラグ
+      signupFormHasError: true,
+      loginFormHasError: true,
+      // isLoggedIn: ログイン中かのフラグ
+      isLoggedIn: false,
+      // successAlertModel, errorAlertModel: アラートを表示するかのフラグ
+      successAlertModel: false,
+      errorAlertModel: false,
       // showDropStationTextField: 降車駅を入力するフィールドを表示するかのフラグ
       showDropStationTextField: false,
       // showSuggestList: キーワード検索の結果リストを表示するかのフラグ
@@ -425,13 +445,61 @@ export default {
       // passwordConfirmRules: パスワードの制限
       passwordConfirmRules: {
         required: value => !!value || 'このフィールドは必須です。',
-        passwordMatch: value => (value === this.passwordModel) || 'メールアドレスまたはパスワードが一致していません。'
+        passwordMatch: value => (value == this.passwordModel) || 'パスワードが一致していません。'
       }
     };
   },
   methods: {
+    // アカウントを登録する
+    async signupAccount(username,password) {
+      var params = new URLSearchParams();
+      params.append('userid', username);
+      params.append('password', password);
+      axios.defaults.withCredentials = true;
+      try {
+        let resp = await axios.post(
+          `http://${window.location.hostname}:1323/signup`, params);
+
+        return resp;
+      } catch (error) {
+        console.error("ERROR @ signupAccount ");
+        throw error;
+      }
+    },
+    // ログイン
+    async login(username,password) {
+      var params = new URLSearchParams();
+      params.append('userid', username);
+      params.append('password', password);
+      axios.defaults.withCredentials = true;
+      try {
+        let resp = await axios.post(
+          `http://${window.location.hostname}:1323/signin`, params);
+
+        return resp;
+      } catch (error) {
+        console.error("ERROR @ login ");
+        throw error;
+      }
+    },
+    // ログアウト
+    async logout() {
+      var params = new URLSearchParams();
+      axios.defaults.withCredentials = true;
+      try {
+        let resp = await axios.delete(
+          `http://${window.location.hostname}:1323/signin`);
+
+        return resp;
+      } catch (error) {
+        console.error("ERROR @ logout ");
+        throw error;
+      }
+    },
+
     // 現在位置にある駅舎一覧を取得する
     async getMarkersInCurrentRect() {
+      axios.defaults.withCredentials = true;
       try {
         let resp = await axios.get(
           `
@@ -464,6 +532,7 @@ export default {
     // キーワードから駅を検索して、駅一覧リストを取得する(建物単位)
     async getBuildingListByKeyword(keyword) {
       console.log(`Keyword: ${keyword}`);
+      axios.defaults.withCredentials = true;
 
       try {
         let resp = await axios.get(`http://${window.location.hostname}:1323/buildings/suggest?keyword=${keyword}`);
@@ -487,6 +556,7 @@ export default {
     // キーワードから駅を検索して、駅一覧リストを取得する(駅単位)
     async getStationListByKeyword(keyword) {
       console.log(`Keyword: ${keyword}`);
+      axios.defaults.withCredentials = true;
 
       try {
         // let resp = await axios.get(`http://${window.location.hostname}:1323/stations/suggest?keyword=${keyword}`);
@@ -510,6 +580,7 @@ export default {
 
     // 駅 ID から駅情報を取得する
     async getStationById(stationId) {
+      axios.defaults.withCredentials = true;
       try {
         let resp = await axios.get(`http://${window.location.hostname}:1323/stations/${stationId}`);
 
@@ -636,15 +707,81 @@ export default {
       }
     },
 
+    // 登録ボタンを有効にできるかフォームの入力をチェックし更新
+    // TODO: バグあり、入力のたびにバリデーションを行うが前の入力に対して行っているようで、最後にユーザー名を入力しないと動かない
+    signupFormUpdated() {
+      console.log(this.$refs.usernameRef.hasError);
+      console.log(this.$refs.passwordRef.hasError);
+      console.log(this.$refs.passwordConfirmRef.hasError);
+      this.signupFormHasError = this.$refs.usernameRef.hasError || this.$refs.passwordRef.hasError || this.$refs.passwordConfirmRef.hasError;
+    },
+
+    loginFormUpdated() {
+      console.log(this.$refs.usernameRef.hasError);
+      console.log(this.$refs.passwordRef.hasError);
+      this.loginFormHasError = this.$refs.usernameRef.hasError || this.$refs.passwordRef.hasError;
+      console.log(this.loginFormHasError);
+    },
+
+
     /*****************************************************************/
     /************************** Event Handlers ***********************/
     /*****************************************************************/
-
 
     // ツールバーのメニューを開くアイコン(サイドアイコン)を押したとき
     onClickSideIcon() {
       this.showSideMenu = true;
     },
+
+    // ユーザーアカウント登録ボタンが押されたとき
+    onClickSignupButton() {
+      this.signupAccount(this.usernameModel,this.passwordModel).then(resp => {
+          console.log(resp.status);
+          this.username = "ユーザー";
+          this.isLoggedIn = true;
+          this.showSignupMenu = false;
+          this.successAlertModel = true;
+          this.successAlertMessage = "登録しました。";
+        })
+        .catch(error => {
+          console.error(error);
+          this.errorAlertModel = true;
+          this.errorAlertMessage = "登録に失敗しました。";
+        });
+    },
+
+    // ログインボタンが押されたとき
+    onClickLoginButton() {
+      this.login(this.usernameModel,this.passwordModel).then(resp => {
+          console.log(resp.status);
+          this.username = "ユーザー"
+          this.isLoggedIn = true;
+          this.showLoginMenu = false;
+          this.successAlertModel = true;
+          this.successAlertMessage = "ログインしました。";
+        })
+        .catch(error => {
+          console.error(error);
+          this.errorAlertModel = true;
+          this.errorAlertMessage = "ログインに失敗しました。";
+        });
+    },
+    // ログアウトボタンが押されたとき
+    onClickLogoutButton() {
+      this.logout().then(resp => {
+          console.log(resp.status);
+          this.username = "";
+          this.isLoggedIn = false;
+          this.successAlertModel = true;
+          this.successAlertMessage = "ログアウトしました。";
+        })
+        .catch(error => {
+          console.error(error);
+          this.errorAlertModel = true;
+          this.errorAlertMessage = "ログアウトに失敗しました。";
+        });
+    },
+
 
     // キーワード検索結果の候補をクリックしたとき
     onClickStationList(stationInfo, railwayInfo) {
@@ -704,7 +841,7 @@ export default {
       this.rideRailway = [railwayInfo];
     },
 
-    // 登録ボタンをクリックしたとき
+    // 乗り潰し記録の登録ボタンをクリックしたとき
     onClickRegisterButton() {
       console.log("register")
     },
@@ -725,7 +862,6 @@ export default {
           console.error(error);
         });
     },
-
 
     // 位置情報の取得が完了したとき
     getCurrentPositionCompleted(pos) {
@@ -800,6 +936,20 @@ export default {
 
   // 変数の監視処理
   watch: {
+
+    // 登録/ログインフィールドの監視処理
+    usernameModel() {
+      this.signupFormUpdated();
+      this.loginFormUpdated();
+    },
+    passwordModel() {
+      this.signupFormUpdated();
+      this.loginFormUpdated();
+    },
+    passwordConfirmModel() {
+      this.signupFormUpdated();
+    },
+
     // rideStationTextFieldModel: キーワード検索文字列
     rideStationTextFieldModel(str) {
       // 入力確定後に変更があり、それが候補と違えば確定を解除
