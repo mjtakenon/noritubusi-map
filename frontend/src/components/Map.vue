@@ -186,14 +186,14 @@
         </v-slide-y-transition>
       </v-card-text>
       <!-- 左下のFloatingActionButton -->
-      <v-btn absolute dark fab bottom right color="pink"
-        style="margin-bottom:75px;"
+      <v-btn fixed dark fab bottom right color="pink"
+        style="margin-bottom:50px;"
         @click="onClickGetCurrentPosition()"
       >
         <v-icon>my_location</v-icon>
       </v-btn>
-      <v-btn absolute dark fab bottom right color="blue"
-        style="margin-bottom:150px;"
+      <v-btn fixed dark fab bottom right color="blue"
+        style="margin-bottom:125px;"
         @click="onClickMyLocationIcon()"
       >
         <v-icon>search</v-icon>
