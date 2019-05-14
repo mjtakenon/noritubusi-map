@@ -6,7 +6,7 @@
       <v-list-tile
         v-for="(l, idx) in this.data.lines"
         :key="idx"
-        @click="companyNameClicked(idx)"
+        @click="railwayNameClicked(l)"
       >
         <v-list-tile-avatar>
           <H2>{{icon}}</H2>
@@ -38,8 +38,8 @@ export default {
     };
   },
   methods: {
-    companyNameClicked(val) {
-      console.log(val);
+    railwayNameClicked(railwayInfo) {
+      this.$parent.$parent.$parent.$parent.onClickRideRailwayList(railwayInfo);
     }
   },
   mounted: function() {

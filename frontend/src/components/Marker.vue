@@ -27,6 +27,8 @@ export default {
   methods: {
     onClick: function() {
       this.isVisible = true;
+      console.log(this.data.name);
+      this.$parent.$parent.onClickStationList(this.data);
     }
   }
 };
