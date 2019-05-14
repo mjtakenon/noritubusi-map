@@ -437,17 +437,17 @@ export default {
       },
       // usernameRules: ユーザー名の制限
       usernameRules: { 
-        required: value => !!value || 'このフィールドは必須です。'
+        required: v => isRequired(v) || 'このフィールドは必須です。'
       },
       // passwordRules: パスワードの制限
       passwordRules: {
-        required: value => !!value || 'このフィールドは必須です。',
-        min: v => v.length >= 8 || '8文字以上で入力してください。',
+        required: v => isRequired(v) || 'このフィールドは必須です。',
+        min: v => isEnoughLength(v,8) || '8文字以上で入力してください。',
       },
       // passwordConfirmRules: パスワードの制限
       passwordConfirmRules: {
-        required: value => !!value || 'このフィールドは必須です。',
-        passwordMatch: value => (value == this.passwordModel) || 'パスワードが一致していません。'
+        required: v => isRequired(v) || 'このフィールドは必須です。',
+        passwordMatch: v => isEqualString(v,this.passwordModel) || 'パスワードが一致していません。'
       }
     };
   },
@@ -711,16 +711,19 @@ export default {
       this.signinFormHasError = !(this.isUsernameValid(this.usernameModel) && this.isPasswordValid(this.passwordModel));
     },
 
+    // ユーザー名が有効かどうか
     isUsernameValid(username) {
-      return !!username;
+      return isRequired(username);
     },
-
+    
+    // パスワードが有効かどうか
     isPasswordValid(password) { 
-      return !!password && (password.length>=8);
+      return isRequired(password) && isEnoughLength(password,8);
     },
 
+    // パスワードと確認のパスワードが一緒かどうか
     isPasswordConfirmValid(password,passwordConfirm) {
-      return passwordConfirm==password;
+      return isEqualString(password,passwordConfirm);
     },
 
 
@@ -737,14 +740,21 @@ export default {
     onClickSignupButton() {
       this.signupAccount(this.usernameModel,this.passwordModel).then(resp => {
           console.log(resp);
-          this.username = resp.data['userid'];
+          // ログインも行う
           this.isLoggedIn = true;
+          // ユーザー名を設定
+          this.username = resp.data['userid'];
+          // 登録メニューなどを隠す
           this.showSignupMenu = false;
+          // アラートを表示
+          this.errorAlertModel = false;
           this.successAlertModel = true;
           this.successAlertMessage = "登録しました。";
         })
         .catch(error => {
           console.error(error);
+          // アラートを表示
+          this.successAlertModel = false;
           this.errorAlertModel = true;
           this.errorAlertMessage = "登録に失敗しました。";
         });
@@ -754,15 +764,22 @@ export default {
     onClickSigninButton() {
       this.signin(this.usernameModel,this.passwordModel).then(resp => {
           console.log(resp);
-          this.username = resp.data['userid'];
+          // ログインを行う
           this.isLoggedIn = true;
+          // ユーザー名を設定
+          this.username = resp.data['userid'];
+          // 登録メニューなどを隠す
           this.showSigninMenu = false;
+          // アラートを表示
+          this.errorAlertModel = false;
           this.successAlertModel = true;
           this.successAlertMessage = "ログインしました。";
         })
         .catch(error => {
           console.error(error);
+          // アラートを表示
           this.errorAlertModel = true;
+          this.successAlertModel = false;
           this.errorAlertMessage = "ログインに失敗しました。";
         });
     },
@@ -770,14 +787,19 @@ export default {
     onClickSignoutButton() {
       this.signout().then(resp => {
           console.log(resp);
+          // ユーザー名を消しログアウト扱い
           this.username = "";
           this.isLoggedIn = false;
+          // アラートを表示
           this.successAlertModel = true;
+          this.errorAlertModel = false;
           this.successAlertMessage = "ログアウトしました。";
         })
         .catch(error => {
           console.error(error);
+          // アラートを表示
           this.errorAlertModel = true;
+          this.successAlertModel = false;
           this.errorAlertMessage = "ログアウトに失敗しました。";
         });
     },
@@ -1035,5 +1057,19 @@ export default {
 // 空文字列かどうかチェックする関数
 function isEmpty(str) {
   return !str || /^\s*$/.test(str);
+}
+// 文字列が入力されているか
+function isRequired(str) {
+  return !!str;
+}
+
+// 指定された長さか
+function isEnoughLength(str,len) {
+  return str.length >= len;
+}
+
+// 同じものか
+function isEqualString(str1,str2) {
+  return str1 === str2;
 }
 </script> 
