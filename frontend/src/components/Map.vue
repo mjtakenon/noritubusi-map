@@ -457,7 +457,6 @@ export default {
       var params = new URLSearchParams();
       params.append('userid', username);
       params.append('password', password);
-      axios.defaults.withCredentials = true;
       try {
         let resp = await axios.post(
           `http://${window.location.hostname}:1323/signup`, params);
@@ -473,7 +472,6 @@ export default {
       var params = new URLSearchParams();
       params.append('userid', username);
       params.append('password', password);
-      axios.defaults.withCredentials = true;
       try {
         let resp = await axios.post(
           `http://${window.location.hostname}:1323/signin`, params);
@@ -487,7 +485,6 @@ export default {
     // ログアウト
     async signout() {
       var params = new URLSearchParams();
-      axios.defaults.withCredentials = true;
       try {
         let resp = await axios.delete(
           `http://${window.location.hostname}:1323/signin`);
@@ -501,7 +498,6 @@ export default {
 
     // 現在位置にある駅舎一覧を取得する
     async getMarkersInCurrentRect() {
-      axios.defaults.withCredentials = true;
       try {
         let resp = await axios.get(
           `
@@ -534,7 +530,6 @@ export default {
     // キーワードから駅を検索して、駅一覧リストを取得する(建物単位)
     async getBuildingListByKeyword(keyword) {
       console.log(`Keyword: ${keyword}`);
-      axios.defaults.withCredentials = true;
 
       try {
         let resp = await axios.get(`http://${window.location.hostname}:1323/buildings/suggest?keyword=${keyword}`);
@@ -558,7 +553,6 @@ export default {
     // キーワードから駅を検索して、駅一覧リストを取得する(駅単位)
     async getStationListByKeyword(keyword) {
       console.log(`Keyword: ${keyword}`);
-      axios.defaults.withCredentials = true;
 
       try {
         // let resp = await axios.get(`http://${window.location.hostname}:1323/stations/suggest?keyword=${keyword}`);
@@ -582,7 +576,6 @@ export default {
 
     // 駅 ID から駅情報を取得する
     async getStationById(stationId) {
-      axios.defaults.withCredentials = true;
       try {
         let resp = await axios.get(`http://${window.location.hostname}:1323/stations/${stationId}`);
 
@@ -938,6 +931,8 @@ export default {
       // 初期位置・ズームの設定
       this.bounds = this.$refs.mainMap.mapObject.getBounds();
     });
+    // 後の通信でCookieを使うようにする設定
+    axios.defaults.withCredentials = true;
   },
 
   // 変数の監視処理
