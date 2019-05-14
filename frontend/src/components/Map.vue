@@ -236,13 +236,13 @@
           {{ errorAlertMessage }}
         </v-alert>
         <div class="text-xs-center" v-if="!isLoggedIn">
-          <v-btn @click="showSignupMenu=true; showLoginMenu=false;"> アカウント登録 </v-btn>
-          <v-btn @click="showLoginMenu=true; showSignupMenu=false;"> ログイン </v-btn>
+          <v-btn @click="showSignupMenu=true; showSigninMenu=false;"> アカウント登録 </v-btn>
+          <v-btn @click="showSigninMenu=true; showSignupMenu=false;"> ログイン </v-btn>
         </div>
         <div class="text-xs-center" v-else>
-          <v-btn @click="onClickLogoutButton"> ログアウト </v-btn>
+          <v-btn @click="onClickSignoutButton"> ログアウト </v-btn>
         </div>
-        <v-list v-if="!showSignupMenu && !showLoginMenu">
+        <v-list v-if="!showSignupMenu && !showSigninMenu">
           <v-list-tile @click="showSideMenu=!showSideMenu">
             <v-list-tile-avatar>
               <v-icon>train</v-icon>
@@ -268,7 +268,7 @@
             </v-list-tile-content>
           </v-list-tile>
         </v-list>
-        <div v-else-if="showSignupMenu | showLoginMenu" class="pa-3">
+        <div v-else-if="showSignupMenu | showSigninMenu" class="pa-3">
           <v-text-field
             v-model="usernameModel"
             ref="usernameRef"
@@ -306,10 +306,10 @@
           v-if="showSignupMenu" 
           @click="onClickSignupButton()"> 登録 </v-btn>
           <v-btn absolute right color="#2196f3"
-          v-bind:disabled="loginFormHasError" 
-          v-bind:dark="!loginFormHasError"
-          v-if="showLoginMenu"
-          @click="onClickLoginButton()"> ログイン </v-btn>
+          v-bind:disabled="signinFormHasError" 
+          v-bind:dark="!signinFormHasError"
+          v-if="showSigninMenu"
+          @click="onClickSigninButton()"> ログイン </v-btn>
         </div>
       </v-card>
     </v-slide-x-transition>
@@ -395,14 +395,14 @@ export default {
       showSideMenu: false,
       // showSignupMenu: アカウント作成メニューを表示するかのフラグ
       showSignupMenu: false,
-      // showLoginMenu: ログインメニューを表示するかのフラグ
-      showLoginMenu: false,
+      // showSigninMenu: ログインメニューを表示するかのフラグ
+      showSigninMenu: false,
       // showPassword, showPasswordConfirm: パスワードを表示するかどうかのフラグ
       showPassword: false,
       showPasswordConfirm: false,
-      // signupFromHasError, loginFormHasError: それぞれのフォームにエラーがあるかのフラグ
+      // signupFromHasError, signinFormHasError: それぞれのフォームにエラーがあるかのフラグ
       signupFormHasError: true,
-      loginFormHasError: true,
+      signinFormHasError: true,
       // isLoggedIn: ログイン中かのフラグ
       isLoggedIn: false,
       // successAlertModel, errorAlertModel: アラートを表示するかのフラグ
@@ -469,7 +469,7 @@ export default {
       }
     },
     // ログイン
-    async login(username,password) {
+    async signin(username,password) {
       var params = new URLSearchParams();
       params.append('userid', username);
       params.append('password', password);
@@ -480,12 +480,12 @@ export default {
 
         return resp;
       } catch (error) {
-        console.error("ERROR @ login ");
+        console.error("ERROR @ signin ");
         throw error;
       }
     },
     // ログアウト
-    async logout() {
+    async signout() {
       var params = new URLSearchParams();
       axios.defaults.withCredentials = true;
       try {
@@ -494,7 +494,7 @@ export default {
 
         return resp;
       } catch (error) {
-        console.error("ERROR @ logout ");
+        console.error("ERROR @ signout ");
         throw error;
       }
     },
@@ -711,11 +711,23 @@ export default {
 
     // 登録ボタンを有効にできるかフォームの入力をチェックし更新
     signupFormUpdated() {
-      this.signupFormHasError = !this.usernameModel || !this.passwordModel || !(this.passwordModel.length>=8) || !(this.passwordModel==this.passwordConfirmModel);
+      this.signupFormHasError = !(this.isUsernameValid(this.usernameModel) && this.isPasswordValid(this.passwordModel) && this.isPasswordConfirmValid(this.passwordModel,this.passwordConfirmModel));
     },
 
-    loginFormUpdated() {
-      this.loginFormHasError = !this.usernameModel || !this.passwordModel || !(this.passwordModel.length>=8);
+    signinFormUpdated() {
+      this.signinFormHasError = !(this.isUsernameValid(this.usernameModel) && this.isPasswordValid(this.passwordModel));
+    },
+
+    isUsernameValid(username) {
+      return !!username;
+    },
+
+    isPasswordValid(password) { 
+      return !!password && (password.length>=8);
+    },
+
+    isPasswordConfirmValid(password,passwordConfirm) {
+      return passwordConfirm==password;
     },
 
 
@@ -731,8 +743,8 @@ export default {
     // ユーザーアカウント登録ボタンが押されたとき
     onClickSignupButton() {
       this.signupAccount(this.usernameModel,this.passwordModel).then(resp => {
-          console.log(resp.status);
-          this.username = "ユーザー";
+          console.log(resp);
+          this.username = resp.data['userid'];
           this.isLoggedIn = true;
           this.showSignupMenu = false;
           this.successAlertModel = true;
@@ -746,12 +758,12 @@ export default {
     },
 
     // ログインボタンが押されたとき
-    onClickLoginButton() {
-      this.login(this.usernameModel,this.passwordModel).then(resp => {
-          console.log(resp.status);
-          this.username = "ユーザー"
+    onClickSigninButton() {
+      this.signin(this.usernameModel,this.passwordModel).then(resp => {
+          console.log(resp);
+          this.username = resp.data['userid'];
           this.isLoggedIn = true;
-          this.showLoginMenu = false;
+          this.showSigninMenu = false;
           this.successAlertModel = true;
           this.successAlertMessage = "ログインしました。";
         })
@@ -762,9 +774,9 @@ export default {
         });
     },
     // ログアウトボタンが押されたとき
-    onClickLogoutButton() {
-      this.logout().then(resp => {
-          console.log(resp.status);
+    onClickSignoutButton() {
+      this.signout().then(resp => {
+          console.log(resp);
           this.username = "";
           this.isLoggedIn = false;
           this.successAlertModel = true;
@@ -934,11 +946,11 @@ export default {
     // 登録/ログインフィールドの監視処理
     usernameModel() {
       this.signupFormUpdated();
-      this.loginFormUpdated();
+      this.signinFormUpdated();
     },
     passwordModel() {
       this.signupFormUpdated();
-      this.loginFormUpdated();
+      this.signinFormUpdated();
     },
     passwordConfirmModel() {
       this.signupFormUpdated();
