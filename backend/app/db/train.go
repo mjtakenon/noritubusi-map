@@ -126,7 +126,12 @@ func (d *DB) GetRailwaysInfoByName(name string) ([]RailwayInfo, error) {
 }
 
 func (d *DB) GetStationsInfoByID(id int) ([]StationInfo, error) {
-	return []StationInfo{}, nil
+	query := `SELECT buildings.id AS building_id,stations.id AS station_id,stations.name AS station_name,ST_X(latlong) AS 'lat',ST_Y(latlong) AS 'long',railways.name AS railway_line_name ,num_in_railway FROM stations INNER JOIN railways on stations.railway_id=railways.id INNER JOIN buildings on stations.building_id=buildings.id WHERE railways.id = ?  ORDER BY station_id`
+
+	stations := []StationInfo{}
+	err := d.DB.Select(&stations, query, id)
+
+	return stations, err
 }
 
 func (d *DB) GetStationsInfoByName(name string) ([]StationInfo, error) {
