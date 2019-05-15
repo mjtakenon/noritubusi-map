@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"strconv"
 
@@ -121,18 +122,28 @@ func getRailwaysInfoByQuery(c echo.Context) error {
 
 	id, err := strconv.Atoi(query)
 
-	railwayInfos := []db.RailwayInfo{}
+	stationInfos := []db.StationInfo{}
 	if err != nil {
-		railwayInfos, err = DB.GetRailwaysInfoByName(query)
+		// パーセントエンコーディングをデコード
+		query, err = url.QueryUnescape(query)
+		if err != nil {
+			return c.String(http.StatusInternalServerError, "server error")
+		}
+
+		stationInfos, err = DB.GetStationsInfoByRailwayName(query)
 	} else {
-		railwayInfos, err = DB.GetRailwaysInfoByID(id)
+		stationInfos, err = DB.GetStationsInfoByRailwayID(id)
 	}
 
 	if err != nil {
-		return c.String(http.StatusNotFound, "not found")
+		return c.String(http.StatusInternalServerError, "server error")
 	}
 
-	return c.JSON(http.StatusOK, railwayInfos)
+	if len(stationInfos) == 0 {
+		return c.String(http.StatusNotFound, "not found")
+	} else {
+		return c.JSON(http.StatusOK, stationInfos)
+	}
 }
 
 func createUser(c echo.Context) error {
