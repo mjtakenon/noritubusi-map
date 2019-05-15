@@ -124,3 +124,11 @@ func (d *DB) GetRailwaysInfoByName(name string) ([]RailwayInfo, error) {
 
 	return railways, err
 }
+
+func (d *DB) GetStationsInfoByID(id int) ([]StationInfo, error) {
+	return []StationInfo{}, nil
+}
+
+func (d *DB) GetStationsInfoByName(name string) ([]StationInfo, error) {
+	return []StationInfo{}, nil
+}
