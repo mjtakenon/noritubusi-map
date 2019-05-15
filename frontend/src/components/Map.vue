@@ -123,8 +123,10 @@
             label="乗車駅を入力"
             tabindex="1"
             v-model="rideStationTextFieldModel"
-            @keyup.enter="searchStation"
+            @keydown.enter="searchStation"
             @click:clear="rideStationTextFieldCleared"
+            @compositionstart="keyCompositionState=true"
+            @compositionend="keyCompositionState=false"
           ></v-text-field>
           <v-btn icon style="color:#FFFFFF" @click="searchStation">
             <v-icon>search</v-icon>
@@ -141,8 +143,10 @@
             label="降車駅を入力"
             tabindex="2"
             v-model="dropStationTextFieldModel"
-            @keyup.enter="searchStation"
+            @keydown.enter="searchStation"
             @click:clear="dropStationTextFieldCleared"
+            @compositionstart="keyCompositionState=true"
+            @compositionend="keyCompositionState=false"
           ></v-text-field>
           <v-btn icon style="color:#FFFFFF">
             <v-icon>search</v-icon>
@@ -387,6 +391,8 @@ export default {
       // successAlertMessage, errorAlertMessage: アラートに表示するメッセージ
       successAlertMessage: "",
       errorAlertMessage: "",
+      // keyCompositionState: 日本語入力のEnterキーかどうかを判別するフラグ
+      keyCompositionState: false,
       // flatToolbar: 検索バーのデザインをflatにするか
       flatToolbar: false,
       // hasResult: キーワード検索の結果があるかどうかのフラグ
@@ -624,6 +630,10 @@ export default {
 
     // キーワードに基づく駅検索
     searchStation() {
+      
+      // 日本語入力でSubmitしない処理
+      if (this.keyCompositionState) return;
+      
       let keyword = "";
       if (!this.isRideStationFixed) {
         keyword = this.rideStationTextFieldModel;
