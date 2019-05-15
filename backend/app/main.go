@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"strconv"
 
@@ -11,11 +12,11 @@ import (
 	"noritubusi-map/backend/app/db"
 
 	"github.com/asaskevich/govalidator"
+	"github.com/boj/redistore"
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/middleware"
-	"github.com/srinathgs/mysqlstore"
 )
 
 // Handler
@@ -121,18 +122,28 @@ func getRailwaysInfoByQuery(c echo.Context) error {
 
 	id, err := strconv.Atoi(query)
 
-	railwayInfos := []db.RailwayInfo{}
+	stationInfos := []db.StationInfo{}
 	if err != nil {
-		railwayInfos, err = DB.GetRailwaysInfoByName(query)
+		// パーセントエンコーディングをデコード
+		query, err = url.QueryUnescape(query)
+		if err != nil {
+			return c.String(http.StatusInternalServerError, "server error")
+		}
+
+		stationInfos, err = DB.GetStationsInfoByRailwayName(query)
 	} else {
-		railwayInfos, err = DB.GetRailwaysInfoByID(id)
+		stationInfos, err = DB.GetStationsInfoByRailwayID(id)
 	}
 
 	if err != nil {
-		return c.String(http.StatusNotFound, "not found")
+		return c.String(http.StatusInternalServerError, "server error")
 	}
 
-	return c.JSON(http.StatusOK, railwayInfos)
+	if len(stationInfos) == 0 {
+		return c.String(http.StatusNotFound, "not found")
+	} else {
+		return c.JSON(http.StatusOK, stationInfos)
+	}
 }
 
 func createUser(c echo.Context) error {
@@ -182,14 +193,17 @@ func signin(c echo.Context) error {
 		return c.String(http.StatusUnauthorized, "login failed")
 	}
 
-	//ログイン成功
-	saveSession(userID, 60*60*24*7, c)
+	//ログイン成功 , セッション保存
+	if err := saveSession(userID, 60*60*24*7, c); err != nil {
+		return c.String(http.StatusInternalServerError, "login failed")
+	}
 
 	return c.JSON(http.StatusOK, map[string]string{"userid": userID})
 }
 
 func signout(c echo.Context) error {
-	if err := deleteSession(c); err != nil {
+	// Cookieの削除
+	if err := saveSession("", -1, c); err != nil {
 		return c.String(http.StatusInternalServerError, "failed logout")
 	}
 
@@ -216,19 +230,6 @@ func saveSession(userID string, maxAge int, c echo.Context) error {
 		return err
 	}
 
-	return nil
-}
-
-func deleteSession(c echo.Context) error {
-	sess, err := session.Get("session", c)
-
-	if err != nil {
-		return err
-	}
-
-	if err := sess.Store().(*mysqlstore.MySQLStore).Delete(c.Request(), c.Response(), sess); err != nil {
-		return err
-	}
 	return nil
 }
 
@@ -309,7 +310,7 @@ func main() {
 	}
 
 	// session store connect
-	sqlstore, err := mysqlstore.NewMySQLStoreFromConnection(DB.DB.DB, "session", "/", 60*60*24*7, []byte("sessionid"))
+	sqlstore, err := redistore.NewRediStore(10, "tcp", "redis:6379", "", []byte("secret-key"))
 	if err != nil {
 		e.Logger.Fatal("Session Store Error:", err)
 	}
