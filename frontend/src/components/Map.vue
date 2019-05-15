@@ -318,7 +318,7 @@
       width="100%"
       style="position: absolute; top:0px; z-index:9; background-color:black; opacity:0.2;"
       v-show="showSideMenu"
-      @click="showSideMenu=false"
+      @click="showSideMenu=false; successAlertModel=false; errorAlertModel=false;"
     >
     </v-card>
   </div>
