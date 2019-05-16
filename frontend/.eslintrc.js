@@ -9,14 +9,17 @@ module.exports = {
     "no-console": process.env.NODE_ENV === "production" ? "error" : "off",
     "no-debugger": process.env.NODE_ENV === "production" ? "error" : "off",
 
-    // 文末セミコロンがない箇所に Warning を出す
+    // 文末セミコロンに関するエラー
     "semi": ["warn", "always"],
 
-    // undefined エラーを非検知に
-    "no-undef": "off",
+    // // undefined エラー
+    // "no-undef": "off",
 
-    // 未使用の変数宣言に関するエラーを非検知に
-    "no-unused-vars": "off"
+    // // 未使用の変数宣言に関するエラー
+    // "no-unused-vars": "off",
+
+    // // Vue: import したが未使用のコンポーネントに対するエラー
+    // "vue/no-unused-components": "off"
   },
   parserOptions: {
     parser: "babel-eslint"

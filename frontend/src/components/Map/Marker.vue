@@ -1,17 +1,17 @@
 <template>
   <l-marker :lat-lng="data" v-on:click="onClick" @l-add="$event.target.openPopup()">
-    <TPopup :v-show="isVisible" :data="data"></TPopup>
+    <Popup :v-show="isVisible" :data="data"></Popup>
   </l-marker>
 </template>
 
 <script>
 import { LMarker } from "vue2-leaflet";
-import TPopup from "./Popup";
+import Popup from "./Popup";
 
 export default {
   components: {
     LMarker,
-    TPopup
+    Popup
   },
   props: {
     data: {

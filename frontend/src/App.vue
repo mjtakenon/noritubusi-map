@@ -1,18 +1,41 @@
 <template>
   <v-app>
-    <Map />
+    <Sidebar/>
+    <v-btn
+      @click="onClickBtn"
+      color="warning"
+      right
+      style="position: absolute;"
+    >Test</v-btn>
   </v-app>
 </template>
 
 <script>
-import Map from "./components/Map";
+import Sidebar from "./components/Sidebar/Sidebar"
 
 export default {
   components: {
-    Map
+    Sidebar,
   },
   data() {
-    return {};
-  }
-};
+    return {}
+  },
+  methods: {
+    onClickBtn() {
+      this.showSidebar = !this.showSidebar
+    },
+  },
+  computed: {
+    showSidebar: {
+      get() {
+        console.log("<App/> getter::showSidebar")
+        return this.$store.getters.isVisible
+      },
+      set(value) {
+        console.log(`<App/> setter::showSidebar(value=${value})`)
+        this.$store.commit("isVisible", value)
+      },
+    },
+  },
+}
 </script>

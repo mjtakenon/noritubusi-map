@@ -2,16 +2,19 @@
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from "vue";
 import Vuetify from "vuetify";
-import "./plugins/vuetify";
 import App from "./App";
-import router from "./router";
+
+import "./plugins/vuetify";
+import store from './vuex/store'
 
 Vue.config.productionTip = false;
 
 // Module: vue2-leaflet
 
 // Icon fix
-import { Icon } from "leaflet";
+import {
+  Icon
+} from "leaflet";
 delete Icon.Default.prototype._getIconUrl;
 Icon.Default.mergeOptions({
   iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
@@ -30,7 +33,7 @@ Vue.use(Vuetify, {
 });
 const vm = new Vue({
   el: "#app",
-  router,
+  store,
   components: {
     App
   },
