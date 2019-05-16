@@ -19,7 +19,7 @@
         light
         height="100%"
         width="340px"
-        style="position: absolute; top:120px;"
+        style="position: absolute; padding-top:120px;"
         transition="slide-x-transition"
         v-show="showInputDetailsModal"
       >
@@ -45,7 +45,7 @@
               :key="idx"
               @click="onClickSuggestedDropStation(s,l)">
                 <v-list-tile-content>
-                  <v-list-tile-title> {{ s }} </v-list-tile-title>
+                  <v-list-tile-title> {{ s.name }} </v-list-tile-title>
                 </v-list-tile-content>
               </v-list-tile>
             </v-list-group>
@@ -580,20 +580,45 @@ export default {
       }
     },
 
+    // キーワードから駅を検索して、駅一覧リストを取得する(駅単位)
+    async getStationListByRailwayName(keyword) {
+      console.log(`Keyword: ${keyword}`);
+
+      try {
+        let resp = await axios.get(`http://${window.location.hostname}:1323/railways/${keyword}`);
+        let stationList = Array();
+
+        stationList = resp.data.map(elem => ({
+          lat: elem.latitude,
+          lng: elem.longitude,
+          name: elem.name,
+          id: elem.building_id,
+          station_id: elem.station_id,
+          railway_name: elem.railway_line_name,
+          order_in_railway: elem.order_in_railway
+        }));
+        return stationList;
+      } catch (error) {
+        console.error(`ERROR @ getStationListByKeyword (${keyword})`);
+        throw error;
+      }
+    },
+
     // 駅 ID から駅情報を取得する
     async getStationById(stationId) {
       try {
-        let resp = await axios.get(`http://${window.location.hostname}:1323/stations/${stationId}`);
+        let resp = await axios.get(`http://${window.location.hostname}:1323/buildings/${stationId}`);
 
         let stationInfo = resp.data.map(elem => ({
           name: elem.name,
+          id: elem.building_id,
           lat: elem.latitude,
           lng: elem.longitude,
-          railwayName: elem.railway_name,
-          orderInRailway: elem.order_in_railway
+          railway_name: elem.railway_line_name,
+          order_in_railway: elem.order_in_railway
         }));
 
-        return stationInfo[0];
+        return stationInfo;
       } catch (error) {
         console.error(`ERROR @ getStationById (${stationId})`);
         throw error;
@@ -682,7 +707,11 @@ export default {
     rideStationUnfix() {
       this.isRideStationFixed = false;
       this.rideStation = [];
-
+      this.rideRailway = [];
+      // 必要? 
+      this.stationList = [];
+      this.markerList = [];
+      
       if (isEmpty(this.dropStationTextFieldModel)) {
         this.showDropStationTextField = false;
         this.suggestListStyle.position = 'relative'
@@ -693,6 +722,7 @@ export default {
         this.showInputDetailsModal = false;
         this.flatToolbar = false;
         this.showSuggestList = false;
+
       }
     },
     // 降車駅の確定処理
@@ -707,6 +737,11 @@ export default {
       this.isDropStationFixed = false;
       this.dropStationToolbarStyle.borderRadius = "0px";
       this.showSuggestList = false;
+      this.rideRailway = [];
+      // 必要? 
+      this.stationList = [];
+      this.markerList = [];
+      
       if (!this.isRideStationFixed) {
         this.rideStationUnfix();
       }
@@ -839,9 +874,16 @@ export default {
     // 乗車した路線名をクリックしたとき
     onClickRideRailwayList(railwayInfo) {
       console.log(railwayInfo);
-      // 実装?
-      // this.getStationListByRailwayName(railwayInfo.railway_name)
-      this.suggestedDropStationList = [ "駅1", "駅2", "駅3" ];
+      this.getStationListByRailwayName(railwayInfo.railway_name)
+          .then(stationList => {
+            this.suggestedDropStationList = stationList;
+            // これを実行するとウィンドウが消える
+            // this.markerList = stationList;
+            // console.log(stationList);
+          })
+          .catch(error => {
+            console.log(error);
+          });
     },
     
     // 後から使用した路線名をクリックしたとき
@@ -851,25 +893,30 @@ export default {
 
     // サジェストされた降車駅をクリックしたとき
     onClickSuggestedDropStation(stationInfo,railwayInfo) {
-      // TODO これはダミーデータなのでエンドポイントができ次第差し替える
-      stationInfo = {'id':1323, 'name': '浜松','lat': '34.703866','lng': '137.734759','lines': [{'railway_name': 'JR東海道本線(熱海～浜松)','station_id': 8517,'order_in_railway': 4},{'railway_name': 'JR東海道本線(浜松～岐阜)','station_id': 8819,'order_in_railway': 1}]};
-      console.log(stationInfo);
-      console.log(railwayInfo);
       // this.onClickStationList(stationInfo);
-      this.forcusToStation(stationInfo);
-      this.markerList = [stationInfo];
-      this.stationList = [stationInfo];
-      // 乗車駅の入力
-      if (!this.isRideStationFixed) { 
-        this.rideStationTextFieldModel = stationInfo.name;
-        this.rideStationFix(stationInfo);
-      } // 降車駅の入力
-      else {
-        this.dropStationTextFieldModel = stationInfo.name;
-        this.dropStationFix(stationInfo);
-      }
-      this.dropStationFix(stationInfo);
-      this.rideRailway = [railwayInfo];
+      
+      this.getStationById(stationInfo.id)
+          .then(stationList => {
+            // 得られたリストからLinesを配列にするため成型
+            var stationInfo = this.stationListToBuildings(stationList);
+            
+            this.forcusToStation(stationInfo);
+            this.markerList = [stationInfo];
+            this.stationList = [stationInfo];
+            this.rideRailway = [railwayInfo];
+            // 乗車駅の入力
+            if (!this.isRideStationFixed) { 
+              this.rideStationTextFieldModel = stationInfo.name;
+              this.rideStationFix(stationInfo);
+            } // 降車駅の入力
+            else {
+              this.dropStationTextFieldModel = stationInfo.name;
+              this.dropStationFix(stationInfo);
+            }
+
+          }).catch(error => {
+          console.error(error);
+        });
     },
 
     // 乗り潰し記録の登録ボタンをクリックしたとき
@@ -936,6 +983,24 @@ export default {
         this.rideRailway = sameRailway;
       }
     },
+
+    stationListToBuildings(stationList) {
+      stationInfo = {
+              id: stationList[0].id,
+              name: stationList[0].name,
+              lat: stationList[0].lat,
+              lng: stationList[0].lng,
+              lines:[]
+            };
+
+      stationList.forEach(v => {
+        stationInfo.lines.push([v.railway_name]);
+      });
+      console.log("stationList:");
+      console.log(stationInfo);
+      return stationInfo;
+    },
+
 
     /**********************************/
     /*******  Map (Leaflet.js)  *******/

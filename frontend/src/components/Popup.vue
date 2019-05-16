@@ -2,20 +2,23 @@
   <l-popup>
     <!-- ID:{{ this.data.id }} -->
     <H1>{{ this.data.name }}</H1>
-    <v-list dense>
-      <v-list-tile
-        v-for="(l, idx) in this.data.lines"
-        :key="idx"
-        @click="railwayNameClicked(l)"
-      >
-        <v-list-tile-avatar>
-          <H2>{{icon}}</H2>
-        </v-list-tile-avatar>
-        <v-list-tile-content>
-          <v-list-tile-title>{{ data.lines[idx].railway_name }}</v-list-tile-title>
-        </v-list-tile-content>
-      </v-list-tile>
-    </v-list>
+    <v-card flat height="150px" style="overflow-y: auto;">
+      <v-list dense subheader>
+        <v-subheader> 路線一覧 </v-subheader>
+        <v-list-tile
+          v-for="(l, idx) in this.data.lines"
+          :key="idx"
+          @click="railwayNameClicked(l)"
+        >
+          <v-list-tile-avatar>
+            <H2>{{icon}}</H2>
+          </v-list-tile-avatar>
+          <v-list-tile-content>
+            <v-list-tile-title>{{ data.lines[idx].railway_name }}</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+      </v-list>
+    </v-card>
   </l-popup>
 </template>
 
