@@ -53,46 +53,61 @@
           <!-- 降車駅選択後 -->
           <div v-else>
             <!-- 路線数が1の場合 -->
-            <v-list-group :prepend-icon="'train'" v-if="rideRailway.length==1">
-              <template v-slot:activator>
-                <div>
-                  {{ rideRailway[0].railway_name }}
-                </div>
-              </template>
-              <v-list-tile>
-                <v-list-tile-content>
-                  <v-list-tile-title> hoge </v-list-tile-title>
-                </v-list-tile-content>
-              </v-list-tile>
-            </v-list-group>
+            <div v-if="rideRailway.length==1" >
+              <v-list>
+                <v-list-group 
+                  :prepend-icon="'train'" 
+                >
+                  <template v-slot:activator>
+                    <v-list-tile>
+                      <v-list-tile-content>
+                      <v-list-tile-title> {{ rideRailway[0].railway_name }} </v-list-tile-title>
+                      </v-list-tile-content>
+                    </v-list-tile>
+                  </template>
+                  <v-list-tile
+                    v-for="(s, idx) in throughStationList"
+                    :key="idx">
+                    <v-list-tile-content>
+                      <v-list-tile-title> {{ s.name }} </v-list-tile-title>
+                    </v-list-tile-content>
+                  </v-list-tile>
+                </v-list-group>
+              </v-list>
+            </div>
             <!-- 路線数が複数 -->
-            <v-list v-else-if="rideRailway.length>=2">
-              <v-list-tile 
-                v-for="(r, idx) in rideRailway"
-                :key="idx"
-                @click="onClickUseRailwayList(r)">
-                <v-list-tile-avatar>
-                  <v-icon>train</v-icon>
-                </v-list-tile-avatar>
-                <v-list-tile-content>
-                  <v-list-tile-title> {{ r.railway_name }} </v-list-tile-title>
-                </v-list-tile-content>
-              </v-list-tile>
-            </v-list>
+            <div v-else-if="rideRailway.length>=2">
+              <v-list>
+                <v-list-tile 
+                  v-for="(r, idx) in rideRailway"
+                  :key="idx"
+                  @click="onClickUseRailwayList(r)">
+                  <v-list-tile-avatar>
+                    <v-icon>train</v-icon>
+                  </v-list-tile-avatar>
+                  <v-list-tile-content>
+                    <v-list-tile-title> {{ r.railway_name }} </v-list-tile-title>
+                  </v-list-tile-content>
+                </v-list-tile>
+              </v-list>
+            </div>
             <!-- 路線数がない場合 -->
-            <v-list v-else>
-              <v-list-tile>
-                <v-list-tile-avatar>
-                  <v-icon>warning</v-icon>
-                </v-list-tile-avatar>
-                <v-list-tile-content>
-                  <v-list-tile-title> 共通の路線がありません </v-list-tile-title>
-                </v-list-tile-content>
-              </v-list-tile>
-            </v-list>
+            <div v-else>            
+              <v-list>
+                <v-list-tile>
+                  <v-list-tile-avatar>
+                    <v-icon>warning</v-icon>
+                  </v-list-tile-avatar>
+                  <v-list-tile-content>
+                    <v-list-tile-title> 共通の路線がありません </v-list-tile-title>
+                  </v-list-tile-content>
+                </v-list-tile>
+              </v-list>
+            </div>
           </div>
           <v-subheader v-if="isDropStationFixed" v-text="dropStationTextFieldModel"></v-subheader>
         </v-list>
+
         <v-btn absolute right color="#2196f3"
           v-show="isDropStationFixed && isRideStationFixed" 
           v-bind:disabled="!(isDropStationFixed && isRideStationFixed)" 
@@ -377,6 +392,8 @@ export default {
       dropStation: [],
       // rideRailway: 利用路線
       rideRailway: [],
+      // throughStationList: 経由した駅のリスト
+      throughStationList: [],
       // suggestedDropStationList: 乗車駅に接続している駅のリスト
       suggestedDropStationList: [],
       // rideStationTextFieldModel, dropStationTextFieldModel: キーワード検索欄の文字列
@@ -877,8 +894,8 @@ export default {
       this.getStationListByRailwayName(railwayInfo.railway_name)
           .then(stationList => {
             this.suggestedDropStationList = stationList;
-            // これを実行するとウィンドウが消える
-            // this.markerList = stationList;
+            // これを実行するとポップアップウィンドウが保持されない
+            this.markerList = stationList;
             // console.log(stationList);
           })
           .catch(error => {
@@ -893,30 +910,41 @@ export default {
 
     // サジェストされた降車駅をクリックしたとき
     onClickSuggestedDropStation(stationInfo,railwayInfo) {
-      // this.onClickStationList(stationInfo);
-      
       this.getStationById(stationInfo.id)
-          .then(stationList => {
-            // 得られたリストからLinesを配列にするため成型
-            var stationInfo = this.stationListToBuildings(stationList);
-            
-            this.forcusToStation(stationInfo);
-            this.markerList = [stationInfo];
-            this.stationList = [stationInfo];
-            this.rideRailway = [railwayInfo];
-            // 乗車駅の入力
-            if (!this.isRideStationFixed) { 
-              this.rideStationTextFieldModel = stationInfo.name;
-              this.rideStationFix(stationInfo);
-            } // 降車駅の入力
-            else {
-              this.dropStationTextFieldModel = stationInfo.name;
-              this.dropStationFix(stationInfo);
-            }
+        .then(stationList => {
+        // 得られたリストからLinesを配列にするため成型
+        stationInfo = {
+          id: stationList[0].id,
+          name: stationList[0].name,
+          lat: stationList[0].lat,
+          lng: stationList[0].lng,
+          lines:[]
+        };
 
-          }).catch(error => {
-          console.error(error);
-        });
+        stationList.forEach(v => {
+          stationInfo.lines.push([v.railway_name]);
+      });
+            
+        this.forcusToStation(stationInfo);
+        this.markerList = [stationInfo];
+        this.stationList = [stationInfo];
+        this.rideRailway = [railwayInfo];
+        // 乗車駅の入力
+        if (!this.isRideStationFixed) { 
+          this.rideStationTextFieldModel = stationInfo.name;
+          this.rideStationFix(stationInfo);
+        } // 降車駅の入力
+        else {
+          this.dropStationTextFieldModel = stationInfo.name;
+          this.dropStationFix(stationInfo);
+        }
+        // もし降車駅も確定していたら経由駅を決定
+        if ( this.isRideStationFixed && this.isDropStationFixed ) {
+          this.calcThroughStationList();
+        }
+      }).catch(error => {
+      console.error(error);
+      });
     },
 
     // 乗り潰し記録の登録ボタンをクリックしたとき
@@ -984,23 +1012,22 @@ export default {
       }
     },
 
-    stationListToBuildings(stationList) {
-      stationInfo = {
-              id: stationList[0].id,
-              name: stationList[0].name,
-              lat: stationList[0].lat,
-              lng: stationList[0].lng,
-              lines:[]
-            };
-
-      stationList.forEach(v => {
-        stationInfo.lines.push([v.railway_name]);
-      });
-      console.log("stationList:");
-      console.log(stationInfo);
-      return stationInfo;
+    // 2駅から中間駅を計算
+    calcThroughStationList() {
+      var rideStationInfo = this.suggestedDropStationList.filter(elem => elem.id == this.rideStation.id)[0];
+      var dropStationInfo = this.suggestedDropStationList.filter(elem => elem.id == this.dropStation.id)[0];
+      if (rideStationInfo.order_in_railway > dropStationInfo.order_in_railway) {
+        // 降順に並びかえ
+        this.throughStationList = this.suggestedDropStationList.filter(elem => (elem.order_in_railway <= rideStationInfo.order_in_railway && elem.order_in_railway >= dropStationInfo.order_in_railway));
+        this.throughStationList = this.throughStationList.reverse();
+      } else if (rideStationInfo.order_in_railway < dropStationInfo.order_in_railway) {
+        // 昇順なのでそのまま
+        this.throughStationList = this.suggestedDropStationList.filter(elem => (elem.order_in_railway >= rideStationInfo.order_in_railway && elem.order_in_railway <= dropStationInfo.order_in_railway));
+        // 1駅
+      } else {
+        this.throughStationList = rideStationInfo;
+      }
     },
-
 
     /**********************************/
     /*******  Map (Leaflet.js)  *******/
