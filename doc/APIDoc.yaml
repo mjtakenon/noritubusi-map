@@ -192,9 +192,11 @@ paths:
           required: true
           type: string
       responses:
-        "200":
+        200:
           description: ユーザ情報の取得が成功
-        "404":
+          schema:
+            $ref: "#/definitions/userInfomation"
+        404:
           description: ユーザが見つからなかった
     put:
       tags:
@@ -478,3 +480,22 @@ definitions:
         # description:
         type: number
         example: 4
+  userInfomation:
+    type: object
+    properties:
+      id:
+        description: ユーザーID
+        type: string
+        example: mjtakenon
+      hashed_password:
+        description: ハッシュ化パスワード
+        type: string
+        example: $2a$10$uy.XzaOpSaPVPTCo6PW6k.C3x9mB9ZIrpiotuRwflR3JYzXIEeovy
+      create_time:
+        description: アカウント作成日時
+        type: string
+        example: "2019-04-01 00:00:00"
+      change_time:
+        description: アカウント変更日時
+        type: string
+        example: "2019-04-01 00:00:00"

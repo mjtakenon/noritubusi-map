@@ -146,6 +146,17 @@ func getRailwaysInfoByQuery(c echo.Context) error {
 	}
 }
 
+func getUserInfo(c echo.Context) error {
+	userid := c.Param("userid")
+
+	userInfo, err := DB.GetUserInfoByUserID(userid)
+	if err != nil {
+		return c.String(http.StatusNotFound, "not found")
+	}
+
+	return c.JSON(http.StatusOK, userInfo)
+}
+
 func createUser(c echo.Context) error {
 	//パラメータ検査
 	userID := c.FormValue("userid")
@@ -338,6 +349,8 @@ func main() {
 
 	e.GET("/stations/:stationid", getStationInfoByID)
 	e.GET("/stations/suggest", getStationNameSuggestion)
+
+	e.GET("/users/:userid", getUserInfo)
 
 	e.POST("/signup", createUser)
 
