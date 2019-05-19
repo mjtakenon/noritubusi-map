@@ -4,12 +4,13 @@ import Vue from "vue";
 import Vuetify from "vuetify";
 import App from "./App";
 
+// Vuetify 
 import "./plugins/vuetify";
+
+// Vuex 
 import store from './vuex/store'
 
 Vue.config.productionTip = false;
-
-// Module: vue2-leaflet
 
 // Icon fix
 import {
@@ -31,11 +32,16 @@ Vue.use(Vuetify, {
     primary: "#378640"
   }
 });
+// Vue インスタンスの生成
 const vm = new Vue({
+  // el: マウント先のDOMセレクタ
   el: "#app",
+  // Vuex データストアを Vue インスタンスから参照できるように
   store,
+  // 使用するコンポーネントを宣言
   components: {
     App
   },
+  // マウントされるテンプレート
   template: "<App/>"
 });

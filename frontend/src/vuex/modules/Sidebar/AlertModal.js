@@ -2,12 +2,19 @@
 
 const store = {
   namespaced: true,
+
+  // データストア
+  // 複数のインスタンスが生成されるモジュールの場合、state を
+  // オブジェクトではなく関数として定義する必要がある。
+  // そうしないと、すべてのインスタンスで state が共有されてしまう
   state() {
     return {
       isVisible: false,
       message: "テストメッセージです"
     }
   },
+
+  // ゲッター
   getters: {
     isVisible(state) {
       return state.isVisible
@@ -16,6 +23,8 @@ const store = {
       return state.message
     }
   },
+
+  // ミューテーション
   mutations: {
     isVisible(state, payload) {
       state.isVisible = payload
@@ -24,6 +33,8 @@ const store = {
       state.message = payload
     }
   },
+
+  // アクション
   actions: {
     isVisible({
       commit

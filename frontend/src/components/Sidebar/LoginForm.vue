@@ -1,3 +1,8 @@
+<!-- 
+  作りはほとんど SignupForm.vue と同じなので、各テンプレート・処理の詳細
+  は SignupForm.vue を参照すること 
+-->
+
 <template>
   <v-container fluid text-xs-center>
     <v-layout row wrap>
