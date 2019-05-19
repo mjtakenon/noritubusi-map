@@ -29,11 +29,11 @@ export default {
     showSidebar: {
       get() {
         console.log("<App/> getter::showSidebar")
-        return this.$store.getters.isVisible
+        return this.$store.getters["Sidebar/isVisible"]
       },
       set(value) {
         console.log(`<App/> setter::showSidebar(value=${value})`)
-        this.$store.commit("isVisible", value)
+        this.$store.dispatch("Sidebar/isVisible", value)
       },
     },
   },
