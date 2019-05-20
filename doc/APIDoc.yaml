@@ -188,7 +188,7 @@ paths:
       parameters:
         - name: userid
           in: path
-          description: Created user object
+          description: ユーザーID
           required: true
           type: string
       responses:
@@ -201,19 +201,31 @@ paths:
     put:
       tags:
         - user
-      summary: ユーザ情報の変更
+      summary: パスワードの変更
       description: ""
       parameters:
         - name: userid
           in: path
-          description: Created user object
+          description: ユーザーID
+          required: true
+          type: string
+        - name: current_password
+          in: query
+          description: 現在のパスワード
+          required: true
+          type: string
+        - name: new_password
+          in: query
+          description: 新しいパスワード
           required: true
           type: string
       responses:
-        "200":
+        200:
           description: OK
-        "400":
-          description: 情報変更が失敗
+        400:
+          description: パスワード変更が失敗
+        401:
+          description: ログイン失敗
     delete:
       tags:
         - user
@@ -222,7 +234,7 @@ paths:
       parameters:
         - name: userid
           in: path
-          description: Created user object
+          description: ユーザーID
           required: true
           type: string
       responses:
@@ -240,7 +252,7 @@ paths:
       parameters:
         - name: userid
           in: path
-          description: Created user object
+          description: ユーザーID
           required: true
           type: string
         - name: begin_latitude
@@ -276,7 +288,7 @@ paths:
       parameters:
         - name: userid
           in: path
-          description: Created user object
+          description: ユーザーID
           required: true
           type: string
         - name: begin_station_id

@@ -25,3 +25,11 @@ func (d *DB) GetUserInfoByUserID(userID string) (UserInfo, error) {
 
 	return info, err
 }
+
+func (d *DB) UpdateUser(userID, newHashedPassword string) error {
+	query := `UPDATE users SET hashed_password = ? WHERE id = ?`
+
+	_, err := d.DB.Exec(query, newHashedPassword, userID)
+
+	return err
+}

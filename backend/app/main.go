@@ -157,6 +157,36 @@ func getUserInfo(c echo.Context) error {
 	return c.JSON(http.StatusOK, userInfo)
 }
 
+func putUserInfo(c echo.Context) error {
+	userid := c.Param("userid")
+	currentPass := c.QueryParam("current_password")
+	newPass := c.QueryParam("new_password")
+
+	//ユーザ情報取得
+	userInfo, err := DB.GetUserInfoByUserID(userid)
+	if err != nil {
+		return c.String(http.StatusUnauthorized, "login failed")
+	}
+
+	//パスワード比較
+	if err := bcrypt.CompareHashAndPassword([]byte(userInfo.HashedPassword), []byte(currentPass)); err != nil {
+		return c.String(http.StatusUnauthorized, "login failed")
+	}
+
+	//ハッシュ化
+	hash, err := bcrypt.GenerateFromPassword([]byte(newPass), bcrypt.DefaultCost)
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "server error")
+	}
+
+	err = DB.UpdateUser(userid, string(hash))
+	if err != nil {
+		return c.String(http.StatusBadRequest, "failed")
+	}
+
+	return c.JSON(http.StatusOK, "ok")
+}
+
 func createUser(c echo.Context) error {
 	//パラメータ検査
 	userID := c.FormValue("userid")
@@ -351,6 +381,7 @@ func main() {
 	e.GET("/stations/suggest", getStationNameSuggestion)
 
 	e.GET("/users/:userid", getUserInfo)
+	e.PUT("/users/:userid", putUserInfo)
 
 	e.POST("/signup", createUser)
 
