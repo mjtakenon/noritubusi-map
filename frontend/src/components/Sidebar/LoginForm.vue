@@ -111,7 +111,7 @@ export default {
         validator => validator(this.password) === true
       )
       return (
-        isUsernamePrepared && isPasswordPrepared && isPasswordConfirmPrepared
+        isUsernamePrepared && isPasswordPrepared
       )
     },
   },

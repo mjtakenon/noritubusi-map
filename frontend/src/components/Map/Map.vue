@@ -11,7 +11,7 @@
       @update:bounds="onUpdateBounds"
     >
       <l-tile-layer :url="tileMapUrl"></l-tile-layer>
-      <Marker v-for="marker in markerList" :key="m.id" :data="marker"/>
+      <Marker v-for="m in markerList" :key="m.id" :data="marker"/>
     </l-map>
   </div>
 </template>
