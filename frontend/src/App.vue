@@ -1,24 +1,33 @@
 <template>
   <v-app>
+    <Map/>
     <!-- まずは、ユーザー管理機能があるサイドバーからリファクタリング -->
     <Sidebar/>
     <!-- サイドバーを開けるためのボタン(仮) -->
     <v-btn
-      @click="onClickBtn"
+      @click="toggleSidebar"
       color="warning"
       right
       style="position: absolute;"
+    >Toggle</v-btn>
+    <v-btn
+      @click="onClickBtn"
+      color="info"
+      right
+      style="position: absolute; margin-top: 52px;"
     >Test</v-btn>
   </v-app>
 </template>
 
 <script>
+import Map from "./components/Map/Map"
 import Sidebar from "./components/Sidebar/Sidebar"
 
 export default {
   // 使用するコンポーネントを宣言
   components: {
     Sidebar,
+    Map,
   },
   // データ
   data() {
@@ -26,8 +35,14 @@ export default {
   },
   // メソッド
   methods: {
-    onClickBtn() {
+    toggleSidebar() {
       this.showSidebar = !this.showSidebar
+    },
+    onClickBtn() {
+      this.$store.dispatch("Map/updateCenter", {
+        lat: 34.9613557,
+        lng: 137.1389376,
+      })
     },
   },
   // 算出プロパティ

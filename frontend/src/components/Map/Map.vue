@@ -1,86 +1,112 @@
 <template>
   <div>
+    <!-- Leaflet.js マップ -->
     <l-map
+      :center="center"
+      :options="mapOptions"
+      :zoom="zoom"
+      @update:bounds="onUpdateBounds"
+      @update:center="onUpdateCenter"
+      @update:zoom="onUpdateZoom"
       class="l-map"
       ref="mainMap"
-      :options="{ zoomControl: false }"
-      :zoom="zoom"
-      :center="center"
-      @update:zoom="onUpdateZoom"
-      @update:center="onUpdateCenter"
-      @update:bounds="onUpdateBounds"
     >
+      <!-- Leaflet.js タイルレイヤー -->
       <l-tile-layer :url="tileMapUrl"></l-tile-layer>
-      <Marker v-for="m in markerList" :key="m.id" :data="marker"/>
+      <!-- マーカー -->
+      <Marker :data="marker" :key="m.id" v-for="m in markerList"/>
     </l-map>
   </div>
 </template>
 
 <script>
 // Module: vue2-leaflet
-import { LMap, LTileLayer } from "vue2-leaflet";
-import Marker from "./Marker";
-import "leaflet/dist/leaflet.css";
+import { LMap, LTileLayer } from "vue2-leaflet"
+import Marker from "./Marker"
+import "leaflet/dist/leaflet.css"
 
 export default {
+  // 使用するコンポーネント
   components: {
     LMap,
     LTileLayer,
-    Marker
+    Marker,
   },
+  // データ
   data() {
     return {
+      // mapOptions: Leaflet.js Map のオプション
+      mapOptions: {
+        // ズーム操作用の「＋/−」ボタンは非表示に
+        zoomControl: false,
+      },
+
       // tileMapUrl: Leaflet.js のタイルマップのURL
       tileMapUrl: "https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png", // 地理院地図
       // tileMapUrl: "http://{s}.tile.osm.org/{z}/{x}/{y}.png",                   // OpenStreetMap
-
-      // zoom: Leaflet.js Map のズームスケール
-      zoom: 14,
-      // center: Leaflet.js Map の中心座標
-      center: {
-        lat: 35.680446,
-        lng: 139.761801
+    }
+  },
+  // 算出プロパティ
+  computed: {
+    // [Vuex] zoom: マップのズーム率
+    zoom: {
+      get() {
+        return this.$store.getters["Map/zoom"]
       },
-      // bounds: Leaflet.js Mapの表示範囲
-      bounds: {
-        // 左下の座標
-        _southWest: {
-          lat: 35.63532680480169,
-          lng: 139.73910056054595
-        },
-        // 右上の座標
-        _northEast: {
-          lat: 35.691113860493594,
-          lng: 139.79489050805572
-        }
+      set(value) {
+        this.$store.dispatch("Map/updateZoom", value)
       },
-      // markerList: 地図上にプロットされるマーカーのリスト
-      markerList: []
-    };
+    },
+    // [Vuex] center: マップの中心座標
+    center: {
+      get() {
+        return this.$store.getters["Map/center"]
+      },
+      set(value) {
+        this.$store.dispatch("Map/updateCenter", value)
+      },
+    },
+    // [Vuex] bounds: マップの矩形座標(左上, 右下)
+    bounds: {
+      get() {
+        return this.$store.getters["Map/bounds"]
+      },
+      set(value) {
+        this.$store.dispatch("Map/updateBounds", value)
+      },
+    },
+    // [Vuex] markerList: マップ上にプロットされるマーカー
+    markerList: {
+      get() {
+        return this.$store.getters["Map/markerList"]
+      },
+      set(value) {
+        return this.$store.dispatch("Map/markerList", value)
+      },
+    },
   },
   methods: {
     // ズームスケールが変更されたとき
     onUpdateZoom(zoom) {
-      this.zoom = zoom;
+      this.zoom = zoom
     },
 
     // 中心座標が変更されたとき
     onUpdateCenter(center) {
-      this.center = center;
+      this.center = center
     },
 
     // 表示範囲が変更されたとき
     onUpdateBounds(bounds) {
-      this.bounds = bounds;
-    }
+      this.bounds = bounds
+    },
   },
-
   // このコンポーネントがマウントされたときに実行される処理
   mounted: function() {
     this.$nextTick(function() {
       // 初期位置・ズームの設定
-      this.bounds = this.$refs.mainMap.mapObject.getBounds();
-    });
-  }
-};
+      this.bounds = this.$refs.mainMap.mapObject.getBounds()
+    })
+  },
+}
 </script>
