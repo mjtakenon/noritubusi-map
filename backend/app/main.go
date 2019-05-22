@@ -172,7 +172,7 @@ func createUser(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, "cookie store failed")
 	}
 
-	return c.String(http.StatusCreated, "ok")
+	return c.JSON(http.StatusCreated, map[string]string{"userid": userID})
 }
 
 func signin(c echo.Context) error {
@@ -198,7 +198,7 @@ func signin(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, "login failed")
 	}
 
-	return c.String(http.StatusOK, "success login")
+	return c.JSON(http.StatusOK, map[string]string{"userid": userID})
 }
 
 func signout(c echo.Context) error {
