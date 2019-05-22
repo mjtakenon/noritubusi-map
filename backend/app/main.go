@@ -323,7 +323,8 @@ func main() {
 
 	// CORS
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"http://localhost:8080"},
+		AllowOrigins:     []string{"http://localhost:8080"},
+		AllowCredentials: true,
 	}))
 
 	// Routes
