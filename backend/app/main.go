@@ -159,8 +159,8 @@ func getUserInfo(c echo.Context) error {
 
 func putUserInfo(c echo.Context) error {
 	userid := c.Param("userid")
-	currentPass := c.QueryParam("current_password")
-	newPass := c.QueryParam("new_password")
+	currentPass := c.FormValue("current_password")
+	newPass := c.FormValue("new_password")
 
 	//ユーザ情報取得
 	userInfo, err := DB.GetUserInfoByUserID(userid)
