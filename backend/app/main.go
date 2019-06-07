@@ -187,6 +187,33 @@ func putUserInfo(c echo.Context) error {
 	return c.JSON(http.StatusOK, "ok")
 }
 
+func deleteUserInfo(c echo.Context) error {
+	userid := c.FormValue("userid")
+	password := c.FormValue("password")
+
+	if userid == "" || password == "" {
+		return c.String(http.StatusBadRequest, "invalid parameter")
+	}
+
+	//ユーザ情報取得
+	userInfo, err := DB.GetUserInfoByUserID(userid)
+	if err != nil {
+		return c.String(http.StatusUnauthorized, "login failed")
+	}
+
+	//パスワード比較
+	if err := bcrypt.CompareHashAndPassword([]byte(userInfo.HashedPassword), []byte(password)); err != nil {
+		return c.String(http.StatusUnauthorized, "login failed")
+	}
+
+	err = DB.DeleteUser(userid)
+	if err != nil {
+		return c.String(http.StatusBadRequest, "failed")
+	}
+
+	return c.JSON(http.StatusOK, "ok")
+}
+
 func createUser(c echo.Context) error {
 	//パラメータ検査
 	userID := c.FormValue("userid")
@@ -382,6 +409,7 @@ func main() {
 
 	e.GET("/users/:userid", getUserInfo)
 	e.PUT("/users/:userid", putUserInfo)
+	e.POST("/users/delete", deleteUserInfo)
 
 	e.POST("/signup", createUser)
 

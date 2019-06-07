@@ -33,3 +33,11 @@ func (d *DB) UpdateUser(userID, newHashedPassword string) error {
 
 	return err
 }
+
+func (d *DB) DeleteUser(userID string) error {
+	query := `DELETE FROM users WHERE id = ?`
+
+	_, err := d.DB.Exec(query, userID)
+
+	return err
+}

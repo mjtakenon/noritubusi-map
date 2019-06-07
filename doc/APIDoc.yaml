@@ -226,20 +226,30 @@ paths:
           description: パスワード変更が失敗
         401:
           description: ログイン失敗
-    delete:
+  "/users/delete":
+    post:
       tags:
         - user
       summary: ユーザの削除
       description: ""
       parameters:
         - name: userid
-          in: path
+          in: query
           description: ユーザーID
           required: true
           type: string
+        - name: password
+          in: query
+          description: パスワード
+          required: true
+          type: string
       responses:
-        "200":
+        200:
           description: OK
+        400:
+          description: 削除が失敗
+        401:
+          description: ログイン失敗
   "/users/{userid}/record":
     get:
       tags:
@@ -276,9 +286,9 @@ paths:
           required: true
           type: number
       responses:
-        "200":
+        200:
           description: 乗り潰し駅情報の取得が成功
-        "404":
+        404:
           description: 乗り潰し駅情報が見つからなかった
     post:
       tags:
