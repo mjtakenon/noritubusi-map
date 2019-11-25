@@ -1,25 +1,24 @@
 <template>
   <l-popup>
-    ID:{{ this.data.id }}
-    <br>
+    <!-- ID:{{ this.data.id }} -->
     <H1>{{ this.data.name }}</H1>
-    <!-- <H2> 🚊  {{ this.data.companyName }} : {{ this.data.railwayName }} </H2>  -->
-    <v-list>
-      <v-list-tile
-        v-for="(c, idx) in this.data.companyName"
-        :key="idx"
-        @click="companyNameClicked(idx)"
-      >
-        <v-list-tile-avatar>
-          <H1>{{icon}}</H1>
-          <!-- <v-icon :class="[item.iconClass]">{{ item.icon }}</v-icon> -->
-        </v-list-tile-avatar>
-        <v-list-tile-content>
-          <v-list-tile-title>{{ data.railwayName[idx] }}</v-list-tile-title>
-          <v-list-tile-sub-title>{{ data.companyName[idx] }}</v-list-tile-sub-title>
-        </v-list-tile-content>
-      </v-list-tile>
-    </v-list>
+    <v-card flat height="150px" style="overflow-y: auto;">
+      <v-list dense subheader>
+        <v-subheader> 路線一覧 </v-subheader>
+        <v-list-tile
+          v-for="(l, idx) in this.data.lines"
+          :key="idx"
+          @click="railwayNameClicked(l)"
+        >
+          <v-list-tile-avatar>
+            <H2>{{icon}}</H2>
+          </v-list-tile-avatar>
+          <v-list-tile-content>
+            <v-list-tile-title>{{ data.lines[idx].railway_name }}</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+      </v-list>
+    </v-card>
   </l-popup>
 </template>
 
@@ -42,20 +41,21 @@ export default {
     };
   },
   methods: {
-    companyNameClicked(val) {
-      console.log(val);
+    railwayNameClicked(railwayInfo) {
+      this.$parent.$parent.$parent.$parent.onClickRideRailwayList(railwayInfo);
     }
   },
   mounted: function() {
     this.$nextTick(function() {
+      this.icon = "🚊";
       // アイコンの指定
-      if (this.data.railwayName[0].indexOf("新幹線") !== -1) {
-        // 新幹線
-        this.icon = "🚆";
-      } else {
-        // それ以外
-        this.icon = "🚊";
-      }
+      // if (this.data.railwayName[0].indexOf("新幹線") !== -1) {
+      //   // 新幹線
+      //   this.icon = "🚆";
+      // } else {
+      //   // それ以外
+      //   this.icon = "🚊";
+      // }
     });
   }
 };
