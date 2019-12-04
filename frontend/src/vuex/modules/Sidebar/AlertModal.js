@@ -10,7 +10,7 @@ const store = {
   state() {
     return {
       isVisible: false,
-      message: "テストメッセージです"
+      message: "テストメッセージです",
     }
   },
 
@@ -21,7 +21,7 @@ const store = {
     },
     message(state) {
       return state.message
-    }
+    },
   },
 
   // ミューテーション
@@ -31,21 +31,17 @@ const store = {
     },
     message(state, payload) {
       state.message = payload
-    }
+    },
   },
 
   // アクション
   actions: {
-    isVisible({
-      commit
-    }, payload) {
-      commit('isVisible', payload)
+    isVisible({ commit }, payload) {
+      commit("isVisible", payload)
     },
-    setMessage({
-      commit
-    }, payload) {
-      commit('message', payload)
-    }
-  }
+    setMessage({ commit }, payload) {
+      commit("message", payload)
+    },
+  },
 }
 export default store

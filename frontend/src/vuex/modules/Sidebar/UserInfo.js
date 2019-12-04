@@ -7,7 +7,7 @@ const store = {
   state: {
     // userInfo: ログイン済みのユーザー情報
     // 「未ログイン」状態は null であることが想定される
-    userInfo: null
+    userInfo: null,
   },
 
   // ゲッター
@@ -19,14 +19,14 @@ const store = {
     },
     userInfo(state) {
       return state.userInfo
-    }
+    },
   },
 
   // ミューテーション
   mutations: {
     userInfo(state, payload) {
       state.userInfo = payload
-      if (state.userInfo != null) state.isLoggedIn = true;
+      if (state.userInfo != null) state.isLoggedIn = true
     },
   },
 
@@ -34,19 +34,15 @@ const store = {
   actions: {
     // login: ログイン処理
     // payload はユーザー情報(userInfo)であることが想定される
-    login({
-      commit
-    }, payload) {
-      commit('userInfo', payload)
+    login({ commit }, payload) {
+      commit("userInfo", payload)
     },
 
     // logout: ログアウト処理
     // userInfo を null にすることで実装
-    logout({
-      commit
-    }) {
-      commit('userInfo', null)
-    }
-  }
+    logout({ commit }) {
+      commit("userInfo", null)
+    },
+  },
 }
 export default store
