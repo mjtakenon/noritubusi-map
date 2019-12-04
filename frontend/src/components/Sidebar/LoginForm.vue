@@ -110,9 +110,7 @@ export default {
       const isPasswordPrepared = this.validators.password.every(
         validator => validator(this.password) === true
       )
-      return (
-        isUsernamePrepared && isPasswordPrepared
-      )
+      return isUsernamePrepared && isPasswordPrepared
     },
   },
 }

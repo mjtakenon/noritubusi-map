@@ -1,33 +1,37 @@
 <template>
-  <l-marker :lat-lng="data" v-on:click="onClick" @l-add="$event.target.openPopup()">
+  <l-marker
+    :lat-lng="data"
+    v-on:click="onClick"
+    @l-add="$event.target.openPopup()"
+  >
     <Popup :v-show="isVisible" :data="data"></Popup>
   </l-marker>
 </template>
 
 <script>
-import { LMarker } from "vue2-leaflet";
-import Popup from "./Popup";
+import { LMarker } from "vue2-leaflet"
+import Popup from "./Popup"
 
 export default {
   components: {
     LMarker,
-    Popup
+    Popup,
   },
   props: {
     data: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
   data() {
     return {
-      isVisible: false
-    };
+      isVisible: false,
+    }
   },
   methods: {
     onClick: function() {
-      this.isVisible = true;
-    }
-  }
-};
+      this.isVisible = true
+    },
+  },
+}
 </script>

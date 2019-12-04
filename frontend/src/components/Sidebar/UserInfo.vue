@@ -1,5 +1,4 @@
-<style scoped>
-</style>
+<style scoped></style>
 
 <template>
   <v-list>

@@ -4,7 +4,8 @@
     dismissible
     transition="slide-y-transition"
     v-model="isVisible"
-  >{{ message }}</v-alert>
+    >{{ message }}</v-alert
+  >
 </template>
 
 <script>
