@@ -1,12 +1,12 @@
 // store.js -- Vuex ルートデータストア
 
 // Vue, Vuex のインポート
-import Vue from 'vue'
-import Vuex from 'vuex'
+import Vue from "vue"
+import Vuex from "vuex"
 
 // データストアのインポート
-import Sidebar from './modules/Sidebar/Sidebar'
-import Map from './modules/Map/Map'
+import Sidebar from "./modules/Sidebar/Sidebar"
+import Map from "./modules/Map/Map"
 
 // Vue に Vuex の機能を統合
 Vue.use(Vuex)
@@ -20,6 +20,6 @@ const store = new Vuex.Store({
   modules: {
     Sidebar,
     Map,
-  }
+  },
 })
 export default store

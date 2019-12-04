@@ -25,7 +25,9 @@
           <!-- パスワード確認欄 -->
           <v-text-field
             :rules="validators.passwordConfirm"
-            @click:append="isFormVisible.passwordConfirm = !isFormVisible.passwordConfirm"
+            @click:append="
+              isFormVisible.passwordConfirm = !isFormVisible.passwordConfirm
+            "
             clearable
             counter
             hint="8文字以上で入力してください。"

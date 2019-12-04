@@ -1,21 +1,23 @@
 <template>
   <v-app>
-    <Map/>
+    <Map />
     <!-- まずは、ユーザー管理機能があるサイドバーからリファクタリング -->
-    <Sidebar/>
+    <Sidebar />
     <!-- サイドバーを開けるためのボタン(仮) -->
     <v-btn
       @click="toggleSidebar"
       color="warning"
       right
       style="position: absolute;"
-    >Toggle</v-btn>
+      >Toggle</v-btn
+    >
     <v-btn
       @click="onClickBtn"
       color="info"
       right
       style="position: absolute; margin-top: 52px;"
-    >Test</v-btn>
+      >Test</v-btn
+    >
   </v-app>
 </template>
 

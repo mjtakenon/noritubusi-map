@@ -1,19 +1,19 @@
 <template>
   <!-- サイドバーとして Navigation Drawer を利用 -->
   <v-navigation-drawer :style="style" aboslute temporary v-model="isVisible">
-    <UserInfo/>
+    <UserInfo />
     <!-- サインアップ・ログイン用のボタン -->
     <div class="text-xs-center" id="account-controls" v-show="!isFormVisible">
       <v-btn @click="onClickSignup">アカウント登録</v-btn>
       <v-btn @click="onClickLogin">ログイン</v-btn>
     </div>
     <!-- ログイン処理通知用 -->
-    <AlertModal module-name="successModal" type="success"/>
-    <AlertModal module-name="errorModal" type="error"/>
+    <AlertModal module-name="successModal" type="success" />
+    <AlertModal module-name="errorModal" type="error" />
     <!-- サインアップ用フォーム -->
-    <SignupForm v-if="isSignupVisible"/>
+    <SignupForm v-if="isSignupVisible" />
     <!-- ログイン用フォーム -->
-    <LoginForm v-if="isLoginVisible"/>
+    <LoginForm v-if="isLoginVisible" />
   </v-navigation-drawer>
 </template>
 

@@ -14,7 +14,7 @@
       <!-- Leaflet.js タイルレイヤー -->
       <l-tile-layer :url="tileMapUrl"></l-tile-layer>
       <!-- マーカー -->
-      <Marker :data="marker" :key="m.id" v-for="m in markerList"/>
+      <Marker :data="marker" :key="m.id" v-for="m in markerList" />
     </l-map>
   </div>
 </template>
