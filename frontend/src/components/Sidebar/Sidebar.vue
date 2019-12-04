@@ -1,6 +1,11 @@
 <template>
   <!-- サイドバーとして Navigation Drawer を利用 -->
-  <v-navigation-drawer :style="style" aboslute temporary v-model="isVisible">
+  <v-navigation-drawer
+    v-bind="style.navigationDrawer"
+    aboslute
+    temporary
+    v-model="isVisible"
+  >
     <UserInfo />
     <!-- サインアップ・ログイン用のボタン -->
     <div class="text-xs-center" id="account-controls" v-show="!isFormVisible">
@@ -38,8 +43,10 @@ export default {
       // style: サイドバーのスタイル指定
       // テンプレート上に書くと見通しが悪くなるので、分離
       style: {
-        // サイドバーの横幅は、画面全体に対して 30％ に
-        width: "30%",
+        navigationDrawer: {
+          // サイドバーの横幅は、300px に
+          width: "300px",
+        },
       },
     }
   },
