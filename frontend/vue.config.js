@@ -5,12 +5,12 @@ module.exports = {
   devServer: {
     proxy: {
       // api/*  --> localhost:1323/*
-      '.*': {
-        target: 'http://localhost:1323',
+      ".*": {
+        target: "http://localhost:1323",
         pathRewrite: {
-          '^/api': ''
-        }
-      }
-    }
-  }
-};
+          "^/api": "",
+        },
+      },
+    },
+  },
+}

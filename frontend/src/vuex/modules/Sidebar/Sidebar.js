@@ -1,7 +1,7 @@
 // Vuex::Sidebar -- Sidebar.vue に関するデータストア
 
-import AlertModal from './AlertModal'
-import UserInfo from './UserInfo'
+import AlertModal from "./AlertModal"
+import UserInfo from "./UserInfo"
 
 const store = {
   // 名前空間を定義することで、変数名の重複
@@ -76,28 +76,19 @@ const store = {
     //   getters,     ローカルのゲッター
     //   rootGetters  親モジュールのゲッター
     // }
-    isVisible({
-      commit
-    }, payload) {
-      commit('isVisible', payload)
+    isVisible({ commit }, payload) {
+      commit("isVisible", payload)
     },
     // isVisible をトグル切り替えするためのアクション
-    toggleVisiblity({
-      getters,
-      commit
-    }) {
-      commit('isVisible', !getters.isVisible)
+    toggleVisiblity({ getters, commit }) {
+      commit("isVisible", !getters.isVisible)
     },
-    visibleForm({
-      commit
-    }, payload) {
-      commit('visibleForm', payload)
+    visibleForm({ commit }, payload) {
+      commit("visibleForm", payload)
     },
     // 各フォームの「キャンセル」ボタンで閉じるためのアクション
-    closeForm({
-      commit
-    }) {
-      commit('visibleForm', '')
+    closeForm({ commit }) {
+      commit("visibleForm", "")
     },
   },
 }

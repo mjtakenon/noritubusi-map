@@ -69,26 +69,18 @@ const store = {
 
   // アクション
   actions: {
-    updateZoom({
-      commit
-    }, payload) {
-      commit('zoom', payload)
+    updateZoom({ commit }, payload) {
+      commit("zoom", payload)
     },
-    updateCenter({
-      commit
-    }, payload) {
-      commit('center', payload)
+    updateCenter({ commit }, payload) {
+      commit("center", payload)
     },
-    updateBounds({
-      commit
-    }, payload) {
-      commit('bounds', payload)
+    updateBounds({ commit }, payload) {
+      commit("bounds", payload)
     },
-    markerList({
-      commit
-    }, payload) {
-      commit('markerList', payload)
-    }
-  }
+    markerList({ commit }, payload) {
+      commit("markerList", payload)
+    },
+  },
 }
 export default store
