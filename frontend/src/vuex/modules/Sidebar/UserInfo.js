@@ -47,10 +47,14 @@ const store = {
     },
 
     async signup({ commit }, payload) {
-      // console.log("signup", JSON.stringify(payload))
       const { username, password } = payload
-      let res = await signup(username, password)
-      console.log(res)
+      let response = null
+      try {
+        response = await signup(username, password)
+        console.log(response)
+      } catch (error) {
+        console.error(error)
+      }
       commit("userInfo", null)
     },
   },

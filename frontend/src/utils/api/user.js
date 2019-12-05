@@ -10,19 +10,24 @@ const axios = axiosBase.create({
 
 export async function signup(username, password) {
   let params = new URLSearchParams()
-  let res = null
   params.append("userid", username)
   params.append("password", password)
-  console.log("/signup?" + params.toString())
 
-  await axios
-    .post("/signup?" + params.toString())
+  // クエリを投げる
+  return await axios
+    .post("/signup", params, {
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    })
     .then(response => {
-      res = response
+      // 201 Created なら成功なのでレスポンスを返す それ以外なら例外を投げる
+      if (response.status === 201) {
+        return response
+      } else {
+        throw response
+      }
     })
     .catch(error => {
-      res = error
+      throw error.response
     })
-  return res
 }
 export function login(username, password) {}
