@@ -78,7 +78,7 @@ export default {
     /*************** イベントリスナ ***************/
     onClickSignup() {
       // console.log("onClickSignup")
-      this.$store.dispatch("UserInfo/signup", {
+      this.$store.dispatch("Sidebar/UserInfo/signup", {
         username: this.username,
         password: this.password,
       })
