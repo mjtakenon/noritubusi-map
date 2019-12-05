@@ -77,7 +77,11 @@ export default {
   methods: {
     /*************** イベントリスナ ***************/
     onClickSignup() {
-      console.log("onClickSignup")
+      // console.log("onClickSignup")
+      this.$store.dispatch("UserInfo/signup", {
+        username: this.username,
+        password: this.password,
+      })
     },
     onClickCancel() {
       this.$store.dispatch("Sidebar/closeForm")

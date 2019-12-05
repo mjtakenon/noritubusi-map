@@ -1,5 +1,7 @@
 // Vuex::Sidebar::UserInfo -- UserInfo.vue に関するデータストア
 
+import { signup, login } from "../../../utils/api/user.js"
+
 const store = {
   namespaced: true,
 
@@ -41,6 +43,14 @@ const store = {
     // logout: ログアウト処理
     // userInfo を null にすることで実装
     logout({ commit }) {
+      commit("userInfo", null)
+    },
+
+    async signup({ commit }, payload) {
+      // console.log("signup", JSON.stringify(payload))
+      const { username, password } = payload
+      let res = await signup(username, password)
+      console.log(res)
       commit("userInfo", null)
     },
   },

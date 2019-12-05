@@ -6,6 +6,7 @@ import Vuex from "vuex"
 
 // データストアのインポート
 import Sidebar from "./modules/Sidebar/Sidebar"
+import UserInfo from "./modules/Sidebar/UserInfo"
 import Map from "./modules/Map/Map"
 
 // Vue に Vuex の機能を統合
@@ -19,6 +20,7 @@ const store = new Vuex.Store({
   // 各モジュールへのデータアクセスは、ファイルパスのように参照
   modules: {
     Sidebar,
+    UserInfo,
     Map,
   },
 })
