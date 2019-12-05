@@ -1,4 +1,4 @@
-// Vuex::Sidebar::AlertModal -- ログイン処理時のメッセージモーダル
+// Vuex::Sidebar::Alert -- ログイン処理時のメッセージモーダル
 
 const store = {
   namespaced: true,

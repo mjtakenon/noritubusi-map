@@ -54,7 +54,7 @@ const store = {
         console.log(response)
 
         dispatch(
-          "Sidebar/AlertModal/setData",
+          "Sidebar/Alert/setData",
           {
             type: "success",
             message: "サインアップに成功しました。",
@@ -65,7 +65,7 @@ const store = {
         console.error(error)
 
         dispatch(
-          "Sidebar/AlertModal/setData",
+          "Sidebar/Alert/setData",
           {
             type: "error",
             message: "サインアップに失敗しました。",

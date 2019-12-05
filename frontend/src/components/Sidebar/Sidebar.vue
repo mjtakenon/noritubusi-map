@@ -13,7 +13,7 @@
       <v-btn @click="onClickLogin">ログイン</v-btn>
     </div>
     <!-- ログイン処理通知用 -->
-    <AlertModal />
+    <Alert />
     <!-- サインアップ用フォーム -->
     <SignupForm v-if="isSignupVisible" />
     <!-- ログイン用フォーム -->
@@ -24,7 +24,7 @@
 <script>
 // 各 Vue コンポーネントのインポート
 import UserInfo from "./UserInfo.vue"
-import AlertModal from "./AlertModal.vue"
+import Alert from "./Alert.vue"
 import SignupForm from "./SignupForm.vue"
 import LoginForm from "./LoginForm.vue"
 
@@ -32,7 +32,7 @@ export default {
   // 使用するコンポーネントを宣言
   components: {
     UserInfo,
-    AlertModal,
+    Alert,
     SignupForm,
     LoginForm,
   },

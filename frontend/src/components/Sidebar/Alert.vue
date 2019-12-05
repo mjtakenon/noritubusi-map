@@ -19,18 +19,18 @@ export default {
     // セッター, ゲッター両方書く場合は、Object として定義
     isVisible: {
       get() {
-        return this.$store.getters[`Sidebar/AlertModal/isVisible`]
+        return this.$store.getters[`Sidebar/Alert/isVisible`]
       },
       set(value) {
-        this.$store.dispatch(`Sidebar/AlertModal/setVisible`, value)
+        this.$store.dispatch(`Sidebar/Alert/setVisible`, value)
       },
     },
     // ゲッターのみでいい場合は、関数として定義
     message() {
-      return this.$store.getters[`Sidebar/AlertModal/message`]
+      return this.$store.getters[`Sidebar/Alert/message`]
     },
     type() {
-      return this.$store.getters[`Sidebar/AlertModal/type`]
+      return this.$store.getters[`Sidebar/Alert/type`]
     },
   },
 }
