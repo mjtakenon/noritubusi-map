@@ -46,14 +46,32 @@ const store = {
       commit("userInfo", null)
     },
 
-    async signup({ commit }, payload) {
+    async signup({ commit, dispatch }, payload) {
       const { username, password } = payload
       let response = null
       try {
         response = await signup(username, password)
         console.log(response)
+
+        dispatch(
+          "Sidebar/AlertModal/setData",
+          {
+            type: "success",
+            message: "サインアップに成功しました。",
+          },
+          { root: true }
+        )
       } catch (error) {
         console.error(error)
+
+        dispatch(
+          "Sidebar/AlertModal/setData",
+          {
+            type: "error",
+            message: "サインアップに失敗しました。",
+          },
+          { root: true }
+        )
       }
       commit("userInfo", null)
     },
