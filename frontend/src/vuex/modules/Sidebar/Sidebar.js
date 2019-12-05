@@ -1,7 +1,7 @@
 // Vuex::Sidebar -- Sidebar.vue に関するデータストア
 
-import AlertModal from "./AlertModal"
 import UserInfo from "./UserInfo"
+import AlertModal from "./AlertModal"
 
 const store = {
   // 名前空間を定義することで、変数名の重複
@@ -10,9 +10,8 @@ const store = {
 
   // 使用するモジュールの宣言
   modules: {
-    userInfo: UserInfo,
-    successModal: AlertModal,
-    errorModal: AlertModal,
+    UserInfo,
+    AlertModal,
   },
 
   // ステート(データ)
