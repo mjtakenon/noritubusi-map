@@ -166,7 +166,7 @@ func putUserInfo(c echo.Context) error {
 	if err != nil {
 		return c.String(http.StatusInternalServerError, "session not found")
 	}
-	userID, ok := sess["userID"]
+	userID, ok := sess.Values["userID"].(string)
 	if ok == false {
 		return c.String(http.StatusUnauthorized, "you should login before changing password")
 	}
@@ -188,7 +188,7 @@ func putUserInfo(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, "server error")
 	}
 
-	err = DB.UpdateUser(userid, string(hash))
+	err = DB.UpdateUser(userID, string(hash))
 	if err != nil {
 		return c.String(http.StatusBadRequest, "failed")
 	}
@@ -197,25 +197,35 @@ func putUserInfo(c echo.Context) error {
 }
 
 func deleteUserInfo(c echo.Context) error {
-	userid := c.FormValue("userid")
 	password := c.FormValue("password")
 
-	if userid == "" || password == "" {
+	if password == "" {
 		return c.String(http.StatusBadRequest, "invalid parameter")
 	}
 
-	//ユーザ情報取得
-	userInfo, err := DB.GetUserInfoByUserID(userid)
+	// セッション取得
+	sess, err := session.Get("session", c)
 	if err != nil {
-		return c.String(http.StatusUnauthorized, "login failed")
+		return c.String(http.StatusInternalServerError, "session not found")
+	}
+	userID, ok := sess.Values["userID"].(string)
+	if ok == false {
+		return c.String(http.StatusUnauthorized, "you should login before changing password")
+	}
+
+	//ユーザ情報取得
+	userInfo, err := DB.GetUserInfoByUserID(userID)
+	if err != nil { // DBとsessionの整合性が取れてないとき？
+		return c.String(http.StatusInternalServerError, "internal error")
 	}
 
 	//パスワード比較
+	// TODO: 権限チェック，管理者なら一般ユーザを削除可能にするかも？
 	if err := bcrypt.CompareHashAndPassword([]byte(userInfo.HashedPassword), []byte(password)); err != nil {
-		return c.String(http.StatusUnauthorized, "login failed")
+		return c.String(http.StatusUnauthorized, "wrong password")
 	}
 
-	err = DB.DeleteUser(userid)
+	err = DB.DeleteUser(userID)
 	if err != nil {
 		return c.String(http.StatusBadRequest, "failed")
 	}

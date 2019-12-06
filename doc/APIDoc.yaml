@@ -198,17 +198,13 @@ paths:
             $ref: "#/definitions/userInfomation"
         404:
           description: ユーザが見つからなかった
+  "/users":
     put:
       tags:
         - user
       summary: パスワードの変更
       description: ""
       parameters:
-        - name: userid
-          in: path
-          description: ユーザーID
-          required: true
-          type: string
         - name: current_password
           in: query
           description: 現在のパスワード
@@ -226,6 +222,8 @@ paths:
           description: パスワード変更が失敗
         401:
           description: ログイン失敗
+        500:
+          description: 内部エラー
   "/users/delete":
     post:
       tags:
