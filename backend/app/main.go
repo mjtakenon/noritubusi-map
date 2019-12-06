@@ -158,14 +158,23 @@ func getUserInfo(c echo.Context) error {
 }
 
 func putUserInfo(c echo.Context) error {
-	userid := c.Param("userid")
 	currentPass := c.FormValue("current_password")
 	newPass := c.FormValue("new_password")
 
-	//ユーザ情報取得
-	userInfo, err := DB.GetUserInfoByUserID(userid)
+	// セッション取得
+	sess, err := session.Get("session", c)
 	if err != nil {
-		return c.String(http.StatusUnauthorized, "login failed")
+		return c.String(http.StatusInternalServerError, "session not found")
+	}
+	userID, ok := sess["userID"]
+	if ok == false {
+		return c.String(http.StatusUnauthorized, "you should login before changing password")
+	}
+
+	//ユーザ情報取得
+	userInfo, err := DB.GetUserInfoByUserID(userID)
+	if err != nil { // DBとsessionの整合性が取れてないとき？
+		return c.String(http.StatusInternalServerError, "internal error")
 	}
 
 	//パスワード比較
@@ -408,13 +417,13 @@ func main() {
 	e.GET("/stations/suggest", getStationNameSuggestion)
 
 	e.GET("/users/:userid", getUserInfo)
-	e.PUT("/users/:userid", putUserInfo)
+	e.PUT("/users", putUserInfo)
 	e.POST("/users/delete", deleteUserInfo)
 
 	e.POST("/signup", createUser)
 
 	e.POST("/signin", signin)
-	e.DELETE("signin", signout)
+	e.DELETE("/signin", signout)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":1323"))
