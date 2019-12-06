@@ -428,7 +428,7 @@ func main() {
 
 	e.GET("/users/:userid", getUserInfo)
 	e.PUT("/users", putUserInfo)
-	e.POST("/users/delete", deleteUserInfo)
+	e.DELETE("/users", deleteUserInfo)
 
 	e.POST("/signup", createUser)
 
