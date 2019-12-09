@@ -20,8 +20,10 @@ services:
       - "1323:1323"
     links:
       - mysql:stationdb
+      - redis:redis
     depends_on:
       - mysql
+      - redis
     tty: true
 
   mysql:
@@ -38,5 +40,14 @@ services:
       - mysql-data:/var/lib/mysql
       # - ./log/mysql:/var/log/mysql
 
+  redis:
+    image: redis:5.0.4
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+
 volumes:
   mysql-data: {}
+  redis-data: {}
