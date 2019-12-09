@@ -51,6 +51,7 @@ const store = {
           },
           { root: true }
         )
+        dispatch("Sidebar/closeForm", null, { root: true })
       } catch (error) {
         console.error(error)
 
@@ -87,6 +88,7 @@ const store = {
           },
           { root: true }
         )
+        dispatch("Sidebar/closeForm", null, { root: true })
       } catch (error) {
         console.error(error)
 

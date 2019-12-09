@@ -7,13 +7,13 @@
     v-model="isVisible"
   >
     <UserInfo />
+    <!-- ログイン処理通知用 -->
+    <Alert />
     <!-- サインアップ・ログイン用のボタン -->
     <div class="text-xs-center" id="account-controls" v-show="!isFormVisible">
       <v-btn @click="onClickSignup">アカウント登録</v-btn>
       <v-btn @click="onClickLogin">ログイン</v-btn>
     </div>
-    <!-- ログイン処理通知用 -->
-    <Alert />
     <!-- サインアップ用フォーム -->
     <SignupForm v-if="isSignupVisible" />
     <!-- ログイン用フォーム -->
