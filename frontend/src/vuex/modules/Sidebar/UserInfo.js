@@ -63,7 +63,7 @@ const store = {
           { root: true }
         )
       }
-      commit("userInfo", null)
+      commit("userInfo", response.data)
     },
 
     // logout: ログアウト処理
@@ -99,7 +99,7 @@ const store = {
           { root: true }
         )
       }
-      commit("userInfo", null)
+      commit("userInfo", response.data)
     },
   },
 }
