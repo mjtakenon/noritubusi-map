@@ -39,6 +39,9 @@ const store = {
     async login({ commit, dispatch }, payload) {
       const { username, password } = payload
       let response = null
+
+      dispatch("Sidebar/Alert/close", null, { root: true })
+
       try {
         response = await login(username, password)
         console.log(response)
@@ -76,6 +79,9 @@ const store = {
     async signup({ commit, dispatch }, payload) {
       const { username, password } = payload
       let response = null
+
+      dispatch("Sidebar/Alert/close", null, { root: true })
+
       try {
         response = await signup(username, password)
         console.log(response)

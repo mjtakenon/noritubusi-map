@@ -51,6 +51,9 @@ const store = {
       commit("type", payload.type)
       commit("isVisible", true)
     },
+    close({ commit }) {
+      commit("isVisible", false)
+    },
   },
 }
 export default store
