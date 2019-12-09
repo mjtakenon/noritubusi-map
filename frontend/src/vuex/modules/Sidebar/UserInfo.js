@@ -36,8 +36,34 @@ const store = {
   actions: {
     // login: ログイン処理
     // payload はユーザー情報(userInfo)であることが想定される
-    login({ commit }, payload) {
-      commit("userInfo", payload)
+    async login({ commit, dispatch }, payload) {
+      const { username, password } = payload
+      let response = null
+      try {
+        response = await login(username, password)
+        console.log(response)
+
+        dispatch(
+          "Sidebar/Alert/setData",
+          {
+            type: "success",
+            message: "ログインに成功しました。",
+          },
+          { root: true }
+        )
+      } catch (error) {
+        console.error(error)
+
+        dispatch(
+          "Sidebar/Alert/setData",
+          {
+            type: "error",
+            message: "ログインに失敗しました。",
+          },
+          { root: true }
+        )
+      }
+      commit("userInfo", null)
     },
 
     // logout: ログアウト処理

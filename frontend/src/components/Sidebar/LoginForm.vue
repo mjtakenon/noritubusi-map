@@ -60,6 +60,10 @@ export default {
     /*************** イベントリスナ ***************/
     onClickLogin() {
       console.log("onClickLogin")
+      this.$store.dispatch("Sidebar/UserInfo/login", {
+        username: this.username,
+        password: this.password,
+      })
     },
     onClickCancel() {
       this.$store.dispatch("Sidebar/closeForm")
