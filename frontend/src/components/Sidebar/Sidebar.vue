@@ -10,9 +10,16 @@
     <!-- ログイン処理通知用 -->
     <Alert />
     <!-- サインアップ・ログイン用のボタン -->
-    <div class="text-xs-center" id="account-controls" v-show="!isFormVisible">
-      <v-btn @click="onClickSignup">アカウント登録</v-btn>
-      <v-btn @click="onClickLogin">ログイン</v-btn>
+    <div v-if="userInfo === null">
+      <div class="text-xs-center" id="account-controls" v-show="!isFormVisible">
+        <v-btn @click="onClickSignup">アカウント登録</v-btn>
+        <v-btn @click="onClickLogin">ログイン</v-btn>
+      </div>
+    </div>
+    <div v-else>
+      <div class="text-xs-center" id="account-controls">
+        <v-btn @click="onClickLogout">ログアウト</v-btn>
+      </div>
     </div>
     <!-- サインアップ用フォーム -->
     <SignupForm v-if="isSignupVisible" />
@@ -61,6 +68,12 @@ export default {
       this.visibleForm = "login"
       console.log("onClickLogin")
     },
+    // 「ログアウト」ボタンのイベントハンドラ
+    onClickLogout() {
+      this.$store.dispatch("Sidebar/UserInfo/logout")
+      // TODO: Cookieを消す?
+      console.log("onClickLogout")
+    },
   },
   computed: {
     // [Vuex] isVisible: Sidebar の表示・非表示フラグ
@@ -90,6 +103,9 @@ export default {
     },
     isLoginVisible() {
       return this.visibleForm === "login"
+    },
+    userInfo() {
+      return this.$store.getters["Sidebar/UserInfo/userInfo"]
     },
   },
 }

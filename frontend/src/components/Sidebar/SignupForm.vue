@@ -34,6 +34,7 @@
             label="パスワードの確認"
             v-bind="formAttributeByVisibility(isFormVisible.password)"
             v-model="passwordConfirm"
+            @keydown.enter="onClickSignup"
           ></v-text-field>
         </v-form>
         <!-- 「登録」ボタン -->
