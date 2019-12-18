@@ -72,6 +72,7 @@ const store = {
 
     // logout: ログアウト処理
     // userInfo を null にすることで実装
+    // TODO ログアウト時にcookieを消す等の処理が必要があれば実装する
     logout({ commit, dispatch }) {
       dispatch("Sidebar/Alert/close", null, { root: true })
       dispatch(

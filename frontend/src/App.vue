@@ -3,6 +3,7 @@
     <Map />
     <!-- まずは、ユーザー管理機能があるサイドバーからリファクタリング -->
     <Sidebar />
+    <SearchBox />
     <!-- サイドバーを開けるためのボタン(仮) -->
     <v-btn
       @click="toggleSidebar"
@@ -24,12 +25,14 @@
 <script>
 import Map from "./components/Map/Map"
 import Sidebar from "./components/Sidebar/Sidebar"
+import SearchBox from "./components/SearchBox/SearchBox"
 
 export default {
   // 使用するコンポーネントを宣言
   components: {
     Sidebar,
     Map,
+    SearchBox,
   },
   // データ
   data() {
