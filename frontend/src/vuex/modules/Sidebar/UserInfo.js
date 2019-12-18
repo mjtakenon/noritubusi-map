@@ -72,7 +72,16 @@ const store = {
 
     // logout: ログアウト処理
     // userInfo を null にすることで実装
-    logout({ commit }) {
+    logout({ commit, dispatch }) {
+      dispatch("Sidebar/Alert/close", null, { root: true })
+      dispatch(
+        "Sidebar/Alert/setData",
+        {
+          type: "success",
+          message: "ログアウトしました。",
+        },
+        { root: true }
+      )
       commit("userInfo", null)
     },
 
