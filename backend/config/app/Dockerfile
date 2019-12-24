@@ -14,6 +14,4 @@ ENV LC_ALL ja_JP.UTF-8
 # To check mysql's healthceck
 RUN apt-get update && apt-get install -y default-mysql-client
 
-RUN go get -u github.com/golang/dep/cmd/dep
-
 CMD ["./delayed_start"]
