@@ -5,21 +5,14 @@
     <Sidebar />
     <SearchBox />
     <!-- サイドバーを開けるためのボタン(仮) -->
-    <v-btn
-      @click="toggleSidebar"
-      color="warning"
-      right
-      absolute
-      >Toggle</v-btn
-    >
+    <v-btn @click="toggleSidebar" absolute color="warning" right>Toggle</v-btn>
     <v-btn
       @click="onClickBtn"
+      absolute
       color="info"
       right
-      absolute
       style="margin-top: 52px;"
-      >Test</v-btn
-    >
+    >Test</v-btn>
   </v-app>
 </template>
 

@@ -37,6 +37,7 @@
             @keydown.enter="onClickSignup"
           ></v-text-field>
         </v-form>
+        <div class="my-6"></div>
         <!-- 「登録」ボタン -->
         <v-btn
           @click="onClickSignup"
@@ -49,6 +50,7 @@
             <font color="white">登録</font>
           </strong>
         </v-btn>
+        <div class="my-3"></div>
         <!-- 「キャンセル」ボタン -->
         <v-btn @click="onClickCancel" block large>
           <strong>キャンセル</strong>

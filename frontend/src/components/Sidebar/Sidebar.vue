@@ -1,30 +1,34 @@
 <template>
   <!-- サイドバーとして Navigation Drawer を利用 -->
   <v-navigation-drawer
-    v-bind="style.navigationDrawer"
     aboslute
     temporary
+    v-bind="style.navigationDrawer"
     v-model="isVisible"
   >
-    <UserInfo />
-    <!-- ログイン処理通知用 -->
-    <Alert />
-    <!-- サインアップ・ログイン用のボタン -->
-    <div v-if="userInfo === null">
-      <div class="text-xs-center" id="account-controls" v-show="!isFormVisible">
-        <v-btn @click="onClickSignup">アカウント登録</v-btn>
-        <v-btn @click="onClickLogin">ログイン</v-btn>
-      </div>
-    </div>
-    <div v-else>
-      <div class="text-xs-center" id="account-controls">
-        <v-btn @click="onClickLogout">ログアウト</v-btn>
-      </div>
-    </div>
-    <!-- サインアップ用フォーム -->
-    <SignupForm v-if="isSignupVisible" />
-    <!-- ログイン用フォーム -->
-    <LoginForm v-if="isLoginVisible" />
+    <v-container>
+      <v-row
+        class="text-xs-center"
+        id="account-controls"
+        v-show="!isFormVisible"
+      >
+        <v-col>
+          <UserInfo />
+          <!-- サインアップ・ログイン用のボタン -->
+          <div class="d-flex justify-space-around">
+            <v-btn @click="onClickSignup">アカウント登録</v-btn>
+            <v-btn @click="onClickLogin">ログイン</v-btn>
+          </div>
+        </v-col>
+      </v-row>
+      <!-- ログイン処理通知用 -->
+      <AlertModal module-name="successModal" type="success" />
+      <AlertModal module-name="errorModal" type="error" />
+      <!-- サインアップ用フォーム -->
+      <SignupForm v-if="isSignupVisible" />
+      <!-- ログイン用フォーム -->
+      <LoginForm v-if="isLoginVisible" />
+    </v-container>
   </v-navigation-drawer>
 </template>
 
