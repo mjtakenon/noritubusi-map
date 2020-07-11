@@ -34,6 +34,7 @@
             label="パスワードの確認"
             v-bind="formAttributeByVisibility(isFormVisible.password)"
             v-model="passwordConfirm"
+            @keydown.enter="onClickSignup"
           ></v-text-field>
         </v-form>
         <!-- 「登録」ボタン -->
@@ -77,7 +78,11 @@ export default {
   methods: {
     /*************** イベントリスナ ***************/
     onClickSignup() {
-      console.log("onClickSignup")
+      // console.log("onClickSignup")
+      this.$store.dispatch("Sidebar/UserInfo/signup", {
+        username: this.username,
+        password: this.password,
+      })
     },
     onClickCancel() {
       this.$store.dispatch("Sidebar/closeForm")

@@ -7,6 +7,7 @@ import Vuex from "vuex"
 // データストアのインポート
 import Sidebar from "./modules/Sidebar/Sidebar"
 import Map from "./modules/Map/Map"
+import SearchBox from "./modules/SearchBox/SearchBox"
 
 // Vue に Vuex の機能を統合
 Vue.use(Vuex)
@@ -18,8 +19,9 @@ const store = new Vuex.Store({
   // 使用するモジュールを宣言
   // 各モジュールへのデータアクセスは、ファイルパスのように参照
   modules: {
-    Sidebar,
     Map,
+    Sidebar,
+    SearchBox,
   },
 })
 export default store

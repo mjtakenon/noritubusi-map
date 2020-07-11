@@ -571,3 +571,137 @@ func TestDB_GetStationInfoInRange(t *testing.T) {
 		})
 	}
 }
+
+func TestDB_GetStationsInfoByID(t *testing.T) {
+	type fields struct {
+		DB *sqlx.DB
+	}
+	type args struct {
+		id int
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    []StationInfo
+		wantErr bool
+	}{
+		{
+			name:   "阿波室戸シーサイドライン(No. 509)",
+			fields: fields{DB: SetUpDB(t)},
+			args:   args{id: 509},
+			want: []StationInfo{
+				{
+					BuildingId:     8049,
+					StationId:      14337,
+					Name:           "海部",
+					Latitude:       "33.593453",
+					Longitude:      "134.351999",
+					RailwayName:    "阿波室戸シーサイドライン",
+					OrderInRailway: 1,
+				},
+				{
+					BuildingId:     8056,
+					StationId:      14338,
+					Name:           "宍喰",
+					Latitude:       "33.566949",
+					Longitude:      "134.300741",
+					RailwayName:    "阿波室戸シーサイドライン",
+					OrderInRailway: 2,
+				},
+				{
+					BuildingId:     8057,
+					StationId:      14339,
+					Name:           "甲浦",
+					Latitude:       "33.547238",
+					Longitude:      "134.288242",
+					RailwayName:    "阿波室戸シーサイドライン",
+					OrderInRailway: 3,
+				},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			d := &DB{
+				DB: tt.fields.DB,
+			}
+			got, err := d.GetStationsInfoByID(tt.args.id)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("DB.GetStationsInfoByID() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("DB.GetStationsInfoByID() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestDB_GetStationsInfoByName(t *testing.T) {
+	type fields struct {
+		DB *sqlx.DB
+	}
+	type args struct {
+		name string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    []StationInfo
+		wantErr bool
+	}{
+		{
+			name:   "阿波室戸シーサイドライン(No. 509)",
+			fields: fields{DB: SetUpDB(t)},
+			args:   args{name: "阿波室戸シーサイドライン"},
+			want: []StationInfo{
+				{
+					BuildingId:     8049,
+					StationId:      14337,
+					Name:           "海部",
+					Latitude:       "33.593453",
+					Longitude:      "134.351999",
+					RailwayName:    "阿波室戸シーサイドライン",
+					OrderInRailway: 1,
+				},
+				{
+					BuildingId:     8056,
+					StationId:      14338,
+					Name:           "宍喰",
+					Latitude:       "33.566949",
+					Longitude:      "134.300741",
+					RailwayName:    "阿波室戸シーサイドライン",
+					OrderInRailway: 2,
+				},
+				{
+					BuildingId:     8057,
+					StationId:      14339,
+					Name:           "甲浦",
+					Latitude:       "33.547238",
+					Longitude:      "134.288242",
+					RailwayName:    "阿波室戸シーサイドライン",
+					OrderInRailway: 3,
+				},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			d := &DB{
+				DB: tt.fields.DB,
+			}
+			got, err := d.GetStationsInfoByName(tt.args.name)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("DB.GetStationsInfoByName() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("DB.GetStationsInfoByName() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

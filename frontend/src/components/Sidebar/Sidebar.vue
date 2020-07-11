@@ -7,14 +7,20 @@
     v-model="isVisible"
   >
     <UserInfo />
-    <!-- サインアップ・ログイン用のボタン -->
-    <div class="text-xs-center" id="account-controls" v-show="!isFormVisible">
-      <v-btn @click="onClickSignup">アカウント登録</v-btn>
-      <v-btn @click="onClickLogin">ログイン</v-btn>
-    </div>
     <!-- ログイン処理通知用 -->
-    <AlertModal module-name="successModal" type="success" />
-    <AlertModal module-name="errorModal" type="error" />
+    <Alert />
+    <!-- サインアップ・ログイン用のボタン -->
+    <div v-if="userInfo === null">
+      <div class="text-xs-center" id="account-controls" v-show="!isFormVisible">
+        <v-btn @click="onClickSignup">アカウント登録</v-btn>
+        <v-btn @click="onClickLogin">ログイン</v-btn>
+      </div>
+    </div>
+    <div v-else>
+      <div class="text-xs-center" id="account-controls">
+        <v-btn @click="onClickLogout">ログアウト</v-btn>
+      </div>
+    </div>
     <!-- サインアップ用フォーム -->
     <SignupForm v-if="isSignupVisible" />
     <!-- ログイン用フォーム -->
@@ -24,16 +30,16 @@
 
 <script>
 // 各 Vue コンポーネントのインポート
-import UserInfo from "./UserInfo"
-import AlertModal from "./AlertModal"
-import SignupForm from "./SignupForm"
-import LoginForm from "./LoginForm"
+import UserInfo from "./UserInfo.vue"
+import Alert from "./Alert.vue"
+import SignupForm from "./SignupForm.vue"
+import LoginForm from "./LoginForm.vue"
 
 export default {
   // 使用するコンポーネントを宣言
   components: {
     UserInfo,
-    AlertModal,
+    Alert,
     SignupForm,
     LoginForm,
   },
@@ -61,6 +67,12 @@ export default {
     onClickLogin() {
       this.visibleForm = "login"
       console.log("onClickLogin")
+    },
+    // 「ログアウト」ボタンのイベントハンドラ
+    onClickLogout() {
+      this.$store.dispatch("Sidebar/UserInfo/logout")
+      // TODO: Cookieを消す?
+      console.log("onClickLogout")
     },
   },
   computed: {
@@ -91,6 +103,9 @@ export default {
     },
     isLoginVisible() {
       return this.visibleForm === "login"
+    },
+    userInfo() {
+      return this.$store.getters["Sidebar/UserInfo/userInfo"]
     },
   },
 }

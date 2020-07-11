@@ -23,6 +23,7 @@
             label="パスワード"
             v-bind="formAttributeByVisibility(isFormVisible.password)"
             v-model="password"
+            @keydown.enter="onClickLogin"
           ></v-text-field>
         </v-form>
         <v-btn
@@ -60,6 +61,10 @@ export default {
     /*************** イベントリスナ ***************/
     onClickLogin() {
       console.log("onClickLogin")
+      this.$store.dispatch("Sidebar/UserInfo/login", {
+        username: this.username,
+        password: this.password,
+      })
     },
     onClickCancel() {
       this.$store.dispatch("Sidebar/closeForm")

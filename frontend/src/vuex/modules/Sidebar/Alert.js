@@ -1,4 +1,4 @@
-// Vuex::Sidebar::AlertModal -- ログイン処理時のメッセージモーダル
+// Vuex::Sidebar::Alert -- ログイン処理時のメッセージモーダル
 
 const store = {
   namespaced: true,
@@ -10,6 +10,7 @@ const store = {
   state() {
     return {
       isVisible: false,
+      type: "info",
       message: "テストメッセージです",
     }
   },
@@ -22,6 +23,9 @@ const store = {
     message(state) {
       return state.message
     },
+    type(state) {
+      return state.type
+    },
   },
 
   // ミューテーション
@@ -32,15 +36,23 @@ const store = {
     message(state, payload) {
       state.message = payload
     },
+    type(state, payload) {
+      state.type = payload
+    },
   },
 
   // アクション
   actions: {
-    isVisible({ commit }, payload) {
+    setVisible({ commit }, payload) {
       commit("isVisible", payload)
     },
-    setMessage({ commit }, payload) {
-      commit("message", payload)
+    setData({ commit }, payload) {
+      commit("message", payload.message)
+      commit("type", payload.type)
+      commit("isVisible", true)
+    },
+    close({ commit }) {
+      commit("isVisible", false)
     },
   },
 }
