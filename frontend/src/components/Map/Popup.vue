@@ -2,20 +2,20 @@
   <l-popup>
     <H1>{{ this.data.name }}</H1>
     <v-list dense>
-      <v-list-tile
+      <v-list-item
         v-for="(l, idx) in this.data.lines"
         :key="idx"
         @click="companyNameClicked(idx)"
       >
-        <v-list-tile-avatar>
+        <v-list-item-avatar>
           <H2>{{ icon }}</H2>
-        </v-list-tile-avatar>
-        <v-list-tile-content>
-          <v-list-tile-title>{{
+        </v-list-item-avatar>
+        <v-list-item-content>
+          <v-list-item-title>{{
             data.lines[idx].railway_name
-          }}</v-list-tile-title>
-        </v-list-tile-content>
-      </v-list-tile>
+          }}</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
     </v-list>
   </l-popup>
 </template>

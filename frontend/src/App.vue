@@ -9,14 +9,15 @@
       @click="toggleSidebar"
       color="warning"
       right
-      style="position: absolute;"
+      absolute
       >Toggle</v-btn
     >
     <v-btn
       @click="onClickBtn"
       color="info"
       right
-      style="position: absolute; margin-top: 52px;"
+      absolute
+      style="margin-top: 52px;"
       >Test</v-btn
     >
   </v-app>
