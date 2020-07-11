@@ -26,7 +26,6 @@ const store = {
   mutations: {
     userInfo(state, payload) {
       state.userInfo = payload
-      if (state.userInfo != null) state.isLoggedIn = true
     },
   },
 
