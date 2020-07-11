@@ -2,30 +2,30 @@
 
 <template>
   <v-list>
-    <v-list-tile>
+    <v-list-item>
       <!-- 「未ログイン」時に表示されるテンプレート -->
       <template id="default" v-if="!isLoggedIn">
         <!-- アバターアイコン -->
-        <v-list-tile-avatar>
+        <v-list-item-avatar>
           <v-icon x-large>portrait</v-icon>
-        </v-list-tile-avatar>
+        </v-list-item-avatar>
         <!-- ユーザー名表示 -->
-        <v-list-tile-content>
-          <v-list-tile-title>未ログイン</v-list-tile-title>
-        </v-list-tile-content>
+        <v-list-item-content>
+          <v-list-item-title>未ログイン</v-list-item-title>
+        </v-list-item-content>
       </template>
       <!-- 「ログイン」時に表示されるテンプレート -->
       <template id="logged-in" v-else>
         <!-- アバターアイコン -->
-        <v-list-tile-avatar>
+        <v-list-item-avatar>
           <v-icon x-large>portrait</v-icon>
-        </v-list-tile-avatar>
+        </v-list-item-avatar>
         <!-- ユーザー名表示 -->
-        <v-list-tile-content>
-          <v-list-tile-title>{{ userInfo.name }}</v-list-tile-title>
-        </v-list-tile-content>
+        <v-list-item-content>
+          <v-list-item-title>{{ userInfo.name }}</v-list-item-title>
+        </v-list-item-content>
       </template>
-    </v-list-tile>
+    </v-list-item>
   </v-list>
 </template>
 
