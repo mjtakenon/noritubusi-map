@@ -28,33 +28,33 @@
             @click:append="
               isFormVisible.passwordConfirm = !isFormVisible.passwordConfirm
             "
+            @keydown.enter="onClickSignup"
             clearable
             counter
             hint="8文字以上で入力してください。"
             label="パスワードの確認"
             v-bind="formAttributeByVisibility(isFormVisible.password)"
             v-model="passwordConfirm"
-            @keydown.enter="onClickSignup"
           ></v-text-field>
         </v-form>
-        <div class="my-6"></div>
-        <!-- 「登録」ボタン -->
-        <v-btn
-          @click="onClickSignup"
-          block
-          color="#2196f3"
-          large
-          v-bind:disabled="!isPreparedSignup"
-        >
-          <strong>
-            <font color="white">登録</font>
-          </strong>
-        </v-btn>
-        <div class="my-3"></div>
-        <!-- 「キャンセル」ボタン -->
-        <v-btn @click="onClickCancel" block large>
-          <strong>キャンセル</strong>
-        </v-btn>
+        <div class="button-stack">
+          <!-- 「登録」ボタン -->
+          <v-btn
+            @click="onClickSignup"
+            block
+            color="#2196f3"
+            large
+            v-bind:disabled="!isPreparedSignup"
+          >
+            <strong>
+              <font color="white">登録</font>
+            </strong>
+          </v-btn>
+          <!-- 「キャンセル」ボタン -->
+          <v-btn @click="onClickCancel" block large>
+            <strong>キャンセル</strong>
+          </v-btn>
+        </div>
       </v-flex>
     </v-layout>
   </v-container>
