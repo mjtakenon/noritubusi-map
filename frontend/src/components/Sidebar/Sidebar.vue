@@ -22,8 +22,7 @@
         </v-col>
       </v-row>
       <!-- ログイン処理通知用 -->
-      <AlertModal module-name="successModal" type="success" />
-      <AlertModal module-name="errorModal" type="error" />
+      <Alert />
       <!-- サインアップ用フォーム -->
       <SignupForm v-if="isSignupVisible" />
       <!-- ログイン用フォーム -->
