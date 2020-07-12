@@ -17,7 +17,7 @@ const store = {
   // ステート(データ)
   state: {
     // isVisible: Sidebar の表示・非表示フラグ
-    isVisible: true,
+    isVisible: false,
     // visibleForm: 表示されているフォームの種別
     visibleForm: "",
   },

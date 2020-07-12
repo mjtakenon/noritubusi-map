@@ -22,8 +22,7 @@
         </v-list-item-avatar>
         <!-- ユーザー名表示 -->
         <v-list-item-content>
-          <!-- <v-list-item-title>{{ userInfo.userId }}</v-list-item-title> -->
-          <v-list-item-title>{{ userInfo.name }}</v-list-item-title>
+          <v-list-item-title>{{ userInfo.userid }}</v-list-item-title>
         </v-list-item-content>
       </template>
     </v-list-item>

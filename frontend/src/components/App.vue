@@ -4,22 +4,21 @@
     <!-- まずは、ユーザー管理機能があるサイドバーからリファクタリング -->
     <Sidebar />
     <SearchBox />
-    <!-- サイドバーを開けるためのボタン(仮) -->
-    <v-btn @click="toggleSidebar" absolute color="warning" right>Toggle</v-btn>
+    <!-- 位置情報を取得するためのボタン(仮) -->
     <v-btn
       @click="onClickBtn"
       absolute
       color="info"
       right
-      style="margin-top: 52px;"
+      style="margin-top: 12px;"
     >Test</v-btn>
   </v-app>
 </template>
 
 <script>
-import Map from "./components/Map/Map"
-import Sidebar from "./components/Sidebar/Sidebar"
-import SearchBox from "./components/SearchBox/SearchBox"
+import Map from "./Map/Map"
+import Sidebar from "./Sidebar/Sidebar"
+import SearchBox from "./SearchBox/SearchBox"
 
 export default {
   // 使用するコンポーネントを宣言
