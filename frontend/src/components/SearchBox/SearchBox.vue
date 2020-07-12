@@ -10,19 +10,28 @@
         append-icon="search"
         single-line
         v-bind:style="style.textField"
+        @input="suggestStations"
       ></v-text-field>
 
       <!-- <v-btn icon>
         <v-icon>my_location</v-icon>
       </v-btn> -->
     </v-toolbar>
+    <SuggestList v-show="stations.length !== 0"
+      :stations="stations"
+    ></SuggestList>
   </div>
 </template>
 
 <script>
-// 各 Vue コンポーネントのインポート
+import { suggest } from "../../utils/api/search.js"
+
+import SuggestList from "./SuggestList"
 
 export default {
+  components: {
+    SuggestList
+  },
   data() {
     return {
       style: {
@@ -36,12 +45,23 @@ export default {
           padding: "0px",
         },
       },
+      stations: [],
     }
   },
   // メソッド
   methods: {
     toggleSidebar() {
       this.showSidebar = !this.showSidebar
+    },
+    
+    suggestStations(input) {
+      if (input.length === 0) {
+        this.stations = []
+      }
+
+      suggest(input)
+        .then(response => this.stations = response.data)
+        .catch(error => console.error(error))
     },
   },
   // 算出プロパティ

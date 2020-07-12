@@ -17,31 +17,29 @@
           <v-text-field
             :rules="validators.password"
             @click:append="isFormVisible.password = !isFormVisible.password"
-            @keydown.enter="onClickLogin"
             clearable
             counter
             hint="8文字以上で入力してください。"
             label="パスワード"
             v-bind="formAttributeByVisibility(isFormVisible.password)"
             v-model="password"
+            @keydown.enter="onClickLogin"
           ></v-text-field>
         </v-form>
-        <div class="button-stack">
-          <v-btn
-            @click="onClickLogin"
-            block
-            color="#2196f3"
-            large
-            v-bind:disabled="!isPreparedSignup"
-          >
-            <strong>
-              <font color="white">ログイン</font>
-            </strong>
-          </v-btn>
-          <v-btn @click="onClickCancel" block large>
-            <strong>キャンセル</strong>
-          </v-btn>
-        </div>
+        <v-btn
+          @click="onClickLogin"
+          block
+          color="#2196f3"
+          large
+          v-bind:disabled="!isPreparedSignup"
+        >
+          <strong>
+            <font color="white">ログイン</font>
+          </strong>
+        </v-btn>
+        <v-btn @click="onClickCancel" block large>
+          <strong>キャンセル</strong>
+        </v-btn>
       </v-flex>
     </v-layout>
   </v-container>
