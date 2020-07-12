@@ -21,7 +21,7 @@ Icon.Default.mergeOptions({
 })
 
 // Import css
-import "./stylesheet/main.css"
+import "./stylesheet/style.scss"
 
 // Vue インスタンスの生成
 const vm = new Vue({
