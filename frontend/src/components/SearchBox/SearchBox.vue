@@ -57,6 +57,7 @@ export default {
     suggestStations(input) {
       if (input.length === 0) {
         this.stations = []
+        return
       }
 
       suggest(input)
