@@ -3,7 +3,7 @@
 cd ${SERVER_APP_DIR}
 
 echo "Install Go depedencies ... "
-dep ensure
+go mod download
 
 echo "Waiting mysql ..."
 
