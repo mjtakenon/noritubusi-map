@@ -9,12 +9,11 @@ const axios = axiosBase.create({
 })
 
 export async function suggest(keyword) {
-  // TODO: 文字列が0文字のときは、リクエストを送信しないようにする
   // TODO: リクエスト間隔を空けるような実装に (例: 100ms ごと)
 
   return await axios
     .get(
-      "/stations/suggest", 
+      "/buildings/suggest", 
       {
         params: { keyword }
       }, 

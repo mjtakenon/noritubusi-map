@@ -2,14 +2,17 @@
   <div>
     <v-list two-line style="max-height: 200px; overflow-y: auto;">
       <v-list-item-group color="primary">
-        <v-list-item v-for="(station, i) in this.stations" :key="i" @click="focusStation(station)">
+        <v-list-item v-for="(building, i) in this.buildings" :key="i" @click="onClickSuggestedBuilding(building)">
           <v-list-item-avatar style="font-size: 150%">
-            <div v-if="isShinkansen(station.railway_line_name)">🚅</div>
-            <div v-else>🚃</div>
+            <v-icon>train</v-icon>
+            <!-- <div v-if="isShinkansen(building.railway_line_name)">🚅</div> -->
+            <!-- <div v-else>🚃</div> -->
           </v-list-item-avatar>
           <v-list-item-content>
-            <v-list-item-title> {{ station.name }} </v-list-item-title>
-            <v-list-item-subtitle> {{ station.railway_line_name }} </v-list-item-subtitle>
+            <v-list-item-title> {{ building.name }} </v-list-item-title>
+            <v-list-item-subtitle>
+              {{ building.lines[0].railway_name + ((building.lines.length !== 1) ? "..." : "") }}
+            </v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
       </v-list-item-group>
@@ -22,7 +25,7 @@ import { suggest } from "../../utils/api/search.js";
 
 export default {
   props: {
-    stations: {
+    buildings: {
       type: Array,
       required: true,
     },
@@ -45,13 +48,33 @@ export default {
     isShinkansen(railwayName) {
       return railwayName.indexOf('新幹線') != -1
     },
-    focusStation(station) {
+    focusBuilding(station) {
       this.$store.dispatch("Map/updateCenter", {
         lat: station.latitude,
         lng: station.longitude,
       })
       return 
-    }
+    },
+    setPin(building) {
+      this.$store.dispatch("Map/setPins", [
+        { 
+          // lat: building.latitude,
+          // lng: building.longitude,
+          latLng: [building.latitude, building.longitude],
+          popup: {
+            name: building.name,
+            lines: building.lines,
+          },
+          autoOpenPopup: true,
+        }
+      ])
+      return
+    },
+    onClickSuggestedBuilding(building) {
+      this.setPin(building)
+      this.focusBuilding(building)
+      return
+    },
   },
   // 算出プロパティ
   computed: {}

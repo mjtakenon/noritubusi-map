@@ -28,8 +28,26 @@ const store = {
         },
       },
     },
-    // markerList: マップ上のマーカー
-    markerList: [],
+    // pins: マップ上のマーカー
+    /***** データ構造サンプル ***************
+     * pins: [
+     *   {
+     *     latLng: [12.3333333, 45.6666666],
+     *     popup: {
+     *       name: "駅建物名",
+     *       // lines は /buildings/suggest のレスポンスと同じ構造
+     *       lines: [ 
+     *         {
+     *           railwayName: "路線名"
+     *           station_id,
+     *           order_in_railway
+     *         }
+     *       ]
+     *     }
+     *   }
+     * ],
+     ******************************************/
+    pins: [],
   },
 
   // ゲッター
@@ -43,8 +61,9 @@ const store = {
     bounds(state) {
       return state.mapProps.bounds
     },
-    markerList(state) {
-      return state.markerList
+    pins(state) {
+      console.log(state.pins)
+      return state.pins
     },
   },
 
@@ -62,8 +81,11 @@ const store = {
     bounds(state, payload) {
       state.mapProps.bounds = payload
     },
-    markerList(state, payload) {
-      state.markerList = payload
+    setPins(state, payload) {
+      state.pins = payload
+    },
+    addPin(state, payload) {
+      state.pins.push(payload)
     },
   },
 
@@ -78,8 +100,11 @@ const store = {
     updateBounds({ commit }, payload) {
       commit("bounds", payload)
     },
-    markerList({ commit }, payload) {
-      commit("markerList", payload)
+    setPins({ commit }, payload) {
+      commit("setPins", payload)
+    },
+    addPin({ commit }, payload) {
+      commit("addPin", payload)
     },
   },
 }

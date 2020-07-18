@@ -10,15 +10,15 @@
         append-icon="search"
         single-line
         v-bind:style="style.textField"
-        @input="suggestStations"
+        @input="suggestBuildings"
       ></v-text-field>
 
       <!-- <v-btn icon>
         <v-icon>my_location</v-icon>
       </v-btn> -->
     </v-toolbar>
-    <SuggestList v-show="stations.length !== 0"
-      :stations="stations"
+    <SuggestList v-show="buildings.length !== 0"
+      :buildings="buildings"
     ></SuggestList>
   </div>
 </template>
@@ -45,7 +45,7 @@ export default {
           padding: "0px",
         },
       },
-      stations: [],
+      buildings: [],
     }
   },
   // メソッド
@@ -54,14 +54,14 @@ export default {
       this.showSidebar = !this.showSidebar
     },
     
-    suggestStations(input) {
+    suggestBuildings(input) {
       if (input.length === 0) {
-        this.stations = []
+        this.buildings = []
         return
       }
 
       suggest(input)
-        .then(response => this.stations = response.data)
+        .then(response => this.buildings = response.data)
         .catch(error => console.error(error))
     },
   },

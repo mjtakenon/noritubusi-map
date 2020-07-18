@@ -14,7 +14,7 @@
       <!-- Leaflet.js タイルレイヤー -->
       <l-tile-layer :url="tileMapUrl"></l-tile-layer>
       <!-- マーカー -->
-      <Marker :data="marker" :key="m.id" v-for="m in markerList" />
+      <Pin v-bind="pin" :key="idx" v-for="(pin, idx) in pins" />
     </l-map>
   </div>
 </template>
@@ -22,7 +22,7 @@
 <script>
 // Module: vue2-leaflet
 import { LMap, LTileLayer } from "vue2-leaflet"
-import Marker from "./Marker"
+import Pin from "./Pin"
 import "leaflet/dist/leaflet.css"
 
 export default {
@@ -30,7 +30,7 @@ export default {
   components: {
     LMap,
     LTileLayer,
-    Marker,
+    Pin,
   },
   // データ
   data() {
@@ -75,13 +75,13 @@ export default {
         this.$store.dispatch("Map/updateBounds", value)
       },
     },
-    // [Vuex] markerList: マップ上にプロットされるマーカー
-    markerList: {
+    // [Vuex] pins: マップ上にプロットされるマーカー
+    pins: {
       get() {
-        return this.$store.getters["Map/markerList"]
+        return this.$store.getters["Map/pins"]
       },
       set(value) {
-        return this.$store.dispatch("Map/markerList", value)
+        return this.$store.dispatch("Map/pins", value)
       },
     },
   },
