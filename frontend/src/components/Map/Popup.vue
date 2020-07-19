@@ -1,5 +1,5 @@
 <template>
-  <l-popup>
+  <l-popup :options="{autoPan: false}">
     <h2>{{ this.name }}</h2>
     <v-divider class="my-1"></v-divider>
     <v-list dense style="max-height: 200px; overflow-y: auto;" class="py-0">

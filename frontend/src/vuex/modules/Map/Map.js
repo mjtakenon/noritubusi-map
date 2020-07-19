@@ -69,9 +69,6 @@ const store = {
 
   // ミューテーション
   mutations: {
-    mapObject(state, payload) {
-      state.mapObject = payload
-    },
     zoom(state, payload) {
       state.mapProps.zoom = payload
     },

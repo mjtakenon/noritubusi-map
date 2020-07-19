@@ -5,13 +5,11 @@
         <v-list-item v-for="(building, i) in this.buildings" :key="i" @click="onClickSuggestedBuilding(building)">
           <v-list-item-avatar style="font-size: 150%">
             <v-icon>train</v-icon>
-            <!-- <div v-if="isShinkansen(building.railway_line_name)">🚅</div> -->
-            <!-- <div v-else>🚃</div> -->
           </v-list-item-avatar>
           <v-list-item-content>
             <v-list-item-title> {{ building.name }} </v-list-item-title>
             <v-list-item-subtitle>
-              {{ building.lines[0].railway_name + ((building.lines.length !== 1) ? "..." : "") }}
+              {{ railwayNameWithTrailing(building) }}
             </v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
@@ -35,31 +33,13 @@ export default {
     }
   },
   // メソッド
-  // {
-  //   "building_id": 2103,
-  //   "station_id": 4635,
-  //   "name": "東京",
-  //   "latitude": "35.681391",
-  //   "longitude": "139.766103",
-  //   "railway_line_name": "JR総武本線",
-  //   "order_in_railway": 1
-  // }
   methods: {
-    isShinkansen(railwayName) {
-      return railwayName.indexOf('新幹線') != -1
-    },
-    focusBuilding(station) {
-      this.$store.dispatch("Map/updateCenter", {
-        lat: station.latitude,
-        lng: station.longitude,
-      })
-      return 
+    railwayNameWithTrailing(building) {
+      return building.lines[0].railway_name + ((building.lines.length !== 1) ? "..." : "")
     },
     setPin(building) {
       this.$store.dispatch("Map/setPins", [
         { 
-          // lat: building.latitude,
-          // lng: building.longitude,
           latLng: [building.latitude, building.longitude],
           popup: {
             name: building.name,
@@ -72,7 +52,6 @@ export default {
     },
     onClickSuggestedBuilding(building) {
       this.setPin(building)
-      this.focusBuilding(building)
       return
     },
   },

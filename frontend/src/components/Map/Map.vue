@@ -102,7 +102,7 @@ export default {
     },
   },
   // このコンポーネントがマウントされたときに実行される処理
-  mounted: function() {
+  mounted() {
     this.$nextTick(function() {
       // 初期位置・ズームの設定
       this.bounds = this.$refs.mainMap.mapObject.getBounds()

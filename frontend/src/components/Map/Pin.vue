@@ -2,7 +2,7 @@
   <l-marker
     ref="marker"
     :lat-lng="latLng"
-    @add="$nextTick(() => $event.target.openPopup())"
+    @add="$nextTick(() => focusBuildingAndOpenPopup())"
   >
     <Popup v-bind="popup"></Popup>
   </l-marker>
@@ -42,14 +42,20 @@ export default {
   data() {
     return {}
   },
-  mounted() {
-    console.log(this.$el)
-    // console.log(this.$refs.marker.mapObject)
-    // if (this.autoOpenPopup) {
-    //   this.$refs.marker.mapObject.togglePopup()
-    // }
-    // this.isVisible = this.autoOpenPopup
+  methods: {
+    focusBuildingAndOpenPopup() {
+      this.$refs.marker.mapObject.openPopup()
+      this.focusBuilding()
+    },
+    focusBuilding() {
+      this.$store.dispatch("Map/updateCenter", {
+        lat: this.latLng[0],
+        lng: this.latLng[1],
+      })
+    },
   },
-  methods: {},
+  updated() {
+    this.focusBuildingAndOpenPopup()
+  },
 }
 </script>
