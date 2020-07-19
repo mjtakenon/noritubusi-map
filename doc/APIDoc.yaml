@@ -224,30 +224,28 @@ paths:
           description: ログイン失敗
         500:
           description: 内部エラー
-  "/users/delete":
-    post:
+    delete:
       tags:
         - user
       summary: ユーザの削除
       description: ""
       parameters:
-        - name: userid
-          in: query
-          description: ユーザーID
-          required: true
-          type: string
-        - name: password
-          in: query
-          description: パスワード
-          required: true
-          type: string
+        - name: request
+          in: body
+          schema:
+            type: object
+            properties:
+              password:
+                type: string
       responses:
         200:
           description: OK
         400:
-          description: 削除が失敗
+          description: パラメータ不整合
         401:
           description: ログイン失敗
+        500:
+          description: サーバーエラー
   "/users/{userid}/record":
     get:
       tags:
