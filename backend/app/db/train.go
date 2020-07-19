@@ -13,7 +13,7 @@ type BuildingInfo struct {
 	Name                 string `db:"name" json:"name"`
 	Latitude             string `db:"lat" json:"latitude"`
 	Longitude            string `db:"long" json:"longitude"`
-	ConnectedRailwaysNum int64  `db:"connected_railways_num" json:"connected_railways_num"`
+	ConnectedRailwaysNum int64  `db:"connected_railways_num" json:"connectedRailwaysNum"`
 }
 
 type RailwayInfo struct {
@@ -22,13 +22,13 @@ type RailwayInfo struct {
 }
 
 type StationInfo struct {
-	BuildingId     int64  `db:"building_id" json:"building_id"`
-	StationId      int64  `db:"station_id" json:"station_id"`
+	BuildingId     int64  `db:"building_id" json:"buildingId"`
+	StationId      int64  `db:"station_id" json:"stationId"`
 	Name           string `db:"station_name" json:"name"`
 	Latitude       string `db:"lat" json:"latitude"`
 	Longitude      string `db:"long" json:"longitude"`
-	RailwayName    string `db:"railway_line_name" json:"railway_line_name"`
-	OrderInRailway int64  `db:"num_in_railway" json:"order_in_railway"`
+	RailwayName    string `db:"railway_line_name" json:"railwayLineName"`
+	OrderInRailway int64  `db:"num_in_railway" json:"orderInRailway"`
 }
 
 func (s StationInfo) String() string {
