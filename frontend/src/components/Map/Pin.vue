@@ -44,7 +44,9 @@ export default {
   },
   methods: {
     focusBuildingAndOpenPopup() {
-      this.$refs.marker.mapObject.openPopup()
+      if (this.autoOpenPopup) {
+        this.$refs.marker.mapObject.openPopup()
+      }
       this.focusBuilding()
     },
     focusBuilding() {
