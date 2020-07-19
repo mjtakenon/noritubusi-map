@@ -42,7 +42,7 @@ export default {
       },
 
       // tileMapUrl: Leaflet.js のタイルマップのURL
-      tileMapUrl: "https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png", // 地理院地図
+      tileMapUrl: "https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png", // 地理院地図
       // tileMapUrl: "http://{s}.tile.osm.org/{z}/{x}/{y}.png",                   // OpenStreetMap
     }
   },
