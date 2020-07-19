@@ -4,7 +4,7 @@ import "time"
 
 type UserInfo struct {
 	Id             string    `db:"id"`
-	HashedPassword string    `db:"hashed_password"`
+	HashedPassword string    `db:"hashed_password" json:"-"`
 	CreateTime     time.Time `db:"create_time"`
 	ChangeTime     time.Time `db:"change_time"`
 }
