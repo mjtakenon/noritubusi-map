@@ -197,7 +197,11 @@ func putUserInfo(c echo.Context) error {
 }
 
 func deleteUserInfo(c echo.Context) error {
-	password := c.FormValue("password")
+	m := echo.Map{}
+	if err := c.Bind(&m); err != nil {
+		return err
+	}
+	password := m["password"].(string)
 
 	if password == "" {
 		return c.String(http.StatusBadRequest, "invalid parameter")
@@ -228,6 +232,11 @@ func deleteUserInfo(c echo.Context) error {
 	err = DB.DeleteUser(userID)
 	if err != nil {
 		return c.String(http.StatusBadRequest, "failed")
+	}
+
+	// cookie削除
+	if err := saveSession("", -1, c); err != nil {
+		return c.String(http.StatusInternalServerError, "cookie delete failed")
 	}
 
 	return c.JSON(http.StatusOK, "ok")
