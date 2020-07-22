@@ -572,7 +572,7 @@ func TestDB_GetStationInfoInRange(t *testing.T) {
 	}
 }
 
-func TestDB_GetStationsInfoByID(t *testing.T) {
+func TestDB_GetStationsInfoByRailwayID(t *testing.T) {
 	type fields struct {
 		DB *sqlx.DB
 	}
@@ -627,7 +627,7 @@ func TestDB_GetStationsInfoByID(t *testing.T) {
 			d := &DB{
 				DB: tt.fields.DB,
 			}
-			got, err := d.GetStationsInfoByID(tt.args.id)
+			got, err := d.GetStationsInfoByRailwayID(tt.args.id)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("DB.GetStationsInfoByID() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -639,7 +639,7 @@ func TestDB_GetStationsInfoByID(t *testing.T) {
 	}
 }
 
-func TestDB_GetStationsInfoByName(t *testing.T) {
+func TestDB_GetStationsInfoByRailwayName(t *testing.T) {
 	type fields struct {
 		DB *sqlx.DB
 	}
@@ -694,7 +694,7 @@ func TestDB_GetStationsInfoByName(t *testing.T) {
 			d := &DB{
 				DB: tt.fields.DB,
 			}
-			got, err := d.GetStationsInfoByName(tt.args.name)
+			got, err := d.GetStationsInfoByRailwayName(tt.args.name)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("DB.GetStationsInfoByName() error = %v, wantErr %v", err, tt.wantErr)
 				return
