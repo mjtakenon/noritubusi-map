@@ -166,6 +166,8 @@ func putUserInfo(c echo.Context) error {
 	if err != nil {
 		return c.String(http.StatusInternalServerError, "session not found")
 	}
+
+	// セッションからユーザID取得
 	userID, ok := sess.Values["userID"].(string)
 	if ok == false {
 		return c.String(http.StatusUnauthorized, "you should login before changing password")
@@ -212,6 +214,8 @@ func deleteUserInfo(c echo.Context) error {
 	if err != nil {
 		return c.String(http.StatusInternalServerError, "session not found")
 	}
+
+	// セッションからユーザIDを取得
 	userID, ok := sess.Values["userID"].(string)
 	if ok == false {
 		return c.String(http.StatusUnauthorized, "you should login before changing password")
