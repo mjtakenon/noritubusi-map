@@ -188,44 +188,64 @@ paths:
       parameters:
         - name: userid
           in: path
-          description: Created user object
+          description: ユーザーID
           required: true
           type: string
       responses:
-        "200":
+        200:
           description: ユーザ情報の取得が成功
-        "404":
+          schema:
+            $ref: "#/definitions/userInfomation"
+        404:
           description: ユーザが見つからなかった
+  "/users":
     put:
       tags:
         - user
-      summary: ユーザ情報の変更
+      summary: パスワードの変更
       description: ""
       parameters:
-        - name: userid
-          in: path
-          description: Created user object
+        - name: current_password
+          in: query
+          description: 現在のパスワード
+          required: true
+          type: string
+        - name: new_password
+          in: query
+          description: 新しいパスワード
           required: true
           type: string
       responses:
-        "200":
+        200:
           description: OK
-        "400":
-          description: 情報変更が失敗
+        400:
+          description: パスワード変更が失敗
+        401:
+          description: ログイン失敗
+        500:
+          description: 内部エラー
     delete:
       tags:
         - user
       summary: ユーザの削除
       description: ""
       parameters:
-        - name: userid
-          in: path
-          description: Created user object
-          required: true
-          type: string
+        - name: request
+          in: body
+          schema:
+            type: object
+            properties:
+              password:
+                type: string
       responses:
-        "200":
+        200:
           description: OK
+        400:
+          description: パラメータ不整合
+        401:
+          description: ログイン失敗
+        500:
+          description: サーバーエラー
   "/users/{userid}/record":
     get:
       tags:
@@ -238,7 +258,7 @@ paths:
       parameters:
         - name: userid
           in: path
-          description: Created user object
+          description: ユーザーID
           required: true
           type: string
         - name: begin_latitude
@@ -262,9 +282,9 @@ paths:
           required: true
           type: number
       responses:
-        "200":
+        200:
           description: 乗り潰し駅情報の取得が成功
-        "404":
+        404:
           description: 乗り潰し駅情報が見つからなかった
     post:
       tags:
@@ -274,7 +294,7 @@ paths:
       parameters:
         - name: userid
           in: path
-          description: Created user object
+          description: ユーザーID
           required: true
           type: string
         - name: begin_station_id
@@ -478,3 +498,22 @@ definitions:
         # description:
         type: number
         example: 4
+  userInfomation:
+    type: object
+    properties:
+      id:
+        description: ユーザーID
+        type: string
+        example: mjtakenon
+      hashed_password:
+        description: ハッシュ化パスワード
+        type: string
+        example: $2a$10$uy.XzaOpSaPVPTCo6PW6k.C3x9mB9ZIrpiotuRwflR3JYzXIEeovy
+      create_time:
+        description: アカウント作成日時
+        type: string
+        example: "2019-04-01 00:00:00"
+      change_time:
+        description: アカウント変更日時
+        type: string
+        example: "2019-04-01 00:00:00"
