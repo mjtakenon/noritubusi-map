@@ -160,6 +160,7 @@ func getUserInfo(c echo.Context) error {
 func putUserInfo(c echo.Context) error {
 	currentPass := c.FormValue("current_password")
 	newPass := c.FormValue("new_password")
+	userID := c.Param("userid")
 
 	// セッション取得
 	sess, err := session.Get("session", c)
@@ -168,13 +169,18 @@ func putUserInfo(c echo.Context) error {
 	}
 
 	// セッションからユーザID取得
-	userID, ok := sess.Values["userID"].(string)
+	sessionUserID, ok := sess.Values["userID"].(string)
 	if ok == false {
 		return c.String(http.StatusUnauthorized, "you should login before changing password")
 	}
 
+	// 変更するユーザとログインしているユーザが異なる
+	if userID != sessionUserID {
+		return c.String(http.StatusForbidden, "you don't have permission")
+	}
+
 	//ユーザ情報取得
-	userInfo, err := DB.GetUserInfoByUserID(userID)
+	userInfo, err := DB.GetUserInfoByUserID(sessionUserID)
 	if err != nil { // DBとsessionの整合性が取れてないとき？
 		return c.String(http.StatusInternalServerError, "internal error")
 	}
@@ -190,7 +196,7 @@ func putUserInfo(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, "server error")
 	}
 
-	err = DB.UpdateUser(userID, string(hash))
+	err = DB.UpdateUser(sessionUserID, string(hash))
 	if err != nil {
 		return c.String(http.StatusBadRequest, "failed")
 	}
@@ -216,13 +222,21 @@ func deleteUserInfo(c echo.Context) error {
 	}
 
 	// セッションからユーザIDを取得
-	userID, ok := sess.Values["userID"].(string)
+	sessionUserID, ok := sess.Values["userID"].(string)
 	if ok == false {
 		return c.String(http.StatusUnauthorized, "you should login before changing password")
 	}
 
+	// パスパラメータ取得
+	userID := c.Param("userid")
+
+	// 変更するユーザとログインしているユーザが異なる
+	if userID != sessionUserID {
+		return c.String(http.StatusForbidden, "you don't have permission")
+	}
+
 	//ユーザ情報取得
-	userInfo, err := DB.GetUserInfoByUserID(userID)
+	userInfo, err := DB.GetUserInfoByUserID(sessionUserID)
 	if err != nil { // DBとsessionの整合性が取れてないとき？
 		return c.String(http.StatusInternalServerError, "internal error")
 	}
@@ -233,7 +247,7 @@ func deleteUserInfo(c echo.Context) error {
 		return c.String(http.StatusUnauthorized, "wrong password")
 	}
 
-	err = DB.DeleteUser(userID)
+	err = DB.DeleteUser(sessionUserID)
 	if err != nil {
 		return c.String(http.StatusBadRequest, "failed")
 	}
@@ -440,8 +454,8 @@ func main() {
 	e.GET("/stations/suggest", getStationNameSuggestion)
 
 	e.GET("/users/:userid", getUserInfo)
-	e.PUT("/users", putUserInfo)
-	e.DELETE("/users", deleteUserInfo)
+	e.PUT("/users/:userid", putUserInfo)
+	e.DELETE("/users/:userid", deleteUserInfo)
 
 	e.POST("/signup", createUser)
 
