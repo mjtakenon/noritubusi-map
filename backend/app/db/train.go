@@ -22,17 +22,17 @@ type RailwayInfo struct {
 }
 
 type StationInfo struct {
-	BuildingId      int64  `db:"building_id" json:"buildingId"`
-	StationId       int64  `db:"station_id" json:"stationId"`
-	Name            string `db:"station_name" json:"name"`
-	Latitude        string `db:"lat" json:"latitude"`
-	Longitude       string `db:"long" json:"longitude"`
-	RailwayLineName string `db:"railway_line_name" json:"railwayLineName"`
-	OrderInRailway  int64  `db:"num_in_railway" json:"orderInRailway"`
+	BuildingId     int64  `db:"building_id" json:"buildingId"`
+	StationId      int64  `db:"station_id" json:"stationId"`
+	Name           string `db:"station_name" json:"name"`
+	Latitude       string `db:"lat" json:"latitude"`
+	Longitude      string `db:"long" json:"longitude"`
+	RailwayName    string `db:"railway_line_name" json:"railwayName"`
+	OrderInRailway int64  `db:"num_in_railway" json:"orderInRailway"`
 }
 
 func (s StationInfo) String() string {
-	return fmt.Sprintf("[%4d, %4d]%s, (%s,%s),  %s ,%d", s.BuildingId, s.StationId, s.Name, s.Latitude, s.Longitude, s.RailwayLineName, s.OrderInRailway)
+	return fmt.Sprintf("[%4d, %4d]%s, (%s,%s),  %s ,%d", s.BuildingId, s.StationId, s.Name, s.Latitude, s.Longitude, s.RailwayName, s.OrderInRailway)
 }
 
 type DB struct {
