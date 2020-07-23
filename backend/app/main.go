@@ -243,9 +243,9 @@ type BuildingInfo struct {
 }
 
 type Line struct {
-	RailwayName    string `json:"railwayName"`
-	StationID      int64  `json:"stationId"`
-	OrderInRailWay int64  `json:"orderInRailway"`
+	RailwayLineName string `json:"railwayLineName"`
+	StationID       int64  `json:"stationId"`
+	OrderInRailWay  int64  `json:"orderInRailway"`
 }
 
 func convertStationInfo2BuildingInfo(stationInfos []db.StationInfo) []BuildingInfo {
@@ -272,7 +272,7 @@ func convertStationInfo2BuildingInfo(stationInfos []db.StationInfo) []BuildingIn
 		}
 
 		// 路線情報追加
-		buildingInfo.Lines = append(buildingInfo.Lines, Line{RailwayName: info.RailwayName,
+		buildingInfo.Lines = append(buildingInfo.Lines, Line{RailwayLineName: info.RailwayLineName,
 			StationID:      info.StationId,
 			OrderInRailWay: info.OrderInRailway,
 		})
