@@ -126,9 +126,9 @@ func TestDB_UpdateUser(t *testing.T) {
 			wantErr: false,
 		},
 	}
-	//テストデータ生成
-	SetUpDB(t).Exec(`INSERT INTO users (id,hashed_password) VALUES (?,?)`, tests[0].args.userID, "$2a$10$uy.XzaOpSaPVPTCo6PW6k.C3x9mB9ZIrpiotuRwflR3JYzXIEeovy")
 	for _, tt := range tests {
+		//テストデータ生成
+		SetUpDB(t).Exec(`INSERT INTO users (id,hashed_password) VALUES (?,?)`, tt.args.userID, "$2a$10$uy.XzaOpSaPVPTCo6PW6k.C3x9mB9ZIrpiotuRwflR3JYzXIEeovy")
 		t.Run(tt.name, func(t *testing.T) {
 			d := &DB{
 				DB: tt.fields.DB,
@@ -137,9 +137,9 @@ func TestDB_UpdateUser(t *testing.T) {
 				t.Errorf("DB.UpdateUser() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
+		//テストデータ削除
+		SetUpDB(t).Exec(`DELETE FROM users WHERE id = ?`, tt.args.userID)
 	}
-	//テストデータ削除
-	SetUpDB(t).Exec(`DELETE FROM users WHERE id = ?`, tests[0].args.userID)
 }
 
 func TestDB_DeleteUser(t *testing.T) {
@@ -164,9 +164,9 @@ func TestDB_DeleteUser(t *testing.T) {
 			wantErr: false,
 		},
 	}
-	//テストデータ生成
-	SetUpDB(t).Exec(`INSERT INTO users (id,hashed_password) VALUES (?,?)`, tests[0].args.userID, "$2a$10$uy.XzaOpSaPVPTCo6PW6k.C3x9mB9ZIrpiotuRwflR3JYzXIEeovy")
 	for _, tt := range tests {
+		//テストデータ生成
+		SetUpDB(t).Exec(`INSERT INTO users (id,hashed_password) VALUES (?,?)`, tt.args.userID, "$2a$10$uy.XzaOpSaPVPTCo6PW6k.C3x9mB9ZIrpiotuRwflR3JYzXIEeovy")
 		t.Run(tt.name, func(t *testing.T) {
 			d := &DB{
 				DB: tt.fields.DB,
