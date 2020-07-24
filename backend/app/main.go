@@ -286,7 +286,7 @@ func createUser(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, "cookie store failed")
 	}
 
-	return c.JSON(http.StatusCreated, map[string]string{"userid": userID})
+	return c.JSON(http.StatusCreated, map[string]string{"userId": userID})
 }
 
 func signin(c echo.Context) error {
@@ -312,7 +312,7 @@ func signin(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, "login failed")
 	}
 
-	return c.JSON(http.StatusOK, map[string]string{"userid": userID})
+	return c.JSON(http.StatusOK, map[string]string{"userId": userID})
 }
 
 func signout(c echo.Context) error {
@@ -349,7 +349,7 @@ func saveSession(userID string, maxAge int, c echo.Context) error {
 
 // 構造体
 type BuildingInfo struct {
-	BuildingID int64  `json:"building_id"`
+	BuildingID int64  `json:"buildingId"`
 	Name       string `json:"name"`
 	Latitude   string `json:"latitude"`
 	Longitude  string `json:"longitude"`
@@ -357,9 +357,9 @@ type BuildingInfo struct {
 }
 
 type Line struct {
-	RailwayName    string `json:"railway_name"`
-	StationID      int64  `json:"station_id"`
-	OrderInRailWay int64  `json:"order_in_railway"`
+	RailwayName    string `json:"railwayName"`
+	StationID      int64  `json:"stationId"`
+	OrderInRailWay int64  `json:"orderInRailway"`
 }
 
 func convertStationInfo2BuildingInfo(stationInfos []db.StationInfo) []BuildingInfo {
