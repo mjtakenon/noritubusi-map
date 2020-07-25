@@ -479,11 +479,11 @@ tags
 [._]*.un~
 
 ### VisualStudioCode ###
-.vscode/
-# !.vscode/settings.json
-# !.vscode/tasks.json
-# !.vscode/launch.json
-# !.vscode/extensions.json
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
 
 ### IntelliJ IDEA ###
 .idea/
