@@ -362,6 +362,11 @@ type Line struct {
 	OrderInRailWay int64  `json:"orderInRailway"`
 }
 
+type Response struct {
+	Status  string `json:"status"`
+	Message string `json:"message"`
+}
+
 func convertStationInfo2BuildingInfo(stationInfos []db.StationInfo) []BuildingInfo {
 	//現在の建物番号
 	prevID := int64(0)
