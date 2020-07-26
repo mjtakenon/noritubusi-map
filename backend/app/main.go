@@ -157,8 +157,12 @@ func getUserInfo(c echo.Context) error {
 }
 
 func putUserInfo(c echo.Context) error {
-	currentPass := c.FormValue("current_password")
-	newPass := c.FormValue("new_password")
+	m := echo.Map{}
+	if err := c.Bind(&m); err != nil {
+		return err
+	}
+	currentPass := m["current_password"].(string)
+	newPass := m["new_password"].(string)
 	userID := c.Param("userid")
 
 	// セッション取得
@@ -261,8 +265,12 @@ func deleteUserInfo(c echo.Context) error {
 
 func createUser(c echo.Context) error {
 	//パラメータ検査
-	userID := c.FormValue("userid")
-	password := c.FormValue("password")
+	m := echo.Map{}
+	if err := c.Bind(&m); err != nil {
+		return err
+	}
+	userID := m["userid"].(string)
+	password := m["password"].(string)
 	if userID == "" || password == "" ||
 		!govalidator.IsAlphanumeric(userID) || !govalidator.IsByteLength(userID, 1, 128) {
 		return c.JSON(http.StatusBadRequest, Response{Status: 200, Message: "invalid paramater"})
@@ -289,8 +297,12 @@ func createUser(c echo.Context) error {
 }
 
 func signin(c echo.Context) error {
-	userID := c.FormValue("userid")
-	password := c.FormValue("password")
+	m := echo.Map{}
+	if err := c.Bind(&m); err != nil {
+		return err
+	}
+	userID := m["userid"].(string)
+	password := m["password"].(string)
 	if userID == "" || password == "" {
 		return c.JSON(http.StatusBadRequest, Response{Status: 200, Message: "invalid paramater"})
 	}
