@@ -14,9 +14,9 @@ import (
 	"github.com/asaskevich/govalidator"
 	"github.com/boj/redistore"
 	"github.com/gorilla/sessions"
-	"github.com/labstack/echo"
 	"github.com/labstack/echo-contrib/session"
-	"github.com/labstack/echo/middleware"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 // Handler
@@ -146,6 +146,120 @@ func getRailwaysInfoByQuery(c echo.Context) error {
 	}
 }
 
+func getUserInfo(c echo.Context) error {
+	userid := c.Param("userid")
+
+	userInfo, err := DB.GetUserInfoByUserID(userid)
+	if err != nil {
+		return c.String(http.StatusNotFound, "not found")
+	}
+
+	return c.JSON(http.StatusOK, userInfo)
+}
+
+func putUserInfo(c echo.Context) error {
+	currentPass := c.FormValue("current_password")
+	newPass := c.FormValue("new_password")
+	userID := c.Param("userid")
+
+	// セッション取得
+	sess, err := session.Get("session", c)
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "session not found")
+	}
+
+	// セッションからユーザID取得
+	sessionUserID, ok := sess.Values["userID"].(string)
+	if ok == false {
+		return c.String(http.StatusUnauthorized, "you should login before changing password")
+	}
+
+	// 変更するユーザとログインしているユーザが異なる
+	if userID != sessionUserID {
+		return c.String(http.StatusForbidden, "you don't have permission")
+	}
+
+	//ユーザ情報取得
+	userInfo, err := DB.GetUserInfoByUserID(sessionUserID)
+	if err != nil { // DBとsessionの整合性が取れてないとき？
+		return c.String(http.StatusInternalServerError, "internal error")
+	}
+
+	//パスワード比較
+	if err := bcrypt.CompareHashAndPassword([]byte(userInfo.HashedPassword), []byte(currentPass)); err != nil {
+		return c.String(http.StatusUnauthorized, "login failed")
+	}
+
+	//ハッシュ化
+	hash, err := bcrypt.GenerateFromPassword([]byte(newPass), bcrypt.DefaultCost)
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "server error")
+	}
+
+	err = DB.UpdateUser(sessionUserID, string(hash))
+	if err != nil {
+		return c.String(http.StatusBadRequest, "failed")
+	}
+
+	return c.JSON(http.StatusOK, "ok")
+}
+
+func deleteUserInfo(c echo.Context) error {
+	m := echo.Map{}
+	if err := c.Bind(&m); err != nil {
+		return err
+	}
+	password := m["password"].(string)
+
+	if password == "" {
+		return c.String(http.StatusBadRequest, "invalid parameter")
+	}
+
+	// セッション取得
+	sess, err := session.Get("session", c)
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "session not found")
+	}
+
+	// セッションからユーザIDを取得
+	sessionUserID, ok := sess.Values["userID"].(string)
+	if ok == false {
+		return c.String(http.StatusUnauthorized, "you should login before changing password")
+	}
+
+	// パスパラメータ取得
+	userID := c.Param("userid")
+
+	// 変更するユーザとログインしているユーザが異なる
+	if userID != sessionUserID {
+		return c.String(http.StatusForbidden, "you don't have permission")
+	}
+
+	//ユーザ情報取得
+	userInfo, err := DB.GetUserInfoByUserID(sessionUserID)
+	if err != nil { // DBとsessionの整合性が取れてないとき？
+		return c.String(http.StatusInternalServerError, "internal error")
+	}
+
+	//パスワード比較
+	// TODO: 権限チェック，管理者なら一般ユーザを削除可能にするかも？
+	if err := bcrypt.CompareHashAndPassword([]byte(userInfo.HashedPassword), []byte(password)); err != nil {
+		return c.String(http.StatusUnauthorized, "wrong password")
+	}
+
+	err = DB.DeleteUser(sessionUserID)
+	if err != nil {
+		return c.String(http.StatusBadRequest, "failed")
+	}
+
+	// cookie削除
+	if err := saveSession("", -1, c); err != nil {
+		return c.String(http.StatusInternalServerError, "cookie delete failed")
+	}
+
+	return c.JSON(http.StatusOK, "ok")
+}
+
 func createUser(c echo.Context) error {
 	//パラメータ検査
 	userID := c.FormValue("userid")
@@ -172,7 +286,7 @@ func createUser(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, "cookie store failed")
 	}
 
-	return c.JSON(http.StatusCreated, map[string]string{"userid": userID})
+	return c.JSON(http.StatusCreated, map[string]string{"userId": userID})
 }
 
 func signin(c echo.Context) error {
@@ -198,7 +312,7 @@ func signin(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, "login failed")
 	}
 
-	return c.JSON(http.StatusOK, map[string]string{"userid": userID})
+	return c.JSON(http.StatusOK, map[string]string{"userId": userID})
 }
 
 func signout(c echo.Context) error {
@@ -235,7 +349,7 @@ func saveSession(userID string, maxAge int, c echo.Context) error {
 
 // 構造体
 type BuildingInfo struct {
-	BuildingID int64  `json:"building_id"`
+	BuildingID int64  `json:"buildingId"`
 	Name       string `json:"name"`
 	Latitude   string `json:"latitude"`
 	Longitude  string `json:"longitude"`
@@ -243,9 +357,9 @@ type BuildingInfo struct {
 }
 
 type Line struct {
-	RailwayName    string `json:"railway_name"`
-	StationID      int64  `json:"station_id"`
-	OrderInRailWay int64  `json:"order_in_railway"`
+	RailwayName    string `json:"railwayName"`
+	StationID      int64  `json:"stationId"`
+	OrderInRailWay int64  `json:"orderInRailway"`
 }
 
 func convertStationInfo2BuildingInfo(stationInfos []db.StationInfo) []BuildingInfo {
@@ -340,10 +454,14 @@ func main() {
 	e.GET("/stations/:stationid", getStationInfoByID)
 	e.GET("/stations/suggest", getStationNameSuggestion)
 
+	e.GET("/users/:userid", getUserInfo)
+	e.PUT("/users/:userid", putUserInfo)
+	e.DELETE("/users/:userid", deleteUserInfo)
+
 	e.POST("/signup", createUser)
 
 	e.POST("/signin", signin)
-	e.DELETE("signin", signout)
+	e.DELETE("/signin", signout)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":1323"))
