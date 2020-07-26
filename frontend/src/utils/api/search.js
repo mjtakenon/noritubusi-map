@@ -13,10 +13,10 @@ export async function suggest(keyword) {
 
   return await axios
     .get(
-      "/buildings/suggest", 
+      "/buildings/suggest",
       {
-        params: { keyword }
-      }, 
+        params: { keyword },
+      },
       {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
       }

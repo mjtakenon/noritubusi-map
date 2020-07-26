@@ -36,7 +36,7 @@ const store = {
      *     popup: {
      *       name: "駅建物名",
      *       // lines は /buildings/suggest のレスポンスと同じ構造
-     *       lines: [ 
+     *       lines: [
      *         {
      *           railwayName: "路線名"
      *           station_id,

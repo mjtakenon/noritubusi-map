@@ -1,5 +1,5 @@
 <template>
-  <l-popup :options="{autoPan: false}">
+  <l-popup :options="{ autoPan: false }">
     <h2>{{ this.name }}</h2>
     <v-divider class="my-1"></v-divider>
     <v-list dense style="max-height: 200px; overflow-y: auto;" class="py-0">
@@ -14,7 +14,7 @@
           <v-icon>train</v-icon>
         </v-list-item-avatar>
         <v-list-item-content class="py-0">
-          <v-list-item-title>{{line.railway_name}}</v-list-item-title>
+          <v-list-item-title>{{ line.railway_name }}</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
     </v-list>
@@ -37,9 +37,7 @@ export default {
       type: Array,
       required: true,
       validator(lines) {
-        return lines.every(
-          line => line.hasOwnProperty("railway_name")
-        )
+        return lines.every(line => line.hasOwnProperty("railway_name"))
       },
     },
   },

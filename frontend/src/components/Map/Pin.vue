@@ -23,11 +23,8 @@ export default {
       required: true,
       validator(latLng) {
         // 配列長が2(緯度, 軽度) かつ 全要素が Number であること
-        return latLng.length === 2
-              && latLng.every(
-                elem => !isNaN(elem)
-              )
-      }
+        return latLng.length === 2 && latLng.every(elem => !isNaN(elem))
+      },
     },
     popup: {
       type: Object,
@@ -37,7 +34,7 @@ export default {
       type: Boolean,
       required: false,
       default: false,
-    }
+    },
   },
   data() {
     return {}

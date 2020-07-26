@@ -17,7 +17,8 @@
         <v-icon>my_location</v-icon>
       </v-btn> -->
     </v-toolbar>
-    <SuggestList v-show="buildings.length !== 0"
+    <SuggestList
+      v-show="buildings.length !== 0"
       :buildings="buildings"
     ></SuggestList>
   </div>
@@ -30,7 +31,7 @@ import SuggestList from "./SuggestList"
 
 export default {
   components: {
-    SuggestList
+    SuggestList,
   },
   data() {
     return {
@@ -53,7 +54,7 @@ export default {
     toggleSidebar() {
       this.showSidebar = !this.showSidebar
     },
-    
+
     suggestBuildings(input) {
       if (input.length === 0) {
         this.buildings = []
@@ -61,7 +62,7 @@ export default {
       }
 
       suggest(input)
-        .then(response => this.buildings = response.data)
+        .then(response => (this.buildings = response.data))
         .catch(error => console.error(error))
     },
   },
