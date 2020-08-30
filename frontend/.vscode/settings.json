@@ -1,0 +1,37 @@
+{
+  /***********************************/
+  /**  Extensions:  Emmet           **/
+  /***********************************/
+  // Settings: Emmet
+  "emmet.includeLanguages": {
+    "erb": "html",
+    "vue-html": "html",
+  },
+  "emmet.showSuggestionsAsSnippets": true,
+  "[javascript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.tslint": true
+    }
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.tslint": true
+    }
+  },
+  // ESLint 有効化
+  "eslint.enable": true,
+  // ファイル保存時にフォーマットするように
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  // Webpack の '@' エイリアスの補完に対応
+  "path-intellisense.mappings": {
+    "@": "${workspaceRoot}/frontend/src",
+  },
+  // Vetur 内蔵のフォーマット機能を無効化
+  // - ESLint と干渉するため
+  "vetur.format.defaultFormatter.js": "none",
+  "vetur.format.defaultFormatter.html": "none",
+}

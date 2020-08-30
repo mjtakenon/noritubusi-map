@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "octref.vetur",
+    "dariofuzinato.vue-peek",
+    "dbaeumer.vscode-eslint",
+    "syler.sass-indented",
+  ]
+}
