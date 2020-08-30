@@ -58,7 +58,7 @@ export default {
   // メソッド
   methods: {
     railwayNameJoinWithComma(building) {
-      return building.lines.map(line => line.railway_name).join(", ")
+      return building.lines.map(line => line.railwayName).join(", ")
     },
     setPin(building) {
       this.$store.dispatch("Map/setPins", [

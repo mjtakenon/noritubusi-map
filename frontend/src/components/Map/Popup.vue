@@ -14,7 +14,7 @@
           <v-icon>train</v-icon>
         </v-list-item-avatar>
         <v-list-item-content class="py-0">
-          <v-list-item-title>{{ line.railway_name }}</v-list-item-title>
+          <v-list-item-title>{{ line.railwayName }}</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
     </v-list>
@@ -37,7 +37,7 @@ export default {
       type: Array,
       required: true,
       validator(lines) {
-        return lines.every(line => line.hasOwnProperty("railway_name"))
+        return lines.every(line => line.hasOwnProperty("railwayName"))
       },
     },
   },

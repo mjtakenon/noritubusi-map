@@ -1,0 +1,22 @@
+{
+	"folders": [
+		{
+			"path": "frontend"
+		},
+		{
+			"path": "backend"
+		},
+		{
+			"path": "doc"
+		}
+	],
+	"settings": {
+		"emmet.includeLanguages": {
+			"erb": "html",
+			"vue-html": "html"
+		},
+		"emmet.showSuggestionsAsSnippets": true,
+		"vetur.format.defaultFormatter.js": "none",
+		"vetur.format.defaultFormatter.html": "none"
+	}
+}
