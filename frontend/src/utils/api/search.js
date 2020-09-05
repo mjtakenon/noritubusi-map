@@ -33,3 +33,21 @@ export async function suggest(keyword) {
       throw error.response
     })
 }
+
+export async function railways(railwayName) {
+  // TODO: リクエスト間隔を空けるような実装に (例: 100ms ごと)
+
+  return await axios
+    .get(`/railways/${railwayName}`)
+    .then(response => {
+      // 200 OK なら成功なのでレスポンスを返す それ以外なら例外を投げる
+      if (response.status === 200) {
+        return response
+      } else {
+        throw response
+      }
+    })
+    .catch(error => {
+      throw error.response
+    })
+}
