@@ -11,7 +11,8 @@
       color="info"
       right
       style="margin-top: 12px;"
-    >Test</v-btn>
+      >Test</v-btn
+    >
   </v-app>
 </template>
 
