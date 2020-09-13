@@ -31,13 +31,13 @@ func getBuildingInfoInRange(c echo.Context) error {
 	endLong := c.QueryParam("end_longitude")
 
 	if beginLat == "" || beginLong == "" || endLat == "" || endLong == "" {
-		return c.JSON(http.StatusBadRequest, Response{Status: 200, Message: "invalid paramater"})
+		return c.JSON(http.StatusBadRequest, ProcessResult{Code: 200, Message: "invalid paramater"})
 	}
 
 	stationInfo, err := DB.GetStationInfoInRange(beginLat, beginLong, endLat, endLong)
 	if err != nil {
 		log.Println("/stations get info error:", err)
-		return c.JSON(http.StatusInternalServerError, Response{Status: 900, Message: "server error"})
+		return c.JSON(http.StatusInternalServerError, ProcessResult{Code: 900, Message: "server error"})
 	}
 
 	return c.JSON(http.StatusOK, convertStationInfo2BuildingInfo(stationInfo))
@@ -46,12 +46,12 @@ func getBuildingInfoInRange(c echo.Context) error {
 func getStationInfoByID(c echo.Context) error {
 	stationID, err := strconv.Atoi(c.Param("stationid"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, Response{Status: 200, Message: "invalid paramater"})
+		return c.JSON(http.StatusBadRequest, ProcessResult{Code: 200, Message: "invalid paramater"})
 	}
 
 	stationInfo, err := DB.GetStationInfoByID(stationID)
 	if err != nil {
-		return c.JSON(http.StatusNotFound, Response{Status: 103, Message: "not found"})
+		return c.JSON(http.StatusNotFound, ProcessResult{Code: 103, Message: "not found"})
 	}
 
 	return c.JSON(http.StatusOK, stationInfo)
@@ -60,16 +60,16 @@ func getStationInfoByID(c echo.Context) error {
 func getStationInfoByBuildingID(c echo.Context) error {
 	buildingID, err := strconv.Atoi(c.Param("buildingid"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, Response{Status: 200, Message: "invalid paramater"})
+		return c.JSON(http.StatusBadRequest, ProcessResult{Code: 200, Message: "invalid paramater"})
 	}
 
 	stationInfos, err := DB.GetStationInfoByBuildingID(buildingID)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, Response{Status: 901, Message: "db error"})
+		return c.JSON(http.StatusInternalServerError, ProcessResult{Code: 901, Message: "db error"})
 	}
 
 	if len(stationInfos) == 0 {
-		return c.JSON(http.StatusNotFound, Response{Status: 103, Message: "not found"})
+		return c.JSON(http.StatusNotFound, ProcessResult{Code: 103, Message: "not found"})
 	}
 
 	return c.JSON(http.StatusOK, stationInfos)
@@ -78,12 +78,12 @@ func getStationInfoByBuildingID(c echo.Context) error {
 func getStationNameSuggestion(c echo.Context) error {
 	keyword := c.QueryParam("keyword")
 	if keyword == "" {
-		return c.JSON(http.StatusBadRequest, Response{Status: 200, Message: "invalid paramater"})
+		return c.JSON(http.StatusBadRequest, ProcessResult{Code: 200, Message: "invalid paramater"})
 	}
 
 	stationInfos, err := DB.GetStationsInfoByKeyword(keyword)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, Response{Status: 900, Message: "server error"})
+		return c.JSON(http.StatusInternalServerError, ProcessResult{Code: 900, Message: "server error"})
 	}
 
 	return c.JSON(http.StatusOK, stationInfos)
@@ -92,12 +92,12 @@ func getStationNameSuggestion(c echo.Context) error {
 func getBuildingNameSuggestion(c echo.Context) error {
 	keyword := c.QueryParam("keyword")
 	if keyword == "" {
-		return c.JSON(http.StatusBadRequest, Response{Status: 200, Message: "invalid paramater"})
+		return c.JSON(http.StatusBadRequest, ProcessResult{Code: 200, Message: "invalid paramater"})
 	}
 
 	stationInfos, err := DB.GetStationsInfoByKeyword(keyword)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, Response{Status: 900, Message: "server error"})
+		return c.JSON(http.StatusInternalServerError, ProcessResult{Code: 900, Message: "server error"})
 	}
 
 	return c.JSON(http.StatusOK, convertStationInfo2BuildingInfo(stationInfos))
@@ -107,7 +107,7 @@ func getRailwaysInfoAll(c echo.Context) error {
 	railwayInfos, err := DB.GetRailwaysInfoAll()
 
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, Response{Status: 900, Message: "server error"})
+		return c.JSON(http.StatusInternalServerError, ProcessResult{Code: 900, Message: "server error"})
 	}
 
 	return c.JSON(http.StatusOK, railwayInfos)
@@ -116,7 +116,7 @@ func getRailwaysInfoAll(c echo.Context) error {
 func getRailwaysInfoByQuery(c echo.Context) error {
 	query := c.Param("query")
 	if query == "" {
-		return c.JSON(http.StatusBadRequest, Response{Status: 200, Message: "invalid paramater"})
+		return c.JSON(http.StatusBadRequest, ProcessResult{Code: 200, Message: "invalid paramater"})
 	}
 
 	id, err := strconv.Atoi(query)
@@ -126,7 +126,7 @@ func getRailwaysInfoByQuery(c echo.Context) error {
 		// パーセントエンコーディングをデコード
 		query, err = url.QueryUnescape(query)
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, Response{Status: 900, Message: "server error"})
+			return c.JSON(http.StatusInternalServerError, ProcessResult{Code: 900, Message: "server error"})
 		}
 
 		stationInfos, err = DB.GetStationsInfoByRailwayName(query)
@@ -135,11 +135,11 @@ func getRailwaysInfoByQuery(c echo.Context) error {
 	}
 
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, Response{Status: 900, Message: "server error"})
+		return c.JSON(http.StatusInternalServerError, ProcessResult{Code: 900, Message: "server error"})
 	}
 
 	if len(stationInfos) == 0 {
-		return c.JSON(http.StatusNotFound, Response{Status: 103, Message: "not found"})
+		return c.JSON(http.StatusNotFound, ProcessResult{Code: 103, Message: "not found"})
 	} else {
 		return c.JSON(http.StatusOK, stationInfos)
 	}
@@ -150,7 +150,7 @@ func getUserInfo(c echo.Context) error {
 
 	userInfo, err := DB.GetUserInfoByUserID(userid)
 	if err != nil {
-		return c.JSON(http.StatusNotFound, Response{Status: 103, Message: "not found"})
+		return c.JSON(http.StatusNotFound, ProcessResult{Code: 103, Message: "not found"})
 	}
 
 	return c.JSON(http.StatusOK, userInfo)
@@ -168,43 +168,43 @@ func putUserInfo(c echo.Context) error {
 	// セッション取得
 	sess, err := session.Get("session", c)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, Response{Status: 400, Message: "session not found"})
+		return c.JSON(http.StatusInternalServerError, ProcessResult{Code: 400, Message: "session not found"})
 	}
 
 	// セッションからユーザID取得
 	sessionUserID, ok := sess.Values["userID"].(string)
 	if ok == false {
-		return c.JSON(http.StatusUnauthorized, Response{Status: 501, Message: "you should login"})
+		return c.JSON(http.StatusUnauthorized, ProcessResult{Code: 501, Message: "you should login"})
 	}
 
 	// 変更するユーザとログインしているユーザが異なる
 	if userID != sessionUserID {
-		return c.JSON(http.StatusForbidden, Response{Status: 300, Message: "you don't have permission"})
+		return c.JSON(http.StatusForbidden, ProcessResult{Code: 300, Message: "you don't have permission"})
 	}
 
 	//ユーザ情報取得
 	userInfo, err := DB.GetUserInfoByUserID(sessionUserID)
 	if err != nil { // DBとsessionの整合性が取れてないとき？
-		return c.JSON(http.StatusInternalServerError, Response{Status: 901, Message: "db error"})
+		return c.JSON(http.StatusInternalServerError, ProcessResult{Code: 901, Message: "db error"})
 	}
 
 	//パスワード比較
 	if err := bcrypt.CompareHashAndPassword([]byte(userInfo.HashedPassword), []byte(currentPass)); err != nil {
-		return c.JSON(http.StatusUnauthorized, Response{Status: 500, Message: "login failed"})
+		return c.JSON(http.StatusUnauthorized, ProcessResult{Code: 500, Message: "login failed"})
 	}
 
 	//ハッシュ化
 	hash, err := bcrypt.GenerateFromPassword([]byte(newPass), bcrypt.DefaultCost)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, Response{Status: 900, Message: "server error"})
+		return c.JSON(http.StatusInternalServerError, ProcessResult{Code: 900, Message: "server error"})
 	}
 
 	err = DB.UpdateUser(sessionUserID, string(hash))
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, Response{Status: 901, Message: "db error"})
+		return c.JSON(http.StatusInternalServerError, ProcessResult{Code: 901, Message: "db error"})
 	}
 
-	return c.JSON(http.StatusOK, Response{Status: 0, Message: "ok"})
+	return c.JSON(http.StatusOK, ProcessResult{Code: 0, Message: "ok"})
 }
 
 func deleteUserInfo(c echo.Context) error {
@@ -215,19 +215,19 @@ func deleteUserInfo(c echo.Context) error {
 	password := m["password"].(string)
 
 	if password == "" {
-		return c.JSON(http.StatusBadRequest, Response{Status: 200, Message: "invalid paramater"})
+		return c.JSON(http.StatusBadRequest, ProcessResult{Code: 200, Message: "invalid paramater"})
 	}
 
 	// セッション取得
 	sess, err := session.Get("session", c)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, Response{Status: 400, Message: "session not found"})
+		return c.JSON(http.StatusInternalServerError, ProcessResult{Code: 400, Message: "session not found"})
 	}
 
 	// セッションからユーザIDを取得
 	sessionUserID, ok := sess.Values["userID"].(string)
 	if ok == false {
-		return c.JSON(http.StatusUnauthorized, Response{Status: 501, Message: "you should login"})
+		return c.JSON(http.StatusUnauthorized, ProcessResult{Code: 501, Message: "you should login"})
 	}
 
 	// パスパラメータ取得
@@ -235,32 +235,32 @@ func deleteUserInfo(c echo.Context) error {
 
 	// 変更するユーザとログインしているユーザが異なる
 	if userID != sessionUserID {
-		return c.JSON(http.StatusForbidden, Response{Status: 300, Message: "you don't have permission"})
+		return c.JSON(http.StatusForbidden, ProcessResult{Code: 300, Message: "you don't have permission"})
 	}
 
 	//ユーザ情報取得
 	userInfo, err := DB.GetUserInfoByUserID(sessionUserID)
 	if err != nil { // DBとsessionの整合性が取れてないとき？
-		return c.JSON(http.StatusInternalServerError, Response{Status: 901, Message: "db error"})
+		return c.JSON(http.StatusInternalServerError, ProcessResult{Code: 901, Message: "db error"})
 	}
 
 	//パスワード比較
 	// TODO: 権限チェック，管理者なら一般ユーザを削除可能にするかも？
 	if err := bcrypt.CompareHashAndPassword([]byte(userInfo.HashedPassword), []byte(password)); err != nil {
-		return c.JSON(http.StatusUnauthorized, Response{Status: 502, Message: "wrong password"})
+		return c.JSON(http.StatusUnauthorized, ProcessResult{Code: 502, Message: "wrong password"})
 	}
 
 	err = DB.DeleteUser(sessionUserID)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, Response{Status: 901, Message: "db error"})
+		return c.JSON(http.StatusInternalServerError, ProcessResult{Code: 901, Message: "db error"})
 	}
 
 	// cookie削除
 	if err := saveSession("", -1, c); err != nil {
-		return c.JSON(http.StatusInternalServerError, Response{Status: 401, Message: "cookie delete failed"})
+		return c.JSON(http.StatusInternalServerError, ProcessResult{Code: 401, Message: "cookie delete failed"})
 	}
 
-	return c.JSON(http.StatusOK, Response{Status: 0, Message: "ok"})
+	return c.JSON(http.StatusOK, ProcessResult{Code: 0, Message: "ok"})
 }
 
 func createUser(c echo.Context) error {
@@ -273,24 +273,24 @@ func createUser(c echo.Context) error {
 	password := m["password"].(string)
 	if userID == "" || password == "" ||
 		!govalidator.IsAlphanumeric(userID) || !govalidator.IsByteLength(userID, 1, 128) {
-		return c.JSON(http.StatusBadRequest, Response{Status: 200, Message: "invalid paramater"})
+		return c.JSON(http.StatusBadRequest, ProcessResult{Code: 200, Message: "invalid paramater"})
 	}
 
 	//ハッシュ化
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, Response{Status: 900, Message: "server error"})
+		return c.JSON(http.StatusInternalServerError, ProcessResult{Code: 900, Message: "server error"})
 	}
 
 	err = DB.InsertUser(userID, string(hash))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, Response{Status: 102, Message: "user exist"})
+		return c.JSON(http.StatusBadRequest, ProcessResult{Code: 102, Message: "user exist"})
 	}
 
 	//仮に有効期限1週間に設定
 	if err = saveSession(userID, 60*60*24*7, c); err != nil {
-		return c.JSON(http.StatusInternalServerError, Response{Status: 402, Message: "cookie store failed"})
+		return c.JSON(http.StatusInternalServerError, ProcessResult{Code: 402, Message: "cookie store failed"})
 	}
 
 	return c.JSON(http.StatusCreated, map[string]string{"userId": userID})
@@ -304,23 +304,23 @@ func signin(c echo.Context) error {
 	userID := m["userid"].(string)
 	password := m["password"].(string)
 	if userID == "" || password == "" {
-		return c.JSON(http.StatusBadRequest, Response{Status: 200, Message: "invalid paramater"})
+		return c.JSON(http.StatusBadRequest, ProcessResult{Code: 200, Message: "invalid paramater"})
 	}
 
 	//ユーザ情報取得
 	userInfo, err := DB.GetUserInfoByUserID(userID)
 	if err != nil {
-		return c.JSON(http.StatusUnauthorized, Response{Status: 500, Message: "login failed"})
+		return c.JSON(http.StatusUnauthorized, ProcessResult{Code: 500, Message: "login failed"})
 	}
 
 	//パスワード比較
 	if err := bcrypt.CompareHashAndPassword([]byte(userInfo.HashedPassword), []byte(password)); err != nil {
-		return c.JSON(http.StatusUnauthorized, Response{Status: 500, Message: "login failed"})
+		return c.JSON(http.StatusUnauthorized, ProcessResult{Code: 500, Message: "login failed"})
 	}
 
 	//ログイン成功 , セッション保存
 	if err := saveSession(userID, 60*60*24*7, c); err != nil {
-		return c.JSON(http.StatusInternalServerError, Response{Status: 402, Message: "cookie store failed"})
+		return c.JSON(http.StatusInternalServerError, ProcessResult{Code: 402, Message: "cookie store failed"})
 	}
 
 	return c.JSON(http.StatusOK, map[string]string{"userId": userID})
@@ -329,10 +329,10 @@ func signin(c echo.Context) error {
 func signout(c echo.Context) error {
 	// Cookieの削除
 	if err := saveSession("", -1, c); err != nil {
-		return c.JSON(http.StatusInternalServerError, Response{Status: 401, Message: "cookie delete failed"})
+		return c.JSON(http.StatusInternalServerError, ProcessResult{Code: 401, Message: "cookie delete failed"})
 	}
 
-	return c.JSON(http.StatusOK, Response{Status: 0, Message: "ok"})
+	return c.JSON(http.StatusOK, ProcessResult{Code: 0, Message: "ok"})
 }
 
 // remember meオプション等によって有効期限変える？
@@ -373,8 +373,8 @@ type Line struct {
 	OrderInRailWay int64  `json:"orderInRailway"`
 }
 
-type Response struct {
-	Status  int64  `json:"status"`
+type ProcessResult struct {
+	Code    int64  `json:"code"`
 	Message string `json:"message"`
 }
 
