@@ -1,5 +1,5 @@
 <template>
-  <l-popup :options="{ autoPan: false }">
+  <l-popup :options="{ autoPan: false, minWidth: '500px' }">
     <h2>{{ this.name }}</h2>
     <v-divider class="my-1"></v-divider>
     <v-list dense style="max-height: 200px; overflow-y: auto;" class="py-0">
@@ -9,13 +9,31 @@
         @click="companyNameClicked(idx)"
         class="px-1"
       >
-        <v-list-item-avatar class="my-0">
+        <v-list-item-avatar class="my-0 mr-0">
           <!-- <H2>{{ icon }}</H2> -->
           <v-icon>train</v-icon>
         </v-list-item-avatar>
-        <v-list-item-content class="py-0">
+        <v-list-item-content class="py-0 px-2">
           <v-list-item-title>{{ line.railwayName }}</v-list-item-title>
         </v-list-item-content>
+        <v-btn
+          @click.stop="onClick"
+          @mousedown.stop=""
+          @touchstart.stop=""
+          color="primary"
+          outlined
+        >
+          乗車
+        </v-btn>
+        <v-btn
+          @click.stop="onClick"
+          @mousedown.stop=""
+          @touchstart.stop=""
+          color="error"
+          outlined
+        >
+          降車
+        </v-btn>
       </v-list-item>
     </v-list>
   </l-popup>
@@ -45,6 +63,9 @@ export default {
     return {}
   },
   methods: {
+    onClick() {
+      console.log(`onClick`)
+    },
     companyNameClicked(val) {
       console.log(val)
     },

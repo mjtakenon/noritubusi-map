@@ -34,4 +34,5 @@
   // - ESLint と干渉するため
   "vetur.format.defaultFormatter.js": "none",
   "vetur.format.defaultFormatter.html": "none",
+  "cmake.configureOnOpen": false,
 }
