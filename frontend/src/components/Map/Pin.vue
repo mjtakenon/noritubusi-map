@@ -2,7 +2,7 @@
   <l-marker
     ref="marker"
     :lat-lng="latLng"
-    @add="$nextTick(() => focusBuildingAndOpenPopup())"
+    @add="$nextTick(() => updateMap())"
   >
     <Popup v-bind="popup"></Popup>
   </l-marker>
@@ -30,7 +30,12 @@ export default {
       type: Object,
       required: true,
     },
-    autoOpenPopup: {
+    openPopup: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    focusPin: {
       type: Boolean,
       required: false,
       default: false,
@@ -40,13 +45,15 @@ export default {
     return {}
   },
   methods: {
-    focusBuildingAndOpenPopup() {
-      if (this.autoOpenPopup) {
+    updateMap() {
+      if (this.openPopup) {
         this.$refs.marker.mapObject.openPopup()
       }
-      this.focusBuilding()
+      if (this.focusPin) {
+        this.focusAtPin()
+      }
     },
-    focusBuilding() {
+    focusAtPin() {
       this.$store.dispatch("Map/updateCenter", {
         lat: this.latLng[0],
         lng: this.latLng[1],
@@ -54,7 +61,7 @@ export default {
     },
   },
   updated() {
-    this.focusBuildingAndOpenPopup()
+    this.updateMap()
   },
 }
 </script>

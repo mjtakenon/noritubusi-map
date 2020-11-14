@@ -1,11 +1,4 @@
-.l-map {
-  position: fixed
-}
-
-.float-toolbar {
-  margin: 16px !important
-}
-
-.button-stack>* {
-  margin-top: 16px;
+html {
+  /* To hide vertical scrollbar for Chrome (Windows)*/
+  overflow-y: auto;
 }

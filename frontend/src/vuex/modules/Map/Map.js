@@ -84,6 +84,9 @@ const store = {
     addPin(state, payload) {
       state.pins.push(payload)
     },
+    addPins(state, payload) {
+      state.pins.push(...payload)
+    },
   },
 
   // アクション
@@ -102,6 +105,9 @@ const store = {
     },
     addPin({ commit }, payload) {
       commit("addPin", payload)
+    },
+    addPins({ commit }, payload) {
+      commit("addPins", payload)
     },
   },
 }

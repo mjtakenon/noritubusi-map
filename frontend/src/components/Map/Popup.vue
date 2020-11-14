@@ -6,7 +6,7 @@
       <v-list-item
         v-for="(line, idx) in this.lines"
         :key="idx"
-        @click="companyNameClicked(idx)"
+        @click="onClickRailwayName(line.railwayName)"
         class="px-1"
       >
         <v-list-item-avatar class="my-0 mr-0">
@@ -41,6 +41,7 @@
 
 <script>
 import { LPopup } from "vue2-leaflet"
+import { railways } from "../../utils/api/search.js"
 
 export default {
   components: {
@@ -68,6 +69,25 @@ export default {
     },
     companyNameClicked(val) {
       console.log(val)
+    },
+    onClickRailwayName(railwayName) {
+      console.log(railwayName)
+
+      railways(railwayName)
+        .then(response => {
+          // here
+          const pins = response.data.map(building => ({
+            latLng: [building.latitude, building.longitude],
+            popup: {
+              name: building.name,
+              lines: building.name !== this.name ? [] : this.lines,
+            },
+            openPopup: building.name === this.name,
+          }))
+
+          this.$store.dispatch("Map/setPins", pins)
+        })
+        .catch(error => console.error(error))
     },
   },
 }

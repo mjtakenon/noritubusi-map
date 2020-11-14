@@ -110,3 +110,9 @@ export default {
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.l-map {
+  position: fixed;
+}
+</style>
