@@ -8,6 +8,7 @@ import Vuex from "vuex"
 import Sidebar from "./modules/Sidebar/Sidebar"
 import Map from "./modules/Map/Map"
 import SearchBox from "./modules/SearchBox/SearchBox"
+import TripRecord from "./modules/TripRecord"
 
 // Vue に Vuex の機能を統合
 Vue.use(Vuex)
@@ -22,6 +23,7 @@ const store = new Vuex.Store({
     Map,
     Sidebar,
     SearchBox,
+    TripRecord,
   },
 })
 export default store

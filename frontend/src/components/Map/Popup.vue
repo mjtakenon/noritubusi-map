@@ -17,7 +17,7 @@
           <v-list-item-title>{{ line.railwayName }}</v-list-item-title>
         </v-list-item-content>
         <v-btn
-          @click.stop="onClick"
+          @click.stop="onClickRide(line)"
           @mousedown.stop=""
           @touchstart.stop=""
           color="primary"
@@ -26,7 +26,7 @@
           乗車
         </v-btn>
         <v-btn
-          @click.stop="onClick"
+          @click.stop="onClickGetOff(line)"
           @mousedown.stop=""
           @touchstart.stop=""
           color="error"
@@ -64,8 +64,27 @@ export default {
     return {}
   },
   methods: {
-    onClick() {
-      console.log(`onClick`)
+    onClickRide(line) {
+      this.$store.commit("TripRecord/stationFrom", {
+        name: this.name,
+        id: line.stationId,
+      })
+      // TODO: IDをバックエンドから返してもらったら変える
+      this.$store.commit("TripRecord/railway", {
+        name: line.railwayName,
+        id: 0,
+      })
+    },
+    onClickGetOff(line) {
+      this.$store.commit("TripRecord/stationTo", {
+        name: this.name,
+        id: line.stationId,
+      })
+      // TODO: IDをバックエンドから返してもらったら変える
+      this.$store.commit("TripRecord/railway", {
+        name: line.railwayName,
+        id: 0,
+      })
     },
     companyNameClicked(val) {
       console.log(val)

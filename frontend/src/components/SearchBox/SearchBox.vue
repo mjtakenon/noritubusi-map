@@ -1,8 +1,8 @@
 <template>
   <div v-bind:style="style.searchBox">
-    <v-toolbar dense>
+    <v-toolbar dense extended>
       <v-btn @click="toggleSidebar" icon>
-        <v-icon>fa-bars</v-icon>
+        <v-icon>menu</v-icon>
       </v-btn>
 
       <v-text-field
@@ -10,8 +10,22 @@
         append-icon="search"
         single-line
         v-bind:style="style.textField"
-        @input="suggestBuildings"
+        @input="suggestFromBuildings"
+        :value="stationFrom.name || inputStationFrom"
       ></v-text-field>
+
+      <template v-slot:extension>
+        <v-btn @click="toggleSidebar" icon>
+          <v-icon>import_export</v-icon>
+        </v-btn>
+        <v-text-field
+          hide-details
+          append-icon="search"
+          single-line
+          v-bind:style="style.textField"
+          @input="suggestToBuildings"
+        ></v-text-field>
+      </template>
 
       <!-- <v-btn icon>
         <v-icon>my_location</v-icon>
@@ -47,6 +61,7 @@ export default {
         },
       },
       buildings: [],
+      inputStationFrom: "",
     }
   },
   // メソッド
@@ -55,15 +70,25 @@ export default {
       this.showSidebar = !this.showSidebar
     },
 
-    suggestBuildings(input) {
-      if (input.length === 0) {
+    updateSuggest(stationName) {
+      if (stationName.length === 0) {
         this.buildings = []
         return
       }
 
-      suggest(input)
+      suggest(stationName)
         .then(response => (this.buildings = response.data))
         .catch(error => console.error(error))
+    },
+
+    suggestFromBuildings(input) {
+      this.inputStationFrom = input
+      this.updateSuggest(input)
+    },
+
+    suggestToBuildings(input) {
+      this.inputStationTo = input
+      this.updateSuggest(input)
     },
   },
   // 算出プロパティ
@@ -83,6 +108,12 @@ export default {
         // $store.dispatch('対象データへのパス', '変更後の値')
         this.$store.dispatch("Sidebar/isVisible", value)
       },
+    },
+    stationFrom() {
+      return this.$store.getters["TripRecord/stationFrom"]
+    },
+    stationTo() {
+      return this.$store.getters["TripRecord/stationTo"]
     },
   },
 }

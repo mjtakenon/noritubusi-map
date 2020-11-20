@@ -1,9 +1,5 @@
 <template>
-  <l-marker
-    ref="marker"
-    :lat-lng="latLng"
-    @add="$nextTick(() => updateMap())"
-  >
+  <l-marker ref="marker" :lat-lng="latLng" @add="$nextTick(() => updateMap())">
     <Popup v-bind="popup"></Popup>
   </l-marker>
 </template>
