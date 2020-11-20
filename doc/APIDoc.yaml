@@ -129,6 +129,29 @@ paths:
         404:
           description: Not Found
 
+  /building/suggest:
+    get:
+      tags:
+        - building
+      summary: "指定された文字列を持つ駅(建物)情報取得"
+      description: ""
+      parameters:
+        - name: keyword
+          description: "検索する文字列"
+          required: true
+          in: query
+          type: string
+      responses:
+        200:
+          description: OK
+          schema:
+            title: arrayOfStations
+            type: array
+            items:
+              $ref: "#/definitions/suggestedBuildingInfomation"
+        400:
+          description: パラメータ不足
+
   /stations/{stationName}:
     get:
       tags:
@@ -188,44 +211,64 @@ paths:
       parameters:
         - name: userid
           in: path
-          description: Created user object
+          description: ユーザーID
           required: true
           type: string
       responses:
-        "200":
+        200:
           description: ユーザ情報の取得が成功
-        "404":
+          schema:
+            $ref: "#/definitions/userInfomation"
+        404:
           description: ユーザが見つからなかった
+  "/users":
     put:
       tags:
         - user
-      summary: ユーザ情報の変更
+      summary: パスワードの変更
       description: ""
       parameters:
-        - name: userid
-          in: path
-          description: Created user object
+        - name: current_password
+          in: query
+          description: 現在のパスワード
+          required: true
+          type: string
+        - name: new_password
+          in: query
+          description: 新しいパスワード
           required: true
           type: string
       responses:
-        "200":
+        200:
           description: OK
-        "400":
-          description: 情報変更が失敗
+        400:
+          description: パスワード変更が失敗
+        401:
+          description: ログイン失敗
+        500:
+          description: 内部エラー
     delete:
       tags:
         - user
       summary: ユーザの削除
       description: ""
       parameters:
-        - name: userid
-          in: path
-          description: Created user object
-          required: true
-          type: string
+        - name: request
+          in: body
+          schema:
+            type: object
+            properties:
+              password:
+                type: string
       responses:
-        "200":
+        200:
           description: OK
+        400:
+          description: パラメータ不整合
+        401:
+          description: ログイン失敗
+        500:
+          description: サーバーエラー
   "/users/{userid}/record":
     get:
       tags:
@@ -238,7 +281,7 @@ paths:
       parameters:
         - name: userid
           in: path
-          description: Created user object
+          description: ユーザーID
           required: true
           type: string
         - name: begin_latitude
@@ -262,9 +305,9 @@ paths:
           required: true
           type: number
       responses:
-        "200":
+        200:
           description: 乗り潰し駅情報の取得が成功
-        "404":
+        404:
           description: 乗り潰し駅情報が見つからなかった
     post:
       tags:
@@ -274,7 +317,7 @@ paths:
       parameters:
         - name: userid
           in: path
-          description: Created user object
+          description: ユーザーID
           required: true
           type: string
         - name: begin_station_id
@@ -455,6 +498,43 @@ definitions:
         description: 経度
         type: number
         example: 137.7353775
+  suggestedBuildingInfomation:
+    type: object
+    properties:
+      building_id:
+        description: 建物ID
+        type: integer
+        example: 5297
+      name:
+        description: 駅名
+        type: string
+        example: 浜松
+      latitude:
+        description: 緯度
+        type: number
+        example: 34.70376
+      longitude:
+        description: 経度
+        type: number
+        example: 137.7353775
+      lines:
+        description: 接続路線
+        type: array
+        items: 
+          type: object
+          properties:
+            railway_name:
+              description: 路線名
+              type: string
+              example: JR東海道本線(浜松～岐阜)
+            station_id:
+              description: 路線ID
+              type: number
+              example: 8819
+            order_in_railway:
+              description: 駅番号
+              type: number
+              example: 1
   railwayInfomation:
     type: object
     properties:
@@ -478,3 +558,22 @@ definitions:
         # description:
         type: number
         example: 4
+  userInfomation:
+    type: object
+    properties:
+      id:
+        description: ユーザーID
+        type: string
+        example: mjtakenon
+      hashed_password:
+        description: ハッシュ化パスワード
+        type: string
+        example: $2a$10$uy.XzaOpSaPVPTCo6PW6k.C3x9mB9ZIrpiotuRwflR3JYzXIEeovy
+      create_time:
+        description: アカウント作成日時
+        type: string
+        example: "2019-04-01 00:00:00"
+      change_time:
+        description: アカウント変更日時
+        type: string
+        example: "2019-04-01 00:00:00"
