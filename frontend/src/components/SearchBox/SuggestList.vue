@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-show="buildings.length !== 0">
     <v-list
       two-line
       style="max-height: 400px; max-width: 300px; overflow-y: auto;"
@@ -31,12 +31,7 @@
 import { suggest } from "../../utils/api/search.js"
 
 export default {
-  props: {
-    buildings: {
-      type: Array,
-      required: true,
-    },
-  },
+  props: {},
   data() {
     return {
       isOverflowns: [],
@@ -80,7 +75,11 @@ export default {
     },
   },
   // 算出プロパティ
-  computed: {},
+  computed: {
+    buildings() {
+      return this.$store.getters["SuggestList/buildings"]
+    },
+  },
 }
 </script>
 

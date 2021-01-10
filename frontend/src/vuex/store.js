@@ -7,7 +7,7 @@ import Vuex from "vuex"
 // データストアのインポート
 import Sidebar from "./modules/Sidebar/Sidebar"
 import Map from "./modules/Map/Map"
-import SearchBox from "./modules/SearchBox/SearchBox"
+import SuggestList from "./modules/SearchBox/SuggestList"
 import TripRecord from "./modules/TripRecord"
 
 // Vue に Vuex の機能を統合
@@ -22,7 +22,7 @@ const store = new Vuex.Store({
   modules: {
     Map,
     Sidebar,
-    SearchBox,
+    SuggestList,
     TripRecord,
   },
 })

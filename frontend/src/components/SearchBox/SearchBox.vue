@@ -5,12 +5,16 @@
         <v-icon>menu</v-icon>
       </v-btn>
 
+      <!-- テキストボックス(乗車駅) -->
       <v-text-field
         hide-details
         append-icon="search"
         single-line
+        :readonly="isStationFromConfirmed"
+        clearable
         v-bind:style="style.textField"
         @input="suggestFromBuildings"
+        @click:clear="resetStationFrom"
         :value="stationFrom.name || inputStationFrom"
       ></v-text-field>
 
@@ -18,12 +22,17 @@
         <v-btn @click="toggleSidebar" icon>
           <v-icon>import_export</v-icon>
         </v-btn>
+        <!-- テキストボックス(降車駅) -->
         <v-text-field
           hide-details
           append-icon="search"
           single-line
+          clearable
+          :readonly="isStationToConfirmed"
           v-bind:style="style.textField"
           @input="suggestToBuildings"
+          @click:clear="resetStationTo"
+          :value="stationTo.name || inputStationTo"
         ></v-text-field>
       </template>
 
@@ -31,10 +40,7 @@
         <v-icon>my_location</v-icon>
       </v-btn> -->
     </v-toolbar>
-    <SuggestList
-      v-show="buildings.length !== 0"
-      :buildings="buildings"
-    ></SuggestList>
+    <SuggestList></SuggestList>
   </div>
 </template>
 
@@ -60,8 +66,8 @@ export default {
           padding: "0px",
         },
       },
-      buildings: [],
       inputStationFrom: "",
+      inputStationTo: "",
     }
   },
   // メソッド
@@ -72,12 +78,13 @@ export default {
 
     updateSuggest(stationName) {
       if (stationName.length === 0) {
-        this.buildings = []
+        this.$store.commit("SuggestList/buildings", [])
         return
       }
-
       suggest(stationName)
-        .then(response => (this.buildings = response.data))
+        .then(response =>
+          this.$store.commit("SuggestList/buildings", response.data)
+        )
         .catch(error => console.error(error))
     },
 
@@ -89,6 +96,12 @@ export default {
     suggestToBuildings(input) {
       this.inputStationTo = input
       this.updateSuggest(input)
+    },
+    resetStationFrom() {
+      this.$store.commit("TripRecord/resetStationFrom")
+    },
+    resetStationTo() {
+      this.$store.commit("TripRecord/resetStationTo")
     },
   },
   // 算出プロパティ
@@ -114,6 +127,12 @@ export default {
     },
     stationTo() {
       return this.$store.getters["TripRecord/stationTo"]
+    },
+    isStationFromConfirmed() {
+      return this.$store.getters["TripRecord/isStationFromConfirmed"]
+    },
+    isStationToConfirmed() {
+      return this.$store.getters["TripRecord/isStationToConfirmed"]
     },
   },
 }

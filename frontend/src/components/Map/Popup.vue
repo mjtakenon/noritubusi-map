@@ -74,6 +74,7 @@ export default {
         name: line.railwayName,
         id: 0,
       })
+      this.$store.commit("SuggestList/buildings", [])
     },
     onClickGetOff(line) {
       this.$store.commit("TripRecord/stationTo", {
@@ -85,6 +86,7 @@ export default {
         name: line.railwayName,
         id: 0,
       })
+      this.$store.commit("SuggestList/buildings", [])
     },
     companyNameClicked(val) {
       console.log(val)

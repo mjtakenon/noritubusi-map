@@ -28,6 +28,12 @@ const store = {
     railway(state) {
       return state.railway
     },
+    isStationFromConfirmed(state) {
+      return state.stationFrom.name.length != 0
+    },
+    isStationToConfirmed(state) {
+      return state.stationTo.name.length != 0
+    },
   },
 
   // ミューテーション(セッター)
@@ -40,6 +46,24 @@ const store = {
     },
     railway(state, railway) {
       state.railway = railway
+    },
+    resetStationFrom(state) {
+      state.stationFrom = {
+        id: 0,
+        name: "",
+      }
+    },
+    resetStationTo(state) {
+      state.stationTo = {
+        id: 0,
+        name: "",
+      }
+    },
+    resetRailway(state) {
+      state.railway = {
+        id: 0,
+        name: "",
+      }
     },
   },
 }
