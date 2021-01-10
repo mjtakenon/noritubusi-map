@@ -13,7 +13,7 @@
         @click:clear="resetStation"
         :value="inputStation"
       ></v-text-field>
-      <v-btn @click="toggleSidebar" icon>
+      <v-btn @click="onClickSwap" icon>
         <v-icon>swap_horiz</v-icon>
       </v-btn>
     </v-toolbar>
@@ -43,10 +43,23 @@ export default {
   },
   // メソッド
   methods: {
+    onInput(input) {
+      this.inputStation = input
+      this.updateSuggest()
+    },
+    onClickSwap() {
+      const stationFrom = this.$store.getters["TripRecord/stationFrom"]
+      const stationTo = this.$store.getters["TripRecord/stationTo"]
+
+      this.$store.commit("TripRecord/stationFrom", stationTo)
+      this.$store.commit("TripRecord/stationTo", stationFrom)
+    },
+    resetStation() {
+      this.inputStation = ""
+    },
     toggleSidebar() {
       this.showSidebar = !this.showSidebar
     },
-
     updateSuggest() {
       if (this.inputStation === null || this.inputStation.length === 0) {
         this.$store.commit("SuggestList/buildings", [])
@@ -57,15 +70,6 @@ export default {
           this.$store.commit("SuggestList/buildings", response.data)
         )
         .catch(error => console.error(error))
-    },
-
-    onInput(input) {
-      this.inputStation = input
-      this.updateSuggest()
-    },
-
-    resetStation() {
-      this.inputStation = ""
     },
   },
   // 算出プロパティ
