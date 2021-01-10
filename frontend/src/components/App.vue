@@ -3,7 +3,7 @@
     <Map />
     <!-- まずは、ユーザー管理機能があるサイドバーからリファクタリング -->
     <Sidebar />
-    <SearchBox />
+    <FloatPanel />
     <!-- 位置情報を取得するためのボタン(仮) -->
     <v-btn
       @click="onClickBtn"
@@ -19,14 +19,14 @@
 <script>
 import Map from "./Map/Map"
 import Sidebar from "./Sidebar/Sidebar"
-import SearchBox from "./SearchBox/SearchBox"
+import FloatPanel from "./FloatPanel/FloatPanel"
 
 export default {
   // 使用するコンポーネントを宣言
   components: {
     Sidebar,
     Map,
-    SearchBox,
+    FloatPanel,
   },
   // データ
   data() {
