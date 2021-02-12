@@ -42,7 +42,7 @@
 
 <script>
 import { LPopup } from "vue2-leaflet"
-import { railways } from "../../utils/api/search.js"
+import { getStationsInRailway } from "../../utils/api/search.js"
 
 export default {
   components: {
@@ -82,6 +82,7 @@ export default {
         id: 0,
       })
       this.$store.commit("SuggestList/buildings", [])
+      this.setPinsOnRailway(line.railwayName)
     },
     onClickGetOff(line) {
       this.$store.commit("TripRecord/stationTo", {
@@ -100,10 +101,11 @@ export default {
     },
     onClickRailwayName(railwayName) {
       console.log(railwayName)
-
-      railways(railwayName)
+      this.setPinsOnRailway(railwayName)
+    },
+    setPinsOnRailway(railwayName) {
+      getStationsInRailway(railwayName)
         .then(response => {
-          // here
           const pins = response.data.map(building => ({
             latLng: [building.latitude, building.longitude],
             popup: {

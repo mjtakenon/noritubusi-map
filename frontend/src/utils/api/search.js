@@ -34,7 +34,7 @@ export async function suggest(keyword) {
     })
 }
 
-export async function railways(railwayName) {
+export async function getStationsInRailway(railwayName) {
   // TODO: リクエスト間隔を空けるような実装に (例: 100ms ごと)
 
   return await axios
