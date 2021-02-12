@@ -38,9 +38,9 @@ const store = {
      *       // lines は /buildings/suggest のレスポンスと同じ構造
      *       lines: [
      *         {
-     *           railwayName: "路線名"
-     *           station_id,
-     *           order_in_railway
+     *           railwayName: "路線名",
+     *           stationId: 1,
+     *           orderInRailway: 1,
      *         }
      *       ]
      *     }

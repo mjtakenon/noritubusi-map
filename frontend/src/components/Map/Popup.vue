@@ -110,7 +110,11 @@ export default {
             latLng: [building.latitude, building.longitude],
             popup: {
               name: building.name,
-              lines: building.name !== this.name ? [] : this.lines,
+              // 乗車駅として選択されたピンと、それ以外の駅のピンで
+              // 表示される内容を分岐している
+              // TODO: 今後乗り換えの連続入力を考えるとbuildingを
+              // クエリを叩いてとってくる必要がある
+              lines: building.name !== this.name ? [building] : this.lines,
             },
             openPopup: building.name === this.name,
           }))
