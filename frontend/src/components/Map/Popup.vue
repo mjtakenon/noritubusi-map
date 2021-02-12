@@ -29,6 +29,7 @@
           @click.stop="onClickGetOff(line)"
           @mousedown.stop=""
           @touchstart.stop=""
+          :disabled="!isStationFromFilled"
           color="error"
           outlined
         >
@@ -62,6 +63,12 @@ export default {
   },
   data() {
     return {}
+  },
+  computed: {
+    isStationFromFilled() {
+      const station = this.$store.getters["TripRecord/stationFrom"]
+      return station.name !== ""
+    },
   },
   methods: {
     onClickRide(line) {
