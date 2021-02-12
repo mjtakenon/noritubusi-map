@@ -10,6 +10,9 @@
           <span>{{ stationTo.name }}</span>
         </div>
       </div>
+      <div class="registration" v-if="true">
+        <v-btn primary block outlined>登録</v-btn>
+      </div>
     </v-card-title>
   </v-card>
 </template>
@@ -23,6 +26,9 @@ export default {
     },
     stationTo() {
       return this.$store.getters["TripRecord/stationTo"]
+    },
+    isFilledBothStations() {
+      return this.stationFrom.name !== "" && this.stationTo.name !== ""
     },
   },
 }
@@ -39,8 +45,15 @@ export default {
   width: 50%;
   display: flex;
   align-items: center;
+  // v-card-titleのフォントサイズが取れず
+  // cardviewのサイズが変わるため決め打ちで指定
+  min-height: 1.25rem;
 }
 .arrow {
   width: 10%;
+}
+.registration {
+  width: 100%;
+  margin-top: 8px;
 }
 </style>
