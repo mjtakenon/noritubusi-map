@@ -45,6 +45,10 @@
     "vue-template-compiler": "^2.6.11",
     "vuetify-loader": "^1.6.0"
   },
+  "resolutions": {
+    "copy-webpack-plugin": "^5.1.2",
+    "selfsigned": "^1.10.8"
+  },
   "contributors": [
     {
       "name": "Fumiya Endou",
