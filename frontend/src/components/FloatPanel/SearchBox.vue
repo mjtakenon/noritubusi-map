@@ -22,6 +22,7 @@
 </template>
 
 <script>
+import _ from "lodash"
 import { suggest } from "../../utils/api/search.js"
 
 import SuggestList from "./SuggestList"
@@ -39,13 +40,23 @@ export default {
         },
       },
       inputStation: "",
+      updateSuggestWithInterval: null,
     }
+  },
+  created() {
+    // サジェストが正しく表示されないバグがあるため
+    // クエリを送る頻度を500msに間引き
+    this.updateSuggestWithInterval = _.debounce(
+      () => this.updateSuggest(),
+      500,
+      { leading: true }
+    )
   },
   // メソッド
   methods: {
     onInput(input) {
       this.inputStation = input
-      this.updateSuggest()
+      this.updateSuggestWithInterval()
     },
     onClickSwap() {
       const stationFrom = this.$store.getters["TripRecord/stationFrom"]
@@ -65,6 +76,7 @@ export default {
         this.$store.commit("SuggestList/buildings", [])
         return
       }
+      this.$store.commit("SuggestList/keyword", this.inputStation)
       suggest(this.inputStation)
         .then(response =>
           this.$store.commit("SuggestList/buildings", response.data)

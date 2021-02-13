@@ -28,8 +28,6 @@
 </template>
 
 <script>
-import { suggest } from "../../utils/api/search.js"
-
 export default {
   props: {},
   data() {
