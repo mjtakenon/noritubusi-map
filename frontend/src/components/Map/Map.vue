@@ -114,5 +114,6 @@ export default {
 <style lang="scss" scoped>
 .l-map {
   position: fixed;
+  font: inherit;
 }
 </style>

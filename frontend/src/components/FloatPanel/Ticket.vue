@@ -1,19 +1,19 @@
 <template>
   <v-card>
-    <v-card-title>
-      <div class="wrapper">
+    <v-card-text>
+      <div class="wrapper font-weight-bold">
         <div class="station">
-          <span>{{ stationFrom.name }}</span>
+          <span class="text--primary">{{ stationFrom.name }}</span>
         </div>
         <v-icon class="arrow">arrow_right</v-icon>
         <div class="station">
-          <span>{{ stationTo.name }}</span>
+          <span class="text--primary">{{ stationTo.name }}</span>
         </div>
       </div>
       <div class="registration" v-if="true">
         <v-btn primary block outlined>登録</v-btn>
       </div>
-    </v-card-title>
+    </v-card-text>
   </v-card>
 </template>
 
@@ -38,6 +38,8 @@ export default {
 .wrapper {
   display: flex;
   width: 100%;
+  height: 2rem;
+  font-size: 1.5rem;
   flex-direction: row;
   align-content: center;
 }
@@ -47,7 +49,6 @@ export default {
   align-items: center;
   // v-card-titleのフォントサイズが取れず
   // cardviewのサイズが変わるため決め打ちで指定
-  min-height: 1.25rem;
 }
 .arrow {
   width: 10%;
