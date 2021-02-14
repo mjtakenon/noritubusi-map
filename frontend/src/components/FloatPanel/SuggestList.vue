@@ -1,16 +1,13 @@
 <template>
   <div v-show="buildings.length !== 0">
-    <v-list
-      two-line
-      style="max-height: 400px; max-width: 300px; overflow-y: auto;"
-    >
+    <v-list two-line class="suggest-list">
       <v-list-item-group color="primary">
         <v-list-item
           v-for="(building, i) in this.buildings"
           :key="i"
           @click="onClickSuggestedBuilding(building)"
         >
-          <v-list-item-avatar style="font-size: 150%">
+          <v-list-item-avatar class="list-icon">
             <v-icon>train</v-icon>
           </v-list-item-avatar>
           <v-list-item-content>
@@ -77,11 +74,22 @@ export default {
     buildings() {
       return this.$store.getters["SuggestList/buildings"]
     },
+    isLoading() {
+      return this.$store.getters["SuggestList/isLoading"]
+    },
   },
 }
 </script>
 
 <style lang="scss" scoped>
+.suggest-list {
+  width: 100%;
+  max-height: 400px;
+  overflow-y: auto;
+}
+.list-icon {
+  font-size: 150%;
+}
 .scrollable {
   overflow: hidden;
   & > span {

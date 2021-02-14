@@ -8,10 +8,10 @@
         append-icon="search"
         single-line
         clearable
-        v-bind:style="style.textField"
+        :loading="isLoading"
         @input="onInput"
-        @click:clear="resetStation"
-        :value="inputStation"
+        @click:clear="clearInput"
+        :value="inputValue"
       ></v-text-field>
       <v-btn @click="onClickSwap" icon>
         <v-icon>swap_horiz</v-icon>
@@ -33,13 +33,8 @@ export default {
   },
   data() {
     return {
-      style: {
-        textField: {
-          // 上に謎のスペースがあるから消す
-          padding: "0px",
-        },
-      },
-      inputStation: "",
+      inputValue: "",
+      isLoading: false,
       updateSuggestWithInterval: null,
     }
   },
@@ -55,7 +50,12 @@ export default {
   // メソッド
   methods: {
     onInput(input) {
-      this.inputStation = input
+      // 変換が確定された時に二度イベントが
+      // 発火されるのを抑止する
+      if (this.inputValue == input) {
+        return
+      }
+      this.inputValue = input
       this.updateSuggestWithInterval()
     },
     onClickSwap() {
@@ -65,23 +65,26 @@ export default {
       this.$store.commit("TripRecord/stationFrom", stationTo)
       this.$store.commit("TripRecord/stationTo", stationFrom)
     },
-    resetStation() {
-      this.inputStation = ""
+    clearInput() {
+      this.inputValue = ""
     },
     toggleSidebar() {
       this.showSidebar = !this.showSidebar
     },
     updateSuggest() {
-      if (this.inputStation === null || this.inputStation.length === 0) {
+      if (this.inputValue === null || this.inputValue.length === 0) {
         this.$store.commit("SuggestList/buildings", [])
+        this.isLoading = false
         return
       }
-      this.$store.commit("SuggestList/keyword", this.inputStation)
-      suggest(this.inputStation)
+      this.$store.commit("SuggestList/keyword", this.inputValue)
+      this.isLoading = true
+      suggest(this.inputValue)
         .then(response =>
           this.$store.commit("SuggestList/buildings", response.data)
         )
         .catch(error => console.error(error))
+        .finally(() => (this.isLoading = false))
     },
   },
   // 算出プロパティ
