@@ -59,5 +59,19 @@ export default {
   updated() {
     this.updateMap()
   },
+  // watch: {
+  //   isVisiblePopup(_, newState) {
+  //     if (newState) {
+  //       this.$refs.marker.mapObject.openPopup()
+  //     } else {
+  //       this.$refs.marker.mapObject.closePopup()
+  //     }
+  //   },
+  // },
+  // computed: {
+  //   isVisiblePopup() {
+  //     return this.$state.getters["Pin/isVisiblePopup"]
+  //   },
+  // },
 }
 </script>

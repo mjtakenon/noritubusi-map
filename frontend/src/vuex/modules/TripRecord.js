@@ -6,10 +6,12 @@ const store = {
     stationFrom: {
       id: 0,
       name: "",
+      lines: [],
     },
     stationTo: {
       id: 0,
       name: "",
+      lines: [],
     },
     railway: {
       id: 0,

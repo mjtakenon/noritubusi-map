@@ -80,6 +80,7 @@ export default {
       this.$store.commit("TripRecord/stationFrom", {
         name: this.name,
         id: line.stationId,
+        lines: this.lines,
       })
       // TODO: IDをバックエンドから返してもらったら変える
       this.$store.commit("TripRecord/railway", {
@@ -93,6 +94,7 @@ export default {
       this.$store.commit("TripRecord/stationTo", {
         name: this.name,
         id: line.stationId,
+        lines: this.lines,
       })
       // TODO: IDをバックエンドから返してもらったら変える
       this.$store.commit("TripRecord/railway", {
