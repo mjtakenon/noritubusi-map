@@ -109,6 +109,19 @@ const store = {
     addPins({ commit }, payload) {
       commit("addPins", payload)
     },
+    setPinAndFocus({ commit }, payload) {
+      commit("setPins", [
+        {
+          latLng: [payload.latitude, payload.longitude],
+          popup: {
+            name: payload.name,
+            lines: payload.lines,
+          },
+          openPopup: true,
+          focusPin: true,
+        },
+      ])
+    },
   },
 }
 export default store

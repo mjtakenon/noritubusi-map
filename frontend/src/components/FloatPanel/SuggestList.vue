@@ -50,22 +50,8 @@ export default {
     railwayNameJoinWithComma(building) {
       return building.lines.map(line => line.railwayName).join(", ")
     },
-    setPins(building) {
-      this.$store.dispatch("Map/setPins", [
-        {
-          latLng: [building.latitude, building.longitude],
-          popup: {
-            name: building.name,
-            lines: building.lines,
-          },
-          openPopup: true,
-          focusPin: true,
-        },
-      ])
-      return
-    },
     onClickSuggestedBuilding(building) {
-      this.setPins(building)
+      this.$store.dispatch("Map/setPinAndFocus", building)
       return
     },
   },

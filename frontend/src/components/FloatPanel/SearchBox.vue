@@ -6,10 +6,12 @@
       <v-text-field
         hide-details
         append-icon="search"
+        @click:append="focusOnFirstCandidate"
         single-line
         clearable
         :loading="isLoading"
         @input="onInput"
+        @change="focusOnFirstCandidate"
         @click:clear="clearInput"
         :value="inputValue"
       ></v-text-field>
@@ -86,6 +88,13 @@ export default {
         .catch(error => console.error(error))
         .finally(() => (this.isLoading = false))
     },
+    focusOnFirstCandidate() {
+      if (this.buildings.length < 1) {
+        return
+      }
+      const first = this.buildings[0]
+      this.$store.dispatch("Map/setPinAndFocus", first)
+    },
   },
   // 算出プロパティ
   computed: {
@@ -104,6 +113,9 @@ export default {
         // $store.dispatch('対象データへのパス', '変更後の値')
         this.$store.dispatch("Sidebar/isVisible", value)
       },
+    },
+    buildings() {
+      return this.$store.getters["SuggestList/buildings"]
     },
   },
 }
