@@ -1,5 +1,5 @@
 import Vue from "vue"
-import Vuetify from "vuetify/lib"
+import Vuetify from "vuetify/lib/framework"
 
 Vue.use(Vuetify)
 
@@ -7,7 +7,9 @@ export default new Vuetify({
   icons: {
     iconfont: "md",
   },
-  theme: {
-    primary: "#378640",
+  themes: {
+    light: {
+      primary: "#378640",
+    },
   },
 })

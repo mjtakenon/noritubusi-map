@@ -20,7 +20,7 @@
     "vue": "^2.6.11",
     "vue-router": "^3.3.4",
     "vue2-leaflet": "^2.5.2",
-    "vuetify": "^2.3.4",
+    "vuetify": "^2.4.0",
     "vuex": "^3.5.1",
     "yarn": "^1.22.4"
   },
@@ -41,14 +41,14 @@
     "eslint-plugin-vue": "^6.2.2",
     "fibers": "^5.0.0",
     "node-sass": "^4.14.1",
-    "sass": "^1.26.10",
-    "sass-loader": "9.0.2",
+    "sass": "^1.32.0",
+    "sass-loader": "^10.0.0",
     "stylus": "^0.54.7",
     "stylus-loader": "^3.0.1",
     "typescript": "~3.9.3",
     "vue-cli-plugin-vuetify": "~2.1.0",
     "vue-template-compiler": "^2.6.11",
-    "vuetify-loader": "^1.6.0"
+    "vuetify-loader": "^1.7.0"
   },
   "contributors": [
     {
