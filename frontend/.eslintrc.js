@@ -1,17 +1,20 @@
 module.exports = {
   root: true,
+
   env: {
     node: true,
-    browser: true
+    browser: true,
   },
+
   extends: ["plugin:vue/essential", "@vue/prettier"],
+
   rules: {
     "prettier/prettier": [
       "warn",
       {
         // 文末セミコロンに関するエラー
-        "semi": false,
-        "trailingComma": "es5",
+        semi: false,
+        trailingComma: "es5",
       },
     ],
     "no-console": process.env.NODE_ENV === "production" ? "error" : "off",
@@ -24,9 +27,12 @@ module.exports = {
     "no-unused-vars": "off",
 
     // Vue: import したが未使用のコンポーネントに対するエラー
-    "vue/no-unused-components": "off"
+    "vue/no-unused-components": "off",
   },
+
   parserOptions: {
-    parser: "babel-eslint"
-  }
-};
+    parser: "@typescript-eslint/parser",
+  },
+
+  extends: ["plugin:vue/essential", "@vue/prettier", "@vue/typescript"],
+}

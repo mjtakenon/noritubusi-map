@@ -26,10 +26,14 @@
   },
   "devDependencies": {
     "@types/lodash": "^4.14.168",
+    "@typescript-eslint/eslint-plugin": "^2.33.0",
+    "@typescript-eslint/parser": "^2.33.0",
     "@vue/cli-plugin-babel": "~4.5.11",
     "@vue/cli-plugin-eslint": "~4.5.11",
+    "@vue/cli-plugin-typescript": "~4.5.0",
     "@vue/cli-service": "~4.5.11",
     "@vue/eslint-config-prettier": "^6.0.0",
+    "@vue/eslint-config-typescript": "^5.0.2",
     "axios": "^0.21.1",
     "babel-eslint": "^10.1.0",
     "eslint": "^7.4.0",
@@ -41,13 +45,10 @@
     "sass-loader": "9.0.2",
     "stylus": "^0.54.7",
     "stylus-loader": "^3.0.1",
+    "typescript": "~3.9.3",
     "vue-cli-plugin-vuetify": "~2.1.0",
     "vue-template-compiler": "^2.6.11",
     "vuetify-loader": "^1.6.0"
-  },
-  "resolutions": {
-    "copy-webpack-plugin": "^5.1.2",
-    "selfsigned": "^1.10.8"
   },
   "contributors": [
     {
@@ -59,5 +60,9 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/mjtakenon/noritubusi-map"
+  },
+  "resolutions": {
+    "copy-webpack-plugin": "^5.1.2",
+    "selfsigned": "^1.10.8"
   }
 }
