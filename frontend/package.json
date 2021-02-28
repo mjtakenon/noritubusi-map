@@ -28,14 +28,15 @@
   "dependencies": {
     "leaflet": "^1.6.0",
     "lodash": "^4.17.20",
+    "typed-vuex": "^0.1.22",
     "vue": "^2.6.11",
     "vue-router": "^3.3.4",
     "vue2-leaflet": "^2.5.2",
     "vuetify": "^2.4.0",
-    "vuex": "^3.5.1",
-    "yarn": "^1.22.4"
+    "vuex": "^3.6.2"
   },
   "devDependencies": {
+    "@types/leaflet": "^1.5.23",
     "@types/lodash": "^4.14.168",
     "@typescript-eslint/eslint-plugin": "^2.33.0",
     "@typescript-eslint/parser": "^2.33.0",
