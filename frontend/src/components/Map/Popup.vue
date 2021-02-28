@@ -2,7 +2,7 @@
   <l-popup :options="{ autoPan: false, minWidth: 'auto' }" style="margin: 0;">
     <v-card elevation="0">
       <v-card-title class="font-weight-bold">
-        {{ this.name }}
+        {{ this.stationName }}
       </v-card-title>
       <v-card-text>
         <v-list dense style="max-height: 200px; overflow-y: auto;" class="py-0">
@@ -45,89 +45,96 @@
   </l-popup>
 </template>
 
-<script>
-import { LPopup } from "vue2-leaflet"
-import { getStationsInRailway } from "../../utils/api/search.js"
+<script lang="ts">
+import Vue, { PropType } from "vue"
 
-export default {
+import { LPopup } from "vue2-leaflet"
+
+import { getStationsInRailway } from "../../utils/api/search"
+
+import { Line } from "@/entities/Line"
+import { Pin } from "@/entities/Pin"
+import { Station } from "@/entities/Station"
+
+export default Vue.extend({
   components: {
     LPopup,
   },
   props: {
-    name: {
+    stationName: {
       type: String,
       required: true,
     },
     lines: {
-      type: Array,
+      type: Array as PropType<Array<Line>>,
       required: true,
-      validator(lines) {
-        return lines.every(line => line.hasOwnProperty("railwayName"))
-      },
+      default: () => [] as Array<Line>,
     },
   },
   data() {
     return {}
   },
   computed: {
-    isStationFromFilled() {
-      const station = this.$store.getters["TripRecord/stationFrom"]
+    isStationFromFilled(): boolean {
+      const station = this.$accessor.TripRecord.stationFrom
       return station.name !== ""
     },
   },
   methods: {
-    onClickRide(line) {
-      this.$store.commit("TripRecord/stationFrom", {
-        name: this.name,
+    onClickRide(line: Line) {
+      this.$accessor.TripRecord.setStationFrom({
+        name: this.stationName,
         id: line.stationId,
       })
       // TODO: IDをバックエンドから返してもらったら変える
-      this.$store.commit("TripRecord/railway", {
+      this.$accessor.TripRecord.setRailway({
         name: line.railwayName,
         id: 0,
       })
-      this.$store.commit("SuggestList/buildings", [])
+      this.$accessor.SuggestList.setBuildings([])
       this.setPinsOnRailway(line.railwayName)
     },
-    onClickGetOff(line) {
-      this.$store.commit("TripRecord/stationTo", {
-        name: this.name,
+    onClickGetOff(line: Line) {
+      this.$accessor.TripRecord.setStationTo({
+        name: this.stationName,
         id: line.stationId,
       })
       // TODO: IDをバックエンドから返してもらったら変える
-      this.$store.commit("TripRecord/railway", {
+      this.$accessor.TripRecord.setRailway({
         name: line.railwayName,
         id: 0,
       })
-      this.$store.commit("SuggestList/buildings", [])
+      this.$accessor.SuggestList.setBuildings([])
     },
-    companyNameClicked(val) {
-      console.log(val)
-    },
-    onClickRailwayName(railwayName) {
+    onClickRailwayName(railwayName: string) {
       console.log(railwayName)
       this.setPinsOnRailway(railwayName)
     },
-    setPinsOnRailway(railwayName) {
+    setPinsOnRailway(railwayName: string) {
       getStationsInRailway(railwayName)
-        .then(response => {
-          const pins = response.data.map(building => ({
-            latLng: [building.latitude, building.longitude],
-            popup: {
-              name: building.name,
-              // 乗車駅として選択されたピンと、それ以外の駅のピンで
-              // 表示される内容を分岐している
-              // TODO: 今後乗り換えの連続入力を考えるとbuildingを
-              // クエリを叩いてとってくる必要がある
-              lines: building.name !== this.name ? [building] : this.lines,
-            },
-            openPopup: building.name === this.name,
-          }))
-
-          this.$store.dispatch("Map/setPins", pins)
-        })
+        .then(stations =>
+          this.$accessor.Map.setPins(
+            stations.map(
+              (station: Station): Pin => ({
+                latLng: {
+                  lat: station.latitude,
+                  lng: station.longitude,
+                },
+                popup: {
+                  stationName: station.name,
+                  lines:
+                    station.name !== this.stationName
+                      ? [station as Line]
+                      : this.lines,
+                },
+                openPopup: station.railwayName === this.stationName,
+                focusPin: false,
+              })
+            )
+          )
+        )
         .catch(error => console.error(error))
     },
   },
-}
+})
 </script>

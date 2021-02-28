@@ -362,8 +362,8 @@ func saveSession(userID string, maxAge int, c echo.Context) error {
 type BuildingInfo struct {
 	BuildingID int64  `json:"buildingId"`
 	Name       string `json:"name"`
-	Latitude   string `json:"latitude"`
-	Longitude  string `json:"longitude"`
+	Latitude   float64 `json:"latitude"`
+	Longitude  float64 `json:"longitude"`
 	Lines      []Line `json:"lines"`
 }
 

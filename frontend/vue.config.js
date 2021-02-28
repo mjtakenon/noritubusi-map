@@ -1,6 +1,7 @@
 module.exports = {
   // 開発時に動的コンパイルを有効にするためのオプション
   runtimeCompiler: true,
+  transpileDependencies: ["vuetify"],
   // 開発環境とデプロイ環境でのURL共通化
   devServer: {
     proxy: {

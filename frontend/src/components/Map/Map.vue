@@ -3,101 +3,95 @@
     <!-- Leaflet.js マップ -->
     <l-map
       :center="center"
-      :options="mapOptions"
+      :options="{ zoomControl: false }"
       :zoom="zoom"
       @update:bounds="onUpdateBounds"
       @update:center="onUpdateCenter"
       @update:zoom="onUpdateZoom"
       class="l-map"
-      ref="mainMap"
+      ref="map"
     >
       <!-- Leaflet.js タイルレイヤー -->
-      <l-tile-layer :url="tileMapUrl"></l-tile-layer>
+      <l-tile-layer
+        url="https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png"
+      ></l-tile-layer>
       <!-- マーカー -->
       <Pin v-bind="pin" :key="idx" v-for="(pin, idx) in pins" />
     </l-map>
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from "vue"
+
 // Module: vue2-leaflet
 import { LMap, LTileLayer } from "vue2-leaflet"
-import Pin from "./Pin"
 import "leaflet/dist/leaflet.css"
 
-export default {
+import { Bounds } from "@/entities/Map"
+import { LatLng } from "@/entities/Common"
+import { Pin as PinObject } from "@/entities/Pin"
+
+import Pin from "@/components/Map/Pin.vue"
+
+export default Vue.extend({
   // 使用するコンポーネント
   components: {
     LMap,
     LTileLayer,
     Pin,
   },
-  // データ
   data() {
-    return {
-      // mapOptions: Leaflet.js Map のオプション
-      mapOptions: {
-        // ズーム操作用の「＋/−」ボタンは非表示に
-        zoomControl: false,
-      },
-
-      // tileMapUrl: Leaflet.js のタイルマップのURL
-      tileMapUrl: "https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png", // 地理院地図
-      // tileMapUrl: "http://{s}.tile.osm.org/{z}/{x}/{y}.png",                   // OpenStreetMap
-    }
+    return {}
   },
-  // 算出プロパティ
   computed: {
-    // [Vuex] zoom: マップのズーム率
     zoom: {
-      get() {
-        return this.$store.getters["Map/zoom"]
+      get(): number {
+        return this.$accessor.Map.zoom
       },
-      set(value) {
-        this.$store.dispatch("Map/updateZoom", value)
+      set(value: number) {
+        this.$accessor.Map.setZoom(value)
       },
     },
-    // [Vuex] center: マップの中心座標
     center: {
-      get() {
-        return this.$store.getters["Map/center"]
+      get(): LatLng {
+        return this.$accessor.Map.center
       },
-      set(value) {
-        this.$store.dispatch("Map/updateCenter", value)
+      set(value: LatLng) {
+        this.$accessor.Map.setCenter(value)
       },
     },
-    // [Vuex] bounds: マップの矩形座標(左上, 右下)
     bounds: {
-      get() {
-        return this.$store.getters["Map/bounds"]
+      get(): Bounds {
+        return this.$accessor.Map.bounds
       },
-      set(value) {
-        this.$store.dispatch("Map/updateBounds", value)
+      set(value: Bounds) {
+        this.$accessor.Map.setBounds(value)
       },
     },
-    // [Vuex] pins: マップ上にプロットされるマーカー
     pins: {
-      get() {
-        return this.$store.getters["Map/pins"]
+      get(): Array<PinObject> {
+        return this.$accessor.Map.pins
       },
-      set(value) {
-        return this.$store.dispatch("Map/pins", value)
+      set(value: Array<PinObject>) {
+        this.$accessor.Map.setPins(value)
       },
+    },
+    map(): LMap {
+      return this.$refs.map as LMap
     },
   },
   methods: {
     // ズームスケールが変更されたとき
-    onUpdateZoom(zoom) {
+    onUpdateZoom(zoom: number) {
       this.zoom = zoom
     },
 
     // 中心座標が変更されたとき
-    onUpdateCenter(center) {
+    onUpdateCenter(center: LatLng) {
       this.center = center
     },
-
-    // 表示範囲が変更されたとき
-    onUpdateBounds(bounds) {
+    onUpdateBounds(bounds: Bounds) {
       this.bounds = bounds
     },
   },
@@ -105,10 +99,20 @@ export default {
   mounted() {
     this.$nextTick(function() {
       // 初期位置・ズームの設定
-      this.bounds = this.$refs.mainMap.mapObject.getBounds()
+      const bounds = this.map.mapObject.getBounds()
+      this.bounds = {
+        _southWest: {
+          lat: bounds.getSouthWest().lat,
+          lng: bounds.getSouthWest().lng,
+        },
+        _northEast: {
+          lat: bounds.getNorthEast().lat,
+          lng: bounds.getNorthEast().lng,
+        },
+      }
     })
   },
-}
+})
 </script>
 
 <style lang="scss" scoped>

@@ -3,27 +3,29 @@
 // Vue, Vuex のインポート
 import Vue from "vue"
 import Vuex from "vuex"
+import { useAccessor } from "typed-vuex"
 
 // データストアのインポート
-import Sidebar from "./modules/Sidebar/Sidebar"
-import Map from "./modules/Map/Map"
+import Sidebar from "./modules/Sidebar"
+import Map from "./modules/Map"
 import SuggestList from "./modules/SearchBox/SuggestList"
 import TripRecord from "./modules/TripRecord"
 
-// Vue に Vuex の機能を統合
-Vue.use(Vuex)
-
-// Vuex Store
-const store = new Vuex.Store({
+const storePatterns = {
   // strict モード: 未定義の変数に対する代入処理を無効
   strict: true,
-  // 使用するモジュールを宣言
-  // 各モジュールへのデータアクセスは、ファイルパスのように参照
   modules: {
     Map,
     Sidebar,
     SuggestList,
     TripRecord,
   },
-})
+}
+
+Vue.use(Vuex)
+const store = new Vuex.Store(storePatterns)
+
+export const accessor = useAccessor(store, storePatterns)
 export default store
+
+Vue.prototype.$accessor = accessor

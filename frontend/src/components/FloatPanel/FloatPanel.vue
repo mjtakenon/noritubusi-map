@@ -5,17 +5,19 @@
   </div>
 </template>
 
-<script>
-import SearchBox from "./SearchBox.vue"
-import Ticket from "./Ticket.vue"
+<script lang="ts">
+import Vue from "vue"
 
-export default {
+import SearchBox from "@/components/FloatPanel/SearchBox.vue"
+import Ticket from "@/components/FloatPanel/Ticket.vue"
+
+export default Vue.extend({
   name: "FloatPanel",
   components: {
     SearchBox,
     Ticket,
   },
-}
+})
 </script>
 
 <style lang="scss" scoped>

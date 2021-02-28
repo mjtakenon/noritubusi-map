@@ -24,10 +24,18 @@
   </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import Vue from "vue"
+
+import { SuggestBuilding } from "@/entities/SuggestBuilding"
+
+type Data = {
+  isOverflowns: Array<boolean>
+}
+
+export default Vue.extend({
   props: {},
-  data() {
+  data(): Data {
     return {
       isOverflowns: [],
     }
@@ -36,35 +44,35 @@ export default {
     this.isOverflowns = [...Array(this.buildings.length).fill(false)]
   },
   watch: {
-    buildings(newBuildings, oldBuildings) {
+    buildings(_, oldBuildings: Array<SuggestBuilding>) {
       if (oldBuildings.length > 0) {
-        this.isOverflowns = this.$refs.scrollables.map(scrollable => {
+        const scrollables = this.$refs.scrollables as Array<HTMLSpanElement>
+        this.isOverflowns = scrollables.map((scrollable: HTMLSpanElement) => {
           const parent = scrollable.parentNode
-          return scrollable.clientWidth > parent.clientWidth
+          if (parent !== null && parent instanceof Element) {
+            return scrollable.clientWidth > parent.clientWidth
+          }
+          return false
         })
       }
     },
   },
   // メソッド
   methods: {
-    railwayNameJoinWithComma(building) {
+    railwayNameJoinWithComma(building: SuggestBuilding) {
       return building.lines.map(line => line.railwayName).join(", ")
     },
-    onClickSuggestedBuilding(building) {
-      this.$store.dispatch("Map/setPinAndFocus", building)
-      return
+    onClickSuggestedBuilding(building: SuggestBuilding) {
+      this.$accessor.Map.setPinAndFocus(building)
     },
   },
   // 算出プロパティ
   computed: {
-    buildings() {
-      return this.$store.getters["SuggestList/buildings"]
-    },
-    isLoading() {
-      return this.$store.getters["SuggestList/isLoading"]
+    buildings(): Array<SuggestBuilding> {
+      return this.$accessor.SuggestList.buildings
     },
   },
-}
+})
 </script>
 
 <style lang="scss" scoped>

@@ -17,21 +17,25 @@
   </v-card>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import Vue from "vue"
+
+import { RecordValue } from "@/entities/TripRecord"
+
+export default Vue.extend({
   name: "Ticket",
   computed: {
-    stationFrom() {
-      return this.$store.getters["TripRecord/stationFrom"]
+    stationFrom(): RecordValue {
+      return this.$accessor.TripRecord.stationFrom
     },
-    stationTo() {
-      return this.$store.getters["TripRecord/stationTo"]
+    stationTo(): RecordValue {
+      return this.$accessor.TripRecord.stationTo
     },
-    isFilledBothStations() {
+    isFilledBothStations(): boolean {
       return this.stationFrom.name !== "" && this.stationTo.name !== ""
     },
   },
-}
+})
 </script>
 
 <style lang="scss" scoped>
