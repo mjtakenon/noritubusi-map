@@ -1,13 +1,24 @@
 {
   "name": "noritubusi-map",
   "version": "0.1.0",
-  "private": true,
   "description": "This is the frontend application of 'noritubusi-map'",
   "author": {
     "name": "So Takeuchi",
     "email": "mjtakenon@gmail.com",
     "url": "https://github.com/mjtakenon"
   },
+  "contributors": [
+    {
+      "name": "Fumiya Endou",
+      "email": "fantom0779@gmail.com",
+      "url": "https://github.com/popunbom"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mjtakenon/noritubusi-map"
+  },
+  "private": true,
   "scripts": {
     "serve": "vue-cli-service serve src/main.js",
     "build": "vue-cli-service build src/main.js",
@@ -49,17 +60,6 @@
     "vue-cli-plugin-vuetify": "~2.1.0",
     "vue-template-compiler": "^2.6.11",
     "vuetify-loader": "^1.7.0"
-  },
-  "contributors": [
-    {
-      "name": "Fumiya Endou",
-      "email": "fantom0779@gmail.com",
-      "url": "https://github.com/popunbom"
-    }
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/mjtakenon/noritubusi-map"
   },
   "resolutions": {
     "copy-webpack-plugin": "^5.1.2",
