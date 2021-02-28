@@ -20,11 +20,11 @@
   },
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve src/main.js",
-    "build": "vue-cli-service build src/main.js",
-    "lint": "vue-cli-service lint src/main.js"
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
   },
-  "main": "src/main.js",
+  "main": "src/main.ts",
   "dependencies": {
     "leaflet": "^1.6.0",
     "lodash": "^4.17.20",
