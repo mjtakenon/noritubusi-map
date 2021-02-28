@@ -1,13 +1,13 @@
 module.exports = {
   root: true,
-
   env: {
     node: true,
     browser: true,
   },
-
-  extends: ["plugin:vue/essential", "@vue/prettier"],
-
+  extends: ["plugin:vue/essential", "@vue/prettier", "@vue/typescript"],
+  parserOptions: {
+    parser: "@typescript-eslint/parser",
+  },
   rules: {
     "prettier/prettier": [
       "warn",
@@ -29,10 +29,4 @@ module.exports = {
     // Vue: import したが未使用のコンポーネントに対するエラー
     "vue/no-unused-components": "off",
   },
-
-  parserOptions: {
-    parser: "@typescript-eslint/parser",
-  },
-
-  extends: ["plugin:vue/essential", "@vue/prettier", "@vue/typescript"],
 }
