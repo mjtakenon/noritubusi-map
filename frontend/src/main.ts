@@ -1,40 +1,29 @@
-// The Vue build version to load with the `import` command
-// (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from "vue"
-import App from "./components/App"
+import { Icon } from "leaflet"
 
-// Vuetify
-import vuetify from "./plugins/vuetify"
+import App from "@/components/App.vue"
+import vuetify from "./plugins/vuetify" // Vuetify
+import store from "./vuex" // Vuex
 
-// Vuex
-import store from "./vuex/store"
+// Import stylesheet
+import "./stylesheet/style.scss"
 
 Vue.config.productionTip = false
 
 // Icon fix
-import { Icon } from "leaflet"
-delete Icon.Default.prototype._getIconUrl
+type D = Icon.Default & {
+  _getIconUrl?: string
+}
+delete (Icon.Default.prototype as D)._getIconUrl
 Icon.Default.mergeOptions({
   iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
   iconUrl: require("leaflet/dist/images/marker-icon.png"),
   shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
 })
 
-// Import css
-import "./stylesheet/style.scss"
-
 // Vue インスタンスの生成
-const vm = new Vue({
-  // el: マウント先のDOMセレクタ
-  el: "#app",
-  // Vuex データストアを Vue インスタンスから参照できるように
+new Vue({
   store,
-  // Vue.use(Vuetify) のかわり
   vuetify,
-  // 使用するコンポーネントを宣言
-  components: {
-    App,
-  },
-  // マウントされるテンプレート
-  template: "<App/>",
-})
+  render: h => h(App),
+}).$mount("#app")

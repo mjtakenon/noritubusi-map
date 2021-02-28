@@ -1,11 +1,6 @@
 <template>
   <!-- サイドバーとして Navigation Drawer を利用 -->
-  <v-navigation-drawer
-    aboslute
-    temporary
-    v-bind="style.navigationDrawer"
-    v-model="isVisible"
-  >
+  <v-navigation-drawer aboslute temporary width="300px" v-model="isVisible">
     <v-container>
       <v-row
         class="text-xs-center"
@@ -16,100 +11,63 @@
           <UserInfo />
           <!-- サインアップ・ログイン用のボタン -->
           <div class="d-flex justify-space-around">
-            <v-btn @click="onClickSignup">アカウント登録</v-btn>
-            <v-btn @click="onClickLogin">ログイン</v-btn>
+            <v-btn @click="visibleForm = 'signup'">アカウント登録</v-btn>
+            <v-btn @click="visibleForm = 'login'">ログイン</v-btn>
           </div>
         </v-col>
       </v-row>
       <!-- ログイン処理通知用 -->
       <Alert />
       <!-- サインアップ用フォーム -->
-      <SignupForm v-if="isSignupVisible" />
+      <SignupForm v-if="visibleForm === 'signup'" />
       <!-- ログイン用フォーム -->
-      <LoginForm v-if="isLoginVisible" />
+      <LoginForm v-if="visibleForm === 'login'" />
     </v-container>
   </v-navigation-drawer>
 </template>
 
-<script>
-// 各 Vue コンポーネントのインポート
-import UserInfo from "./UserInfo.vue"
-import Alert from "./Alert.vue"
-import SignupForm from "./SignupForm.vue"
-import LoginForm from "./LoginForm.vue"
+<script lang="ts">
+import Vue from "vue"
 
-export default {
-  // 使用するコンポーネントを宣言
+import { FormType } from "@/entities/Sidebar"
+
+import UserInfo from "@/components/Sidebar/UserInfo.vue"
+import Alert from "@/components/Sidebar/Alert.vue"
+import SignupForm from "@/components/Sidebar/SignupForm.vue"
+import LoginForm from "@/components/Sidebar/LoginForm.vue"
+
+export default Vue.extend({
   components: {
     UserInfo,
     Alert,
     SignupForm,
     LoginForm,
   },
-  // データ
-  data() {
-    return {
-      // style: サイドバーのスタイル指定
-      // テンプレート上に書くと見通しが悪くなるので、分離
-      style: {
-        navigationDrawer: {
-          // サイドバーの横幅は、300px に
-          width: "300px",
-        },
-      },
-    }
-  },
-  // メソッド
   methods: {
-    // 「アカウント登録」ボタンのイベントハンドラ
-    onClickSignup() {
-      this.visibleForm = "signup"
-      console.log("onClickSignup")
-    },
-    // 「ログイン」ボタンのイベントハンドラ
-    onClickLogin() {
-      this.visibleForm = "login"
-      console.log("onClickLogin")
-    },
-    // 「ログアウト」ボタンのイベントハンドラ
     onClickLogout() {
-      this.$store.dispatch("Sidebar/UserInfo/logout")
-      // TODO: Cookieを消す?
-      console.log("onClickLogout")
+      this.$accessor.Sidebar.UserInfo.logout()
     },
   },
   computed: {
-    // [Vuex] isVisible: Sidebar の表示・非表示フラグ
     isVisible: {
-      get() {
-        return this.$store.getters["Sidebar/isVisible"]
+      get(): boolean {
+        return this.$accessor.Sidebar.isVisible
       },
-      set(value) {
-        this.$store.dispatch("Sidebar/isVisible", value)
+      set(value: boolean) {
+        this.$accessor.Sidebar.setVisible(value)
       },
     },
-    // [Vuex] visibleForm: 表示されているフォームの種別
     visibleForm: {
-      get() {
-        return this.$store.getters["Sidebar/visibleForm"]
+      get(): FormType {
+        return this.$accessor.Sidebar.visibleForm
       },
-      set(value) {
-        this.$store.dispatch("Sidebar/visibleForm", value)
+      set(value: FormType) {
+        this.$accessor.Sidebar.setVisibleForm(value)
       },
     },
-    // テンプレートで表示・非表示を切り替えるフラグ用
-    isFormVisible() {
-      return this.visibleForm === "signup" || this.visibleForm === "login"
-    },
-    isSignupVisible() {
-      return this.visibleForm === "signup"
-    },
-    isLoginVisible() {
-      return this.visibleForm === "login"
-    },
-    userInfo() {
-      return this.$store.getters["Sidebar/UserInfo/userInfo"]
+    isFormVisible(): boolean {
+      return this.$accessor.Sidebar.isFormVisible
     },
   },
-}
+})
 </script>

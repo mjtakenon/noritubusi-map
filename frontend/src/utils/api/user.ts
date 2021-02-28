@@ -1,5 +1,7 @@
-const axiosBase = require("axios")
-const axios = axiosBase.create({
+import { User, LoginInfo, isUser, SignupInfo } from "@/entities/User"
+import axios from "axios"
+
+const httpClient = axios.create({
   baseURL: "http://localhost:1323",
   headers: {
     "Content-Type": "application/json",
@@ -8,19 +10,23 @@ const axios = axiosBase.create({
   responseType: "json",
 })
 
-export async function signup(username, password) {
-  let params = new URLSearchParams()
-
+export async function signup(signupInfo: SignupInfo): Promise<User> {
   // クエリを投げる
-  return await axios
+  return await httpClient
     .post("/signup", {
-      userid: username,
-      password,
+      userid: signupInfo.username,
+      password: signupInfo.password,
     })
     .then(response => {
       // 201 Created なら成功なのでレスポンスを返す それ以外なら例外を投げる
       if (response.status === 201) {
-        return response
+        const responseData = response.data
+        if (isUser(responseData)) {
+          return responseData
+        } else {
+          console.error("Invalid response data structure")
+          throw response
+        }
       } else {
         throw response
       }
@@ -30,19 +36,23 @@ export async function signup(username, password) {
     })
 }
 
-export async function login(username, password) {
-  let params = new URLSearchParams()
-
+export async function login(loginInfo: LoginInfo): Promise<User> {
   // クエリを投げる
-  return await axios
+  return httpClient
     .post("/signin", {
-      userid: username,
-      password,
+      userid: loginInfo.username,
+      password: loginInfo.password,
     })
     .then(response => {
       // 200 OK なら成功なのでレスポンスを返す それ以外なら例外を投げる
       if (response.status === 200) {
-        return response
+        const responseData = response.data
+        if (isUser(responseData)) {
+          return responseData
+        } else {
+          console.error("Invalid response data structure")
+          throw response
+        }
       } else {
         throw response
       }

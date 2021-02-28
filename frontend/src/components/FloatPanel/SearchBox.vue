@@ -23,17 +23,26 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from "vue"
 import _ from "lodash"
-import { suggest } from "../../utils/api/search.js"
 
-import SuggestList from "./SuggestList"
+import { SuggestBuilding } from "@/entities/SuggestBuilding"
+import { searchBuildingsByKeyword } from "../../utils/api/search"
 
-export default {
+import SuggestList from "@/components/FloatPanel/SuggestList.vue"
+
+type Data = {
+  inputValue: string
+  isLoading: boolean
+  updateSuggestWithInterval: Function | null
+}
+
+export default Vue.extend({
   components: {
     SuggestList,
   },
-  data() {
+  data(): Data {
     return {
       inputValue: "",
       isLoading: false,
@@ -51,21 +60,24 @@ export default {
   },
   // メソッド
   methods: {
-    onInput(input) {
+    onInput(input: string) {
       // 変換が確定された時に二度イベントが
       // 発火されるのを抑止する
       if (this.inputValue == input) {
         return
       }
       this.inputValue = input
-      this.updateSuggestWithInterval()
+      if (this.updateSuggestWithInterval !== null) {
+        this.updateSuggestWithInterval()
+      }
     },
     onClickSwap() {
-      const stationFrom = this.$store.getters["TripRecord/stationFrom"]
-      const stationTo = this.$store.getters["TripRecord/stationTo"]
-
-      this.$store.commit("TripRecord/stationFrom", stationTo)
-      this.$store.commit("TripRecord/stationTo", stationFrom)
+      this.$accessor.TripRecord.setStationFrom(
+        this.$accessor.TripRecord.stationTo
+      )
+      this.$accessor.TripRecord.setStationTo(
+        this.$accessor.TripRecord.stationFrom
+      )
     },
     clearInput() {
       this.inputValue = ""
@@ -75,15 +87,16 @@ export default {
     },
     updateSuggest() {
       if (this.inputValue === null || this.inputValue.length === 0) {
-        this.$store.commit("SuggestList/buildings", [])
+        this.$accessor.SuggestList.setBuildings([])
         this.isLoading = false
         return
       }
-      this.$store.commit("SuggestList/keyword", this.inputValue)
+      this.$accessor.SuggestList.setKeyword(this.inputValue)
       this.isLoading = true
-      suggest(this.inputValue)
-        .then(response =>
-          this.$store.commit("SuggestList/buildings", response.data)
+
+      searchBuildingsByKeyword(this.inputValue)
+        .then(suggestBuildings =>
+          this.$accessor.SuggestList.setBuildings(suggestBuildings)
         )
         .catch(error => console.error(error))
         .finally(() => (this.isLoading = false))
@@ -93,30 +106,21 @@ export default {
         return
       }
       const first = this.buildings[0]
-      this.$store.dispatch("Map/setPinAndFocus", first)
+      this.$accessor.Map.setPinAndFocus(first)
     },
   },
-  // 算出プロパティ
   computed: {
-    // showSidebar は Vuex 上で状態管理をしているため、
-    // Vue の算出プロパティ機能を使ってゲッター／セッターを用意する
-    // Vuex インスタンスへは this.$store でアクセスできる
     showSidebar: {
-      get() {
-        // Vuex 上で管理しているデータには $store.getters でアクセスできる
-        // $store.getters['対象データへのパス']
-        return this.$store.getters["Sidebar/isVisible"]
+      get(): boolean {
+        return this.$accessor.Sidebar.isVisible
       },
-      set(value) {
-        // Vuex 上で管理しているデータに関する変更は $store.dispatch で行える
-        // dispatch は非同期処理なので、データ変更を「予約」する形になる
-        // $store.dispatch('対象データへのパス', '変更後の値')
-        this.$store.dispatch("Sidebar/isVisible", value)
+      set(value: boolean) {
+        this.$accessor.Sidebar.setVisible(value)
       },
     },
-    buildings() {
-      return this.$store.getters["SuggestList/buildings"]
+    buildings(): Array<SuggestBuilding> {
+      return this.$accessor.SuggestList.buildings
     },
   },
-}
+})
 </script>

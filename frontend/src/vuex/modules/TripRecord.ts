@@ -1,70 +1,65 @@
-const store = {
+import { getterTree, mutationTree } from "typed-vuex"
+import { TripRecord, RecordValue } from "@/entities/TripRecord"
+
+export type State = TripRecord
+
+const state = (): State => ({
+  stationFrom: {
+    id: 0,
+    name: "",
+  },
+  stationTo: {
+    id: 0,
+    name: "",
+  },
+  railway: {
+    id: 0,
+    name: "",
+  },
+})
+
+const getters = getterTree(state, {
+  isStationFromConfirmed(state): boolean {
+    return state.stationFrom.name.length != 0
+  },
+  isStationToConfirmed(state): boolean {
+    return state.stationTo.name.length != 0
+  },
+})
+
+const mutations = mutationTree(state, {
+  setStationFrom(state, station: RecordValue) {
+    state.stationFrom = station
+  },
+  setStationTo(state, station: RecordValue) {
+    state.stationTo = station
+  },
+  setRailway(state, railway: RecordValue) {
+    state.railway = railway
+  },
+  resetStationFrom(state) {
+    state.stationFrom = {
+      id: 0,
+      name: "",
+    }
+  },
+  resetStationTo(state) {
+    state.stationTo = {
+      id: 0,
+      name: "",
+    }
+  },
+  resetRailway(state) {
+    state.railway = {
+      id: 0,
+      name: "",
+    }
+  },
+})
+
+export default {
   namespaced: true,
-
-  // ステート(データ)
-  state: {
-    stationFrom: {
-      id: 0,
-      name: "",
-    },
-    stationTo: {
-      id: 0,
-      name: "",
-    },
-    railway: {
-      id: 0,
-      name: "",
-    },
-  },
-
-  // ゲッター
-  getters: {
-    stationFrom(state) {
-      return state.stationFrom
-    },
-    stationTo(state) {
-      return state.stationTo
-    },
-    railway(state) {
-      return state.railway
-    },
-    isStationFromConfirmed(state) {
-      return state.stationFrom.name.length != 0
-    },
-    isStationToConfirmed(state) {
-      return state.stationTo.name.length != 0
-    },
-  },
-
-  // ミューテーション(セッター)
-  mutations: {
-    stationFrom(state, station) {
-      state.stationFrom = station
-    },
-    stationTo(state, station) {
-      state.stationTo = station
-    },
-    railway(state, railway) {
-      state.railway = railway
-    },
-    resetStationFrom(state) {
-      state.stationFrom = {
-        id: 0,
-        name: "",
-      }
-    },
-    resetStationTo(state) {
-      state.stationTo = {
-        id: 0,
-        name: "",
-      }
-    },
-    resetRailway(state) {
-      state.railway = {
-        id: 0,
-        name: "",
-      }
-    },
-  },
-}
-export default store
+  state,
+  getters,
+  mutations,
+} // as "typed-vuex/NuxtStore"

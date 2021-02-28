@@ -1,24 +1,28 @@
-const store = {
-  namespaced: true,
-  state: {
-    buildings: [],
-    keyword: "",
-  },
-  getters: {
-    buildings(state) {
-      return state.buildings
-    },
-    keyword(state) {
-      return state.keyword
-    },
-  },
-  mutations: {
-    buildings(state, buildings) {
-      state.buildings = buildings
-    },
-    keyword(state, keyword) {
-      state.keyword = keyword
-    },
-  },
+import { mutationTree } from "typed-vuex"
+
+import { SuggestBuilding } from "@/entities/SuggestBuilding"
+
+export type State = {
+  buildings: Array<SuggestBuilding>
+  keyword: string
 }
-export default store
+
+const state = (): State => ({
+  buildings: [],
+  keyword: "",
+})
+
+const mutations = mutationTree(state, {
+  setBuildings(state, buildings: Array<SuggestBuilding>) {
+    state.buildings = buildings
+  },
+  setKeyword(state, keyword: string) {
+    state.keyword = keyword
+  },
+})
+
+export default {
+  namespaced: true,
+  state,
+  mutations,
+}

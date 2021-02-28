@@ -4,26 +4,28 @@
   </l-marker>
 </template>
 
-<script>
-import { LMarker } from "vue2-leaflet"
-import Popup from "./Popup"
+<script lang="ts">
+import Vue, { PropType } from "vue"
 
-export default {
+import { LMarker } from "vue2-leaflet"
+
+import { LatLng } from "@/entities/Common"
+import { Popup as PopupObject } from "@/entities/Pin"
+
+import Popup from "@/components/Map/Popup.vue"
+
+export default Vue.extend({
   components: {
     LMarker,
     Popup,
   },
   props: {
     latLng: {
-      type: Array,
+      type: Object as PropType<LatLng>,
       required: true,
-      validator(latLng) {
-        // 配列長が2(緯度, 軽度) かつ 全要素が Number であること
-        return latLng.length === 2 && latLng.every(elem => !isNaN(elem))
-      },
     },
     popup: {
-      type: Object,
+      type: Object as PropType<PopupObject>,
       required: true,
     },
     openPopup: {
@@ -40,24 +42,31 @@ export default {
   data() {
     return {}
   },
+  computed: {
+    marker(): LMarker {
+      return this.$refs.marker as LMarker
+    },
+  },
   methods: {
     updateMap() {
       if (this.openPopup) {
-        this.$refs.marker.mapObject.openPopup()
+        this.marker.mapObject.openPopup()
+      } else {
+        this.marker.mapObject.closePopup()
       }
       if (this.focusPin) {
         this.focusAtPin()
       }
     },
     focusAtPin() {
-      this.$store.dispatch("Map/updateCenter", {
-        lat: this.latLng[0],
-        lng: this.latLng[1],
-      })
+      this.$accessor.Map.setCenter(this.latLng)
     },
   },
   updated() {
+    if (!this.openPopup) {
+      this.marker.mapObject.closePopup()
+    }
     this.updateMap()
   },
-}
+})
 </script>

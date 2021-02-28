@@ -1,5 +1,3 @@
-<style scoped></style>
-
 <template>
   <v-list>
     <v-list-item>
@@ -22,26 +20,27 @@
         </v-list-item-avatar>
         <!-- ユーザー名表示 -->
         <v-list-item-content>
-          <v-list-item-title>{{ userInfo.userId }}</v-list-item-title>
+          <v-list-item-title>{{ userName }}</v-list-item-title>
         </v-list-item-content>
       </template>
     </v-list-item>
   </v-list>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import Vue from "vue"
+
+export default Vue.extend({
   data() {
     return {}
   },
   computed: {
-    // [Vuex] isLoggedIn: ログイン状態の確認
-    isLoggedIn() {
-      return this.$store.getters["Sidebar/UserInfo/isLoggedIn"]
+    isLoggedIn(): boolean {
+      return this.$accessor.Sidebar.UserInfo.isLoggedIn
     },
-    userInfo() {
-      return this.$store.getters["Sidebar/UserInfo/userInfo"]
+    userName(): string | undefined {
+      return this.$accessor.Sidebar.UserInfo.userInfo?.userId
     },
   },
-}
+})
 </script>

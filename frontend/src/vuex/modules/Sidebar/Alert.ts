@@ -1,59 +1,48 @@
 // Vuex::Sidebar::Alert -- ログイン処理時のメッセージモーダル
+import { actionTree, mutationTree } from "typed-vuex"
 
-const store = {
-  namespaced: true,
+import { Alert, AlertType } from "@/entities/Alert"
 
-  // データストア
-  // 複数のインスタンスが生成されるモジュールの場合、state を
-  // オブジェクトではなく関数として定義する必要がある。
-  // そうしないと、すべてのインスタンスで state が共有されてしまう
-  state() {
-    return {
-      isVisible: false,
-      type: "info",
-      message: "テストメッセージです",
-    }
+export type State = Alert
+
+const state = (): State => ({
+  isVisible: false,
+  type: "info",
+  message: "テストメッセージです",
+})
+
+const mutations = mutationTree(state, {
+  setVisible(state, payload: boolean) {
+    state.isVisible = payload
   },
-
-  // ゲッター
-  getters: {
-    isVisible(state) {
-      return state.isVisible
-    },
-    message(state) {
-      return state.message
-    },
-    type(state) {
-      return state.type
-    },
+  setMessage(state, payload: string) {
+    state.message = payload
   },
-
-  // ミューテーション
-  mutations: {
-    isVisible(state, payload) {
-      state.isVisible = payload
-    },
-    message(state, payload) {
-      state.message = payload
-    },
-    type(state, payload) {
-      state.type = payload
-    },
+  setType(state, payload: AlertType) {
+    state.type = payload
   },
+})
 
-  // アクション
-  actions: {
-    setVisible({ commit }, payload) {
-      commit("isVisible", payload)
+const actions = actionTree(
+  { state, mutations },
+  {
+    setVisible({ commit }, payload: boolean) {
+      commit("setVisible", payload)
     },
-    setData({ commit }, payload) {
-      commit("message", payload.message)
-      commit("type", payload.type)
-      commit("isVisible", true)
+    setData({ commit }, payload: { message: string; type: AlertType }) {
+      commit("setMessage", payload.message)
+      commit("setType", payload.type)
+      commit("setVisible", true)
     },
     close({ commit }) {
-      commit("isVisible", false)
+      commit("setVisible", false)
     },
-  },
+  }
+)
+
+export default {
+  namespaced: true,
+  state,
+  mutations,
+  actions,
 }
-export default store

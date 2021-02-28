@@ -8,30 +8,30 @@
   >
 </template>
 
-<script>
-export default {
-  // データ
+<script lang="ts">
+import Vue from "vue"
+
+import { AlertType } from "@/entities/Alert"
+
+export default Vue.extend({
   data() {
     return {}
   },
-  // 算出プロパティ
   computed: {
-    // セッター, ゲッター両方書く場合は、Object として定義
     isVisible: {
-      get() {
-        return this.$store.getters[`Sidebar/Alert/isVisible`]
+      get(): boolean {
+        return this.$accessor.Sidebar.Alert.isVisible
       },
-      set(value) {
-        this.$store.dispatch(`Sidebar/Alert/setVisible`, value)
+      set(value: boolean) {
+        this.$accessor.Sidebar.Alert.setVisible(value)
       },
     },
-    // ゲッターのみでいい場合は、関数として定義
-    message() {
-      return this.$store.getters[`Sidebar/Alert/message`]
+    message(): string {
+      return this.$accessor.Sidebar.Alert.message
     },
-    type() {
-      return this.$store.getters[`Sidebar/Alert/type`]
+    type(): AlertType {
+      return this.$accessor.Sidebar.Alert.type
     },
   },
-}
+})
 </script>
