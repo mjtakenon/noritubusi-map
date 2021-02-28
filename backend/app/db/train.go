@@ -11,8 +11,8 @@ import (
 type BuildingInfo struct {
 	Id                   int64  `db:"id" json:"id"`
 	Name                 string `db:"name" json:"name"`
-	Latitude             string `db:"lat" json:"latitude"`
-	Longitude            string `db:"long" json:"longitude"`
+	Latitude             float64 `db:"lat" json:"latitude"`
+	Longitude            float64 `db:"long" json:"longitude"`
 	ConnectedRailwaysNum int64  `db:"connected_railways_num" json:"connectedRailwaysNum"`
 }
 
@@ -25,8 +25,8 @@ type StationInfo struct {
 	BuildingId     int64  `db:"building_id" json:"buildingId"`
 	StationId      int64  `db:"station_id" json:"stationId"`
 	Name           string `db:"station_name" json:"name"`
-	Latitude       string `db:"lat" json:"latitude"`
-	Longitude      string `db:"long" json:"longitude"`
+	Latitude       float64 `db:"lat" json:"latitude"`
+	Longitude      float64 `db:"long" json:"longitude"`
 	RailwayName    string `db:"railway_line_name" json:"railwayName"`
 	OrderInRailway int64  `db:"num_in_railway" json:"orderInRailway"`
 }
