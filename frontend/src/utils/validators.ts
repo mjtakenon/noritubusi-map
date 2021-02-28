@@ -18,7 +18,7 @@ export function createInputValidationRules(
 
 export const hasAnyValue: Validator = {
   validate(value: string): boolean {
-    return typeof value === "string" && /^\s*$/.test(value)
+    return typeof value === "string" && !/^\s*$/.test(value)
   },
   errorMessage: "このフィールドは必須です",
 }
